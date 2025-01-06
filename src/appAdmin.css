@@ -1,0 +1,417 @@
+.acc-close-icon-pos {
+    float: left;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    opacity: 0.7;
+}
+
+.acc-close-icon-pos-right {
+    position: absolute;
+    right: 25px;
+    top: 15px;
+    /* float: right; */
+    /* padding-top: 15px;
+    padding-bottom: 15px;
+    padding-right: 15px; */
+    opacity: 0.7;
+}
+
+.show-nav-left {
+    visibility: visible;
+    opacity: 1;
+    transition: all 150ms ease, flex-basis 150ms;
+}
+
+.hide-nav-left {
+    visibility: hidden;
+    opacity: 0;
+    width: 0 !important;
+    overflow: hidden;
+    transition: all 150ms ease, flex-basis 150ms;
+}
+
+.felx-100 {
+    width: 100%;
+}
+
+.flex-250 {
+    width: 240px;
+}
+
+.flex-100-250 {
+    width: calc(100% - 240px);
+}
+
+.show-nav-right {
+    visibility: visible;
+    opacity: 1;
+    transition: all 150ms ease, flex-basis 150ms;
+}
+
+.hide-nav-right {
+    visibility: hidden;
+    opacity: 0;
+    width: 0 !important;
+    overflow: hidden;
+    transition: all 150ms ease, flex-basis 150ms;
+    max-height: 0px;
+}
+
+.hide-nav-right-if-navv-acc {
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+.acc-nav-line {
+    border-bottom: 1px solid green;
+}
+
+a {
+    text-decoration: none;
+}
+
+.app-top-nav {
+    height: 65px;
+    width: calc(100% - 240px);
+    left: 240px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.app-top-nav-medium {
+    height: 55px;
+    width: calc(100% - 240px);
+    left: 240px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.app-top-nav-small {
+    height: 55px;
+    width: 100%;
+    left: 0px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.app-top-nav-any {
+    position: fixed;
+    top: 0px;
+    z-index: 10;
+
+    /* padding-left: 0px;
+    padding-right: 0px; */
+}
+
+.app-left-nav {
+    position: fixed;
+    height: 100vh;
+    width: 240px;
+    top: 0px;
+    bottom: 0px;
+    overflow: auto;
+    z-index: 10;
+
+}
+
+.app-left-nav-small {
+    position: fixed;
+    height: calc(100vh - 65px);
+    width: 100%;
+    top: 55px;
+    bottom: 0px;
+    overflow: auto;
+    z-index: 10;
+}
+
+.app-main {
+    width: calc(100% - 240px);
+    margin-left: 240px;
+    margin-top: 65px;
+    position: relative;
+}
+
+.app-main-small {
+    width: 100%;
+    margin-top: 55px;
+    position: relative;
+}
+
+.app-main-trade {
+    width: calc(100% - 240px);
+    margin-left: 240px; 
+    position: relative;
+}
+
+.app-main-trade-small {
+    width: 100%; 
+    position: relative;
+}
+
+.hide-css {
+    display: none;
+}
+
+.hide-visibility {
+    visibility: hidden;
+    max-height: 1px;
+    overflow: hidden;
+}
+
+.text-as-div {
+    cursor: pointer !important;
+}
+
+.text-as-div input {
+    cursor: pointer !important;
+}
+
+.tox:not([dir=rtl]) {
+    direction: ltr;
+    text-align: left;
+    outline: 0 !important;
+    border: none;
+}
+
+
+
+
+
+
+.scrollbar-style {
+    /* width */
+    scrollbar-width: thin;
+    /* Firefox */
+    scrollbar-color: #888 #f1f1f1;
+    /* Firefox */
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 5px;
+    }
+
+    /* Handle on hover */
+    &::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+}
+
+
+.TableCss-wrapper {
+    overflow-x: auto;
+}
+
+.TableCss0 {
+    width: auto;
+    max-width: 100%;
+    min-width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    position: relative;
+}
+
+.TableCss0 th,
+.TableCss0 td {
+    text-align: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.TableCss {
+    width: auto;
+    max-width: 100%;
+    min-width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    position: relative;
+}
+
+.TableCss th,
+.TableCss td {
+    text-align: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.TableCss th:nth-child(n + 4),
+.TableCss td:nth-child(n + 4) {
+    position: relative;
+}
+
+.TableCss th {
+    padding: 15px !important;
+}
+
+.TableCss-Channels th:first-child,
+.TableCss-Channels td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
+}
+
+.TableCss-Channels th:nth-child(2),
+.TableCss-Channels td:nth-child(2) {
+    position: sticky;
+    left: 70px;
+    z-index: 1;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.TableCss-Channels th:last-child,
+.TableCss-Channels td:last-child {
+
+    position: sticky;
+    z-index: 2;
+    width: 100px;
+    max-width: 100px;
+    min-width: 100px;
+    right: 0;
+}
+
+
+
+
+.TableCss-Deals th:first-child,
+.TableCss-Deals td:first-child {
+    position: sticky;
+    left: 0px;
+    z-index: 1;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.TableCss-Deals th:last-child,
+.TableCss-Deals td:last-child {
+
+    position: sticky;
+    z-index: 2;
+    width: 100px;
+    max-width: 100px;
+    min-width: 100px;
+    right: 0;
+}
+
+
+
+.TableCss-Shares th:first-child,
+.TableCss-Shares td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
+}
+
+.TableCss-Shares th:nth-child(2),
+.TableCss-Shares td:nth-child(2) {
+    position: sticky;
+    left: 70px;
+    z-index: 1;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.TableCss-Shares th:last-child,
+.TableCss-Shares td:last-child {
+
+    position: sticky;
+    z-index: 2;
+    width: 100px;
+    max-width: 100px;
+    min-width: 100px;
+    right: 0;
+}
+
+.TableCss-Companies th:first-child,
+.TableCss-Companies td:first-child {
+    position: sticky;
+    left: 0px;
+    z-index: 1;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* .TableCss-Companies th:nth-child(2),
+.TableCss-Companies td:nth-child(2) {
+    position: sticky;
+    left: 70px;
+    z-index: 1;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+} */
+
+.TableCss-Companies th:last-child,
+.TableCss-Companies td:last-child {
+
+    position: sticky;
+    z-index: 2;
+    width: 100px;
+    max-width: 100px;
+    min-width: 100px;
+    right: 0;
+}
+
+.flex-stretch-parent {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.flex-stretch-child1 {
+    flex-grow: 0;
+}
+
+.flex-stretch-child2 {
+    flex-grow: 1;
+}
+
+
+
+
+@keyframes rotate {
+
+    0%,
+    100% {
+        /* width:0%; */
+        /* transform: rotate(-5deg); */
+        opacity: 0.4;
+    }
+
+    50% {
+        /* width: 100%; */
+        /* transform: rotate(5deg); */
+        opacity: 1;
+    }
+}
+
+.rotating-ai-icon {
+    animation: rotate 3s linear infinite;
+}
+
+.hash-parent:hover .hash-underline-child {
+    text-decoration: underline;
+}
+.hash-parent .hash-underline-child {
+    text-decoration: none;
+}

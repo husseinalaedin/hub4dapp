@@ -1,0 +1,10 @@
+{
+  "tool": {
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "please_switch_themes": "**Please toggle between the dark and light themes to see how the editor content appears in each.",
+    "save": "Save",
+    "search": "Search",
+    "theme_toggle": "Toggle Theme"
+  }
+}

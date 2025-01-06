@@ -1,0 +1,5 @@
+.mce-toolbar-grp {
+    background-color: blue !important;
+    /* uses !important or override .mce-panel background-color/image */
+    background-image: none !important;
+}
