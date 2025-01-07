@@ -320,7 +320,10 @@ export const AppMain = () => {
             </Box>
           </Center>
         )}
-        <Outlet />
+        <Box pos="relative">
+          <Outlet />
+        </Box>
+        
       </AppShell.Main>
     </AppShell>
   );

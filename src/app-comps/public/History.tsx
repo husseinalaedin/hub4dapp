@@ -23,13 +23,19 @@ export const History = () => {
     dispatch(changeActive("history"));
   }, []);
 
-  let [data, setData] = useState(() => {
-    return HIST.history;
-  });
-  const navigate = useNavigate();
+  const [data, setData] = useState(HIST.history);
   useEffect(() => {
-    setData(HIST.history);
-  }, [HIST.history]);
+    const handleStorageChange = () => {
+      setData(HIST.history);
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+  // useEffect(() => {
+  //   setData(HIST.history);
+  // }, [HIST.history]);
 
   return (
     <>
@@ -66,7 +72,7 @@ export const History = () => {
           {small && <>{t("channel_info", "Channels information")}</>}
           {!small && (
             <Grid gutter="md" pb={0} mb={0}>
-              <Grid.Col  span={{base:12}}>
+              <Grid.Col span={{ base: 12 }}>
                 <Text>{t("link", "Link")}</Text>
               </Grid.Col>
               {/* <Grid.Col xs={12} sm={6} md={4}>
@@ -101,7 +107,7 @@ export const History = () => {
               }}
             >
               <Grid gutter={2}>
-                <Grid.Col span={{base:12}}>
+                <Grid.Col span={{ base: 12 }}>
                   <Box></Box>
                   <Box
                     className={classesG.titleHref}

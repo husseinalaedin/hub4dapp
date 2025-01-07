@@ -3,9 +3,7 @@ import { IconX, IconCheck, IconAlertCircle, IconInfoCircleFilled } from "@tabler
 
 import { useTranslation } from "react-i18next";
 import { notifications } from '@mantine/notifications';
-import { useSelector } from "react-redux";
-import { selectLarge, selectMedium, selectSmall } from "../store/features/ScreenStatus";
-import { resolve } from "path";
+ 
 import { nanoid } from "nanoid";
 
 export class G {

@@ -150,7 +150,9 @@ export const AppThemeProvider = ({ children }:any) => {
     size: "md",
     mt: "0",
   };
-
+let default_loader={
+  type:"bars" 
+}
   if (medium) {
     // headingSizes = {
     //     h1: { fontSize: 18 },
@@ -277,6 +279,9 @@ export const AppThemeProvider = ({ children }:any) => {
     },
     Spoiler: {
       defaultProps: default_size_spoiler,
+    },
+    Loader: {
+      defaultProps: default_loader,
     },
   };
   // export const screenBreaks = {

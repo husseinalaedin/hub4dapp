@@ -252,7 +252,7 @@ export const AppHeaderAI = (prop) => {
   const opened = useSelector(selectOpened);
   const dispatch = useDispatch();
 
-  const [drawerOpened, { open, close }] = useDisclosure(false);
+  const [drawerOpened] = useDisclosure(false);
   const enabled = mouseIn || (opened && (small || medium || large));
   useEffect(() => {
     setMouseIn(false);

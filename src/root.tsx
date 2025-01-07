@@ -2,13 +2,15 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration }
 import "./appAdmin.css"; 
 import "./Editor.css"; 
 import "@mantine/tiptap/styles.css";
+import "@mantine/notifications/styles.css";
+import "@mantine/carousel/styles.css";
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>My App</title>
+        <title>Hub4d</title>
         <Meta />
         <Links />
       </head>
