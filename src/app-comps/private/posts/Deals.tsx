@@ -15,16 +15,14 @@ import {
   Title,
   useMantineTheme,
   Textarea,
-  Alert, 
+  Alert,
   Card,
   Highlight,
   MultiSelect,
   Stack,
   Loader,
- 
   rem,
   ScrollArea,
-  
   SimpleGrid,
   Divider,
   Table,
@@ -33,15 +31,15 @@ import {
 
 import { useForm } from "@mantine/form";
 import {
-  IconAlertCircle, 
+  IconAlertCircle,
   IconTimeDurationOff,
   IconDots,
-  IconEdit, 
+  IconEdit,
   IconFileAnalytics,
   IconInfinity,
   IconPlus,
   IconShare,
-  IconRotate2, 
+  IconRotate2,
   IconInfoSquareRoundedFilled,
   IconMessageCircleShare,
 } from "@tabler/icons-react";
@@ -93,7 +91,10 @@ import { D } from "../../../global/Date";
 import { Pages } from "../../../hooks/usePage";
 import { SearchPannel } from "../../../global/SearchPannel";
 
-import { renderWtsWtbDropVOption, WtsWtbDropV } from "../../../global/WtsWtbDropV";
+import {
+  renderWtsWtbDropVOption,
+  WtsWtbDropV,
+} from "../../../global/WtsWtbDropV";
 import { ExpiredSelect } from "../../../global/ExpiredSelect";
 import { useHover } from "@mantine/hooks";
 import { CardIn } from "../../../global/CardIn";
@@ -106,9 +107,7 @@ import {
 
 import { useDbData } from "../../../global/DbData";
 import { MemoEditorApp } from "../../../global/AppEditor";
-import { 
-  HashValue4Boardd2,
-} from "../../../global/global-comp/Hashtags";
+import { HashValue4Boardd2 } from "../../../global/global-comp/Hashtags";
 import {
   ImagesZoneDeals,
   MAX_NB_IMAGES,
@@ -120,8 +119,6 @@ import { useAppTheme } from "../../../hooks/useAppTheme";
 import { ClearButton } from "../../../global/ClearButton";
 import { useAuth } from "../../../providers/AuthProvider";
 import { closeModal, modals } from "@mantine/modals";
-
- 
 
 export const SHARES_TYPE = {
   SHARE_BY_DEFAULT: "share_by_default",
@@ -380,7 +377,7 @@ export const CompanyDeals = () => {
       {/* {(isLoadingPut) && <LoadingOverlay visible={isLoading || isLoadingPut} overlayBlur={0.7} />} */}
 
       <AppHeader title={t("my_deal_title", "My Deals")}>
-        <Group mt="xs" justify="right" gap="xs">
+        <Group justify="right" gap="xs">
           <Tooltip
             label={t("share_by_default_channel", "Share by default channel.")}
           >
@@ -547,7 +544,7 @@ export const CompanyDeals = () => {
                           }
                         >
                           <Stack gap={0} justify="space-between" h={"100%"}>
-                            <Group justify="apart" mb="sm">
+                            <Group justify="space-between" mb="sm">
                               <Group
                                 justify="left"
                                 mr={75}
@@ -614,7 +611,6 @@ export const CompanyDeals = () => {
                                   right: 5,
                                   top: 5,
                                 }}
-                               
                               >
                                 <DealMenu
                                   item={element}
@@ -630,7 +626,7 @@ export const CompanyDeals = () => {
 
                             {!showImageC() && (
                               <>
-                                <Group justify="apart" mb="md">
+                                <Group justify="space-between" mb="md">
                                   <Stack gap={2}>
                                     <Text fz="sm" style={{ opacity: 0.7 }}>
                                       {" "}
@@ -733,7 +729,7 @@ export const CompanyDeals = () => {
                                       </Text>
                                     }
                                   />
-                                  <Group justify="apart" mr="md">
+                                  <Group justify="space-between" mr="md">
                                     <Stack
                                       fw="bold"
                                       m={0}
@@ -1097,7 +1093,7 @@ export const AddEditDeal0 = () => {
         return dataGet[0].pictures;
       });
       setMain_pic(dataGet[0].main_pic);
-      form.resetDirty()
+      form.resetDirty();
     }
   }, [errorMessageGet, succeededGet]);
 
@@ -1105,6 +1101,7 @@ export const AddEditDeal0 = () => {
     let errorMsg = errorMessageDeal || errorMessagePut;
 
     if (succeededDeal || succeededPut) {
+      form.resetDirty();
       let succeededMsg = dataDeal?.message || dataPut?.message;
       succeed(succeededMsg);
       if (succeededDeal) navigate("../mydeals", { replace: true });
@@ -1168,7 +1165,6 @@ export const AddEditDeal0 = () => {
     };
   }, [unsavedChanges]);
 
- 
   const save = () => {
     // e.preventDefault();
     // if (bodyBeforeSave == '') {
@@ -1195,10 +1191,10 @@ export const AddEditDeal0 = () => {
   });
   // const [currentHash, setCurrentHash] = useState<any>('')
   // const [searchValue, onSearchChange] = useState<any>('');
-let blocker = useBlocker(
-  ({ currentLocation, nextLocation }: any) =>
-    !!form.isDirty() && currentLocation.pathname !== nextLocation.pathname
-);
+  let blocker = useBlocker(
+    ({ currentLocation, nextLocation }: any) =>
+      !!form.isDirty() && currentLocation.pathname !== nextLocation.pathname
+  );
   return (
     <>
       <AppHeader
@@ -1207,7 +1203,7 @@ let blocker = useBlocker(
           navigate("../mydeals", { replace: true });
         }}
       >
-        <Group mt="xs" justify="right" gap="xs">
+        <Group justify="right" gap="xs">
           <Button
             variant="gradient"
             gradient={{ from: "teal", to: "blue", deg: 60 }}
@@ -1426,7 +1422,7 @@ let blocker = useBlocker(
                 </Group>
               </Tooltip>
             </Grid.Col>
-            
+
             <Grid.Col span={{ base: 12 }}>
               {
                 <>
@@ -1780,7 +1776,7 @@ export const DealSearch = (props) => {
                     </Grid.Col> */}
 
           <Grid.Col>
-            <Group justify="apart" gap={4}>
+            <Group justify="space-between" gap={4}>
               <Box maw={"calc(50% - 4px)"}>
                 <HoursRangeSelect
                   zIndex={501}
@@ -1847,8 +1843,7 @@ export const NumericEntry = ({ initVal, form, formKey, ...others }) => {
     />
   );
 };
- 
- 
+
 const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
   const small = useSelector(selectSmall);
   const medium = useSelector(selectMedium);
@@ -1863,7 +1858,7 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
   const rows = data.map((item) => {
     const selected = selection.includes(item.id);
     return (
-      <tr
+      <Table.Tr
         key={item.id}
         className={
           selected
@@ -1875,7 +1870,7 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
             : ""
         }
       >
-        <td>
+        <Table.Td>
           <Box
             className={`${
               item.deal_dir === "I"
@@ -1911,13 +1906,13 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
               </Highlight>
             </Text>
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text style={{ fontSize: "0.8rem", color: "gray" }}>
             {D.utc_to_distance(item.last_posted_on)}
           </Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text
             style={{ fontSize: "0.8rem" }}
             c={item.expired == "X" ? "red" : "gray.6"}
@@ -1934,8 +1929,8 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
                         {t('expired', 'Expired')}
                     </Text>
                     } */}
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Group justify="right" gap={0} c="blue.5" fw="bolder">
             <NumericFormat
               decimalScale={0}
@@ -1947,33 +1942,33 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
             />
             <Text>x</Text>
           </Group>
-        </td>
-        {/* <td style={{ paddingRight: "2px" }}>
+        </Table.Td>
+        {/* <Table.Td style={{ paddingRight: "2px" }}>
                     <Group justify='right' gap={0}>
                        
                         <NumericFormat decimalScale={0} readOnly={true} displayType="text" value={`${item.quantity}`} thousandSeparator={thousandSep()} decimalSeparator={decimalSep()} />
 
                     </Group>
-                </td> */}
-        {/* <td style={{ padding: "0px", margin: "0px", width: "0px" }}>
+                </Table.Td> */}
+        {/* <Table.Td style={{ padding: "0px", margin: "0px", width: "0px" }}>
                     {item.uom}
-                </td> */}
-        {/* <td style={{ paddingRight: "2px" }}>
+                </Table.Td> */}
+        {/* <Table.Td style={{ paddingRight: "2px" }}>
                     <Group justify='right' gap={0}>
                         
                         <NumericFormat decimalScale={1} readOnly={true} displayType="text" value={`${item.price}`} thousandSeparator={thousandSep()} decimalSeparator={decimalSep()} />
 
                     </Group>
-                </td> */}
-        {/* <td style={{ padding: "0px", margin: "0px", paddingRight: "5px", width: "0px" }}>
+                </Table.Td> */}
+        {/* <Table.Td style={{ padding: "0px", margin: "0px", paddingRight: "5px", width: "0px" }}>
                     {item.curr_symbol}
-                </td> */}
-        <td>
+                </Table.Td> */}
+        <Table.Td>
           <Text c={item.privacy_id == "P" ? "blue" : "red"}>
             {item.privacy}
           </Text>
-        </td>
-        <td className={classesG.tableBk1} style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td className={classesG.tableBk1} style={{ textAlign: "right" }}>
           <Box fw="bold" m={0} p={0}>
             <NumericFormat
               decimalScale={0}
@@ -1984,8 +1979,8 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
               decimalSeparator={decimalSep()}
             />
           </Box>
-        </td>
-        <td className={classesG.tableBk1} style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td className={classesG.tableBk1} style={{ textAlign: "right" }}>
           <Box fw="bold" m={0} p={0}>
             <NumericFormat
               decimalScale={0}
@@ -1996,8 +1991,8 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
               decimalSeparator={decimalSep()}
             />
           </Box>
-        </td>
-        <td style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td style={{ textAlign: "right" }}>
           <Box fw="bold" m={0} p={0} c="orange.6">
             <NumericFormat
               decimalScale={0}
@@ -2008,8 +2003,8 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
               decimalSeparator={decimalSep()}
             />
           </Box>
-        </td>
-        <td style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td style={{ textAlign: "right" }}>
           <Box fw="bold" m={0} p={0} c="orange.6">
             <NumericFormat
               decimalScale={0}
@@ -2020,8 +2015,8 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
               decimalSeparator={decimalSep()}
             />
           </Box>
-        </td>
-        <td className={classesG.tableBk1} style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td className={classesG.tableBk1} style={{ textAlign: "right" }}>
           <Box fw="bold" m={0} p={0}>
             <NumericFormat
               decimalScale={0}
@@ -2032,8 +2027,8 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
               decimalSeparator={decimalSep()}
             />
           </Box>
-        </td>
-        <td className={classesG.tableBk1} style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td className={classesG.tableBk1} style={{ textAlign: "right" }}>
           <Box fw="bold" m={0} p={0}>
             <NumericFormat
               decimalScale={0}
@@ -2044,8 +2039,8 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
               decimalSeparator={decimalSep()}
             />
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <DealMenu
             item={item}
             t={t}
@@ -2055,8 +2050,8 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
             setForceOpenLinkInfo={setForceOpenLinkInfo}
             classesG={classesG}
           />
-        </td>
-      </tr>
+        </Table.Td>
+      </Table.Tr>
     );
   });
 
@@ -2072,19 +2067,21 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
           highlightOnHover
           className={`${"TableCss"} ${"TableCss-Deals"}  ${classesG.table}  `}
         >
-          <thead>
-            <tr>
-              <th>{t("name", "Name")}</th>
-              <th>{t("posted", "Posted")}</th>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>{t("name", "Name")}</Table.Th>
+              <Table.Th>{t("posted", "Posted")}</Table.Th>
 
-              <th>{t("expire", "Expire")}</th>
-              <th style={{ textAlign: "right" }}>{t("renewed", "Renewed")}</th>
-              <th>{t("privacy", "Privacy")}</th>
-              {/* <th style={{ textAlign: "right" }}>{t('quantity', 'Quantity')}</th>
-                            <th></th>
-                            <th style={{ textAlign: "right" }}>{t('price', 'Price')}</th>
-                            <th></th> */}
-              <th
+              <Table.Th>{t("expire", "Expire")}</Table.Th>
+              <Table.Th style={{ textAlign: "right" }}>
+                {t("renewed", "Renewed")}
+              </Table.Th>
+              <Table.Th>{t("privacy", "Privacy")}</Table.Th>
+              {/* <Table.Th style={{ textAlign: "right" }}>{t('quantity', 'Quantity')}</Table.Th>
+                            <Table.Th></Table.Th>
+                            <Table.Th style={{ textAlign: "right" }}>{t('price', 'Price')}</Table.Th>
+                            <Table.Th></Table.Th> */}
+              <Table.Th
                 className={`${classesG.tableBk1} ${classesG.help}`}
                 colSpan={2}
                 style={{ textAlign: "center" }}
@@ -2099,8 +2096,8 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
                     1hr
                   </Text>
                 </Tooltip>
-              </th>
-              <th
+              </Table.Th>
+              <Table.Th
                 className={`${classesG.help}`}
                 colSpan={2}
                 style={{ textAlign: "center" }}
@@ -2115,8 +2112,8 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
                     24hr
                   </Text>
                 </Tooltip>
-              </th>
-              <th
+              </Table.Th>
+              <Table.Th
                 className={`${classesG.tableBk1} ${classesG.help}`}
                 colSpan={2}
                 style={{ textAlign: "center" }}
@@ -2131,11 +2128,11 @@ const DealsList = ({ data, searchMyDeals, renew_or_terminate, t }) => {
                     <IconInfinity />
                   </Box>
                 </Tooltip>
-              </th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
+              </Table.Th>
+              <Table.Th></Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>{rows}</Table.Tbody>
         </Table>
       </ScrollArea>
     </>
@@ -2380,9 +2377,4 @@ const useAiParser = (onApply) => {
   return { open };
 };
 
-
-const HashTagsComp=()=>{
-
-
-}
- 
+const HashTagsComp = () => {};

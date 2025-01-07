@@ -121,16 +121,14 @@ import { IconBrands } from "../../../global/IconBrands";
 import { useDisclosure, useOs } from "@mantine/hooks";
 import { Cell } from "../../../global/Cell";
 import { UserCard } from "../../../global/UserCard";
-import { AppDiv } from "../../../global/AppDiv"; 
+import { AppDiv } from "../../../global/AppDiv";
 import { IconBuilding } from "@tabler/icons-react";
-import { 
-  HashValue4Boardd2,
-} from "../../../global/global-comp/Hashtags";
+import { HashValue4Boardd2 } from "../../../global/global-comp/Hashtags";
 import { TradeHashTagsPop } from "./Hashtags";
 import { GENERIC_TRADE_IMAGE, ImagesZoneTrades } from "./ImagesZoneTrades";
 import { IconList } from "@tabler/icons-react";
 import { IconTallymark3 } from "@tabler/icons-react";
-import { ClearButton1 } from "../../../global/ClearButton"; 
+import { ClearButton1 } from "../../../global/ClearButton";
 const ITEM_ACTIONS = {
   CLEAR: "CLEAR",
   SWITCH: "SWITCH",
@@ -414,7 +412,7 @@ export const Trades = () => {
           }
         >
           {islogged && (
-            <Group mt="xs" justify="right" gap="xs">
+            <Group justify="right" gap="xs">
               <Button
                 variant="default"
                 onClick={(val) => {
@@ -1142,7 +1140,7 @@ const CoInfo = ({ data, message, clear_message, focusOn }) => {
                       return (
                         <>
                           {usr.cell && usr.cell != "" && (
-                            <Grid.Col span={{base:12,md:6,lg:4}}>
+                            <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
                               <Cell
                                 fz={rem("1rem")}
                                 cell={usr.cell}
@@ -1381,7 +1379,7 @@ const Trade = ({
               mb="5px"
             >
               <Group
-                justify="apart"
+                justify="space-between"
                 fz={small ? "1em" : "1.2em"}
                 fw={small ? "bold" : "bolder"}
                 style={{
@@ -1896,7 +1894,7 @@ export const TradeDetails = () => {
               );
             }}
           >
-            <Group justify="apart">
+            <Group justify="space-between">
               <IconAdjustmentsOff style={{ transform: "rotate(90deg)" }} />
               {!small && <>{t("clear_filters", "Clear Filters")}</>}
             </Group>
@@ -1910,7 +1908,7 @@ export const TradeDetails = () => {
       <TraderInfo coData={coData} />
       <Box w="100%" className={`${classesG.cmpanyTradeLeftRigthPadding}`}>
         <Grid gutter={small ? 5 : medium ? 10 : 15}>
-          <Grid.Col span={{base:12}}>
+          <Grid.Col span={{ base: 12 }}>
             <Card
               radius="sm"
               p={small ? "xs" : medium ? "sm" : "md"}
@@ -1954,7 +1952,7 @@ export const TradeDetails = () => {
                     </Grid.Col> */}
 
           {data && data.hashtags != "" && (
-            <Grid.Col span={{base:12}}>
+            <Grid.Col span={{ base: 12 }}>
               <Card radius="sm" p="0" pt="0" pl={5} pr={5} withBorder>
                 {data.hashtags && data.hashtags != "" && (
                   <Box className={`${classesG.hashtagboardContainer2}`}>
@@ -1988,7 +1986,7 @@ export const TradeDetails = () => {
             </Grid.Col>
           )}
           {data && data.pictures != "" && (
-            <Grid.Col span={{base:12}}>
+            <Grid.Col span={{ base: 12 }}>
               <ImagesZoneTrades pictures={data.pictures} />
               {/* <Card radius="sm" p="md" pt="xs" withBorder>
                             
@@ -1998,7 +1996,7 @@ export const TradeDetails = () => {
           )}
 
           {data && data.body != "" && (
-            <Grid.Col span={{base:12}}>
+            <Grid.Col span={{ base: 12 }}>
               <Card radius="sm" p="md" pt="xs" withBorder>
                 <div dangerouslySetInnerHTML={{ __html: data?.body }}></div>
               </Card>
@@ -2130,7 +2128,7 @@ const TraderInfo = ({ coData }) => {
                       );
                   }}
                 >
-                  <Group justify="apart" gap={2}>
+                  <Group justify="space-between" gap={2}>
                     <IconArrowLeft size={18} />
                     <Box>{t("back", "Back")}</Box>
                   </Group>
@@ -2146,7 +2144,7 @@ const TraderInfo = ({ coData }) => {
                     setAhowAbout(v);
                   }}
                 >
-                  <Group justify="apart" gap={2}>
+                  <Group justify="space-between" gap={2}>
                     <Box>{t("about", "About")}</Box>
                     {showAbout == "" && <IconChevronsDown size={18} />}
                     {showAbout == "X" && <IconChevronsUp size={18} />}
@@ -2162,7 +2160,7 @@ const TraderInfo = ({ coData }) => {
                     setShowContact(v);
                   }}
                 >
-                  <Group justify="apart" gap={2}>
+                  <Group justify="space-between" gap={2}>
                     <Box> {t("contacts", "Contacts")}</Box>
                     {showContact == "" && <IconChevronsDown size={18} />}
                     {showContact == "X" && <IconChevronsUp size={18} />}
@@ -2174,7 +2172,7 @@ const TraderInfo = ({ coData }) => {
                   variant="default"
                   onClick={show_deals}
                 >
-                  <Group justify="apart" gap={2} c="violet.5">
+                  <Group justify="space-between" gap={2} c="violet.5">
                     <Box>
                       <IconListDetails size={18} />
                     </Box>
@@ -2368,7 +2366,7 @@ const MessageToSend = ({ coData, message, clear_message }) => {
                   return (
                     <>
                       {usr.cell && usr.cell != "" && (
-                        <Grid.Col span={{base:12,md:6,lg:4}} >
+                        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
                           <Cell
                             fz={rem("1rem")}
                             cell={usr.cell}

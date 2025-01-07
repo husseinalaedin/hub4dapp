@@ -111,8 +111,8 @@ import {
 import { DatePickerInput } from "@mantine/dates";
 import { closeModal, modals } from "@mantine/modals";
 import { IconSquareCheck } from "@tabler/icons-react";
-import { selectMenu, useSelection } from "../../../hooks/useSelection"; 
-  
+import { selectMenu, useSelection } from "../../../hooks/useSelection";
+
 import { useDbData } from "../../../global/DbData";
 import { IconShare } from "@tabler/icons-react";
 
@@ -266,7 +266,7 @@ export const Shares = () => {
       )}
 
       <AppHeader title={t("channel_title_shares", "Shares")}>
-        <Group mt="xs" justify="right" gap="xs">
+        <Group justify="right" gap="xs">
           {isAnySelected() && (
             <Button
               variant="outline"
@@ -361,7 +361,7 @@ export const Shares = () => {
                             select(element.id);
                           }}
                         >
-                          <Group justify="apart" mb="sm">
+                          <Group justify="space-between" mb="sm">
                             <Box
                               style={{
                                 overflow: "hidden",
@@ -384,7 +384,7 @@ export const Shares = () => {
                               </Text>
                             </Box>
                             <Box>
-                              <Group justify="apart" gap={1}>
+                              <Group justify="space-between" gap={1}>
                                 <Box
                                   className={`${classesG.cursorAsPointer}`}
                                   onClick={() => {
@@ -517,7 +517,7 @@ export const Shares = () => {
                             </Box>
                           </Group>
 
-                          <Group justify="apart" mb="md">
+                          <Group justify="space-between" mb="md">
                             <Stack gap={2}>
                               <Text fz="sm" style={{ opacity: 0.7 }}>
                                 {" "}
@@ -845,7 +845,7 @@ export const AddEditShare = () => {
         </Box>
         {succeededGet && channel && (
           <Grid gutter={small ? 5 : medium ? 10 : 15}>
-            <Grid.Col span={{base:12}}>
+            <Grid.Col span={{ base: 12 }}>
               <TextInput
                 value={channel.channel_name}
                 readOnly={true}
@@ -854,7 +854,7 @@ export const AddEditShare = () => {
                 placeholder={t("channel_name", "Channel Name")}
               />
             </Grid.Col>
-            <Grid.Col span={{base:12}}>
+            <Grid.Col span={{ base: 12 }}>
               <TextInput
                 value={shareableLink}
                 readOnly={true}
@@ -889,12 +889,16 @@ export const AddEditShare = () => {
               />
             </Grid.Col>
 
-            <Grid.Col span={{base:12}}>
+            <Grid.Col span={{ base: 12 }}>
               <Text className={classesG.textAsLabel}>
                 {t("share_options", "Share Options")}
               </Text>
               <Card className={classesG.border}>
-                <Group justify="apart" style={{ maxWidth: "500px" }} mt="md">
+                <Group
+                  justify="space-between"
+                  style={{ maxWidth: "500px" }}
+                  mt="md"
+                >
                   <Switch
                     disabled={disableShare}
                     checked={withQuantity}
@@ -917,7 +921,7 @@ export const AddEditShare = () => {
               </Card>
             </Grid.Col>
 
-            <Grid.Col span={{base:12}}>
+            <Grid.Col span={{ base: 12 }}>
               <Textarea
                 readOnly={disableShare}
                 onChange={(e) => {
@@ -951,7 +955,7 @@ export const AddEditShare = () => {
                 }
               />
             </Grid.Col>
-            <Grid.Col span={{base:12}}>
+            <Grid.Col span={{ base: 12 }}>
               <TextInput
                 leftSection={
                   <IconBrands
@@ -972,7 +976,7 @@ export const AddEditShare = () => {
               />
             </Grid.Col>
             {channel.channel_group_id == "WATS_APP" && (
-              <Grid.Col span={{base:12}}>
+              <Grid.Col span={{ base: 12 }}>
                 <Text size="xs">
                   {t(
                     "if_whats_app_change_open",
@@ -1098,7 +1102,7 @@ export const SharesSearch = (props) => {
             />
           </Grid.Col>
           <Grid.Col>
-            <Group justify="apart" gap={4}>
+            <Group justify="space-between" gap={4}>
               <Box maw={"calc(50% - 4px)"}>
                 <HoursRangeSelect
                   data={lastXHours}
@@ -1176,16 +1180,16 @@ const SharesList = ({
   const rows = data.map((item) => {
     // const selected = true;//selection.includes(item.id);
     return (
-      <tr key={item.id} className={item.isSelected ? classesG.rowSelected : ""}>
-        <td
+      <Table.Tr key={item.id} className={item.isSelected ? classesG.rowSelected : ""}>
+        <Table.Td
           style={{ cursor: "pointer !important" }}
           onClick={() => {
             select(item.id);
           }}
         >
           <Checkbox size="md" checked={item.isSelected} onChange={() => {}} />
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Box
             className={`${classesG.cursorAsPointer}`}
             onClick={() => {
@@ -1198,8 +1202,8 @@ const SharesList = ({
             />
             <IconExternalLink size={small ? 18 : medium ? 20 : 22} />
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Box
             className={classesG.titleHref2}
             onClick={() => {
@@ -1217,20 +1221,20 @@ const SharesList = ({
               {item.channel_name}
             </Text>
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text style={{ fontSize: "0.8rem", color: "gray" }}>
             {D.utc_to_distance(item.created_on)}
           </Text>
-        </td>
+        </Table.Td>
 
-        <td>
+        <Table.Td>
           <Text c="red.5">
             {D.utc_to_distance(item.expired_on, t("never", "Never"))}
           </Text>
-        </td>
+        </Table.Td>
 
-        <td>
+        <Table.Td>
           <Group justify="right" gap={0} c="blue.5" fw="bolder">
             <NumericFormat
               decimalScale={0}
@@ -1242,8 +1246,8 @@ const SharesList = ({
             />
             <Text>x</Text>
           </Group>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Group justify="right" gap={2}>
             <PopShareVisitedStatInfo data={item}>
               <ActionIcon>
@@ -1317,8 +1321,8 @@ const SharesList = ({
               </Menu.Dropdown>
             </Menu>
           </Group>
-        </td>
-      </tr>
+        </Table.Td>
+      </Table.Tr>
     );
   });
 
@@ -1329,9 +1333,9 @@ const SharesList = ({
         highlightOnHover
         className={`${"TableCss"} ${"TableCss-Shares"}  ${classesG.table}`}
       >
-        <thead>
-          <tr>
-            <th>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>
               <Checkbox
                 size="md"
                 checked={isAllSelected()}
@@ -1339,19 +1343,19 @@ const SharesList = ({
                   selectAll(e.currentTarget.checked);
                 }}
               />
-            </th>
-            <th>{t("group", "Group")}</th>
-            <th>{t("name", "Name")}</th>
+            </Table.Th>
+            <Table.Th>{t("group", "Group")}</Table.Th>
+            <Table.Th>{t("name", "Name")}</Table.Th>
 
-            <th>{t("shared", "Shared")}</th>
-            <th>{t("expire", "Expire")}</th>
+            <Table.Th>{t("shared", "Shared")}</Table.Th>
+            <Table.Th>{t("expire", "Expire")}</Table.Th>
 
-            <th style={{ textAlign: "right" }}>{t("nb_visited", "Visited")}</th>
+            <Table.Th style={{ textAlign: "right" }}>{t("nb_visited", "Visited")}</Table.Th>
 
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
+            <Table.Th></Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
       </Table>
     </ScrollArea>
   );
@@ -1471,7 +1475,7 @@ export const ShareExpirationManip = ({ t, ids, expire, withinPortal }) => {
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       <Select
-        style={{zIndex:501}}
+        style={{ zIndex: 501 }}
         // withinPortal={withinPortal}
         maxDropdownHeight={300}
         value={shareExpire}
@@ -1493,7 +1497,6 @@ export const ShareExpirationManip = ({ t, ids, expire, withinPortal }) => {
   );
 };
 
- 
 export const DealsToShare = ({
   t,
   onChange,
@@ -1571,7 +1574,7 @@ export const DealsToShare = ({
 
   return (
     <Stack gap="md">
-      <Group justify="apart" style={{ maxWidth: "500px" }} mt="md">
+      <Group justify="space-between" style={{ maxWidth: "500px" }} mt="md">
         <Switch
           disabled={shareCompleted}
           checked={withQuantity}

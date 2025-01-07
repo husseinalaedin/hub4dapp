@@ -196,7 +196,7 @@ export const EmailsSharesReport = () => {
       )}
 
       <AppHeader title={t("email_share_status", "Email Share Status")}>
-        <Group mt="xs" justify="right" gap="xs">
+        <Group justify="right" gap="xs">
           <Button
             variant="default"
             onClick={(val) => {
@@ -287,7 +287,7 @@ export const EmailsSharesReport = () => {
                           key={element.id}
                           classesG={classesG}
                         >
-                          <Group justify="apart" mb="sm">
+                          <Group justify="space-between" mb="sm">
                             <Box
                               style={{
                                 overflow: "hidden",
@@ -302,7 +302,7 @@ export const EmailsSharesReport = () => {
                             </Box>
                           </Group>
 
-                          <Group justify="apart" mb="md">
+                          <Group justify="space-between" mb="md">
                             <Stack gap={2}>
                               <Text fz="sm" style={{ opacity: 0.7 }}>
                                 {t("delivered", "Delivered")}
@@ -360,7 +360,7 @@ export const EmailsSharesReport = () => {
                             }
                           />
 
-                          <Group justify="apart" mr="md">
+                          <Group justify="space-between" mr="md">
                             <Stack
                               fw="bold"
                               m={0}
@@ -566,7 +566,7 @@ export const EmailsSharesReportSearch = (props) => {
         <Grid gutter={15}>
           <Grid.Col>
             {/* <DatePeriods dataLastDays={dataLastDays} {...form.getInputProps('period')} /> */}
-            <Group justify="apart" gap={4}>
+            <Group justify="space-between" gap={4}>
               <Box maw={"calc(50% - 4px)"}>
                 <HoursRangeSelect
                   data={lastXHours}
@@ -618,8 +618,11 @@ const EmailsSharesReportList = ({ data, t }) => {
   const rows = data?.map((item) => {
     const selected = selection.includes(item.id);
     return (
-      <tr key={item.id} className={cx({ [classesG.rowSelected]: selected })}>
-        <td>
+      <Table.Tr
+        key={item.id}
+        className={cx({ [classesG.rowSelected]: selected })}
+      >
+        <Table.Td>
           <Box className={classesG.title}>
             <Text
               style={{
@@ -631,21 +634,21 @@ const EmailsSharesReportList = ({ data, t }) => {
               {item.email}
             </Text>
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text m={0} p={0}>
             {D.utc_to_distance(
               item.last_email_delivered_on,
               t("never", "Never")
             )}
           </Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text m={0} p={0}>
             {D.utc_to_distance(item.last_email_opened_on, t("never", "Never"))}
           </Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text
             ta="right"
             m={0}
@@ -655,9 +658,9 @@ const EmailsSharesReportList = ({ data, t }) => {
           >
             {item.nb_delivered}
           </Text>
-        </td>
+        </Table.Td>
 
-        <td>
+        <Table.Td>
           <Text
             ta="right"
             m={0}
@@ -667,8 +670,8 @@ const EmailsSharesReportList = ({ data, t }) => {
           >
             {item.nb_opened}
           </Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text
             ta="right"
             m={0}
@@ -684,8 +687,8 @@ const EmailsSharesReportList = ({ data, t }) => {
           >
             {item.responses_percnt * 100} %
           </Text>
-        </td>
-      </tr>
+        </Table.Td>
+      </Table.Tr>
     );
   });
 
@@ -696,23 +699,25 @@ const EmailsSharesReportList = ({ data, t }) => {
         highlightOnHover
         className={`${"TableCss"} ${classesG.table}`}
       >
-        <thead>
-          <tr>
-            <th>{t("email", "Email")}</th>
-            <th>{t("last_email_delivered_on", "Last Email Read On")}</th>
-            <th>{t("last_email_read_on0", "Deliverd On")}</th>
-            <th>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>{t("email", "Email")}</Table.Th>
+            <Table.Th>
+              {t("last_email_delivered_on", "Last Email Read On")}
+            </Table.Th>
+            <Table.Th>{t("last_email_read_on0", "Deliverd On")}</Table.Th>
+            <Table.Th>
               <Box ta="right">{t("delivered", "Delivered")}</Box>{" "}
-            </th>
-            <th>
+            </Table.Th>
+            <Table.Th>
               <Box ta="right">{t("read", "Read")}</Box>
-            </th>
-            <th>
+            </Table.Th>
+            <Table.Th>
               <Box ta="right">{t("response_percent", "Response %")}</Box>
-            </th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
+            </Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
       </Table>
     </ScrollArea>
   );

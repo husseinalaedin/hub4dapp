@@ -66,7 +66,7 @@ export const UserCard = ({ usr }) => {
           pt="xs"
           className={classesG.borderBottomCard}
         >
-          <Group justify="apart" gap={0}>
+          <Group justify="space-between" gap={0}>
             <Text fz={rem("1rem")}>
               <CopyButton value={usr.email}>
                 {({ copied, copy }) => (
@@ -124,7 +124,7 @@ export const UserCard = ({ usr }) => {
           </Group>
         </Grid.Col>
         <Grid.Col span={rspan} pt="xs">
-          <Group justify="apart" gap={0}>
+          <Group justify="space-between" gap={0}>
             <Cell
               fz={rem("1rem")}
               cell={usr.cell}

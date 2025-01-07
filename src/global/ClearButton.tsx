@@ -4,7 +4,7 @@ import { IconAdjustmentsOff } from "@tabler/icons-react";
 export const ClearButton = ({ t, small, onClear }) => {
   return (
     <Button variant="outline" type="button" color="red.9" onClick={onClear}>
-      {/* <Group justify="apart">
+      {/* <Group justify="space-between">
                 <IconAdjustmentsOff style={{ transform: 'rotate(90deg)' }} />
                 {!small && <>{t('clear_filters', 'Clear Filters')}</>}
             </Group> */}
@@ -31,7 +31,7 @@ export const ClearButton1 = ({ t, small, onClear }) => {
 export const ClearButton2 = ({ t, small, onClear }) => {
   return (
     <Button variant="filled" type="button" color="red" onClick={onClear}>
-      <Group justify="apart">
+      <Group justify="space-between">
         <IconAdjustmentsOff style={{ transform: "rotate(90deg)" }} />
         {!small && <>{t("clear_filters", "Clear Filters")}</>}
       </Group>

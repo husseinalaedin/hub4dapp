@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { BUILD_API, useMessage } from "../../../global/G";
 import { useAxiosGet } from "../../../hooks/Https";
-import { 
-  HashValue4Boardd 
-} from "../../../global/global-comp/Hashtags";
+import { HashValue4Boardd } from "../../../global/global-comp/Hashtags";
 import {
   ActionIcon,
   Box,

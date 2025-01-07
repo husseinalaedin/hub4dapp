@@ -819,7 +819,7 @@ const ShareChannelComp = ({
             {channel.channel_name}
           </Text>
         </Group>
-        <Group justify="apart">
+        <Group justify="space-between">
           <Text fz={"xs"} opacity={mouseIn ? 0.9 : 0.5}>
             {t("shared", "Shared")}{" "}
             {D.utc_to_distance(
@@ -872,7 +872,7 @@ const ShareChannelComp = ({
               )}
               onClick={() => onShareClicked(false, true)}
             >
-              <Group justify="apart" gap={2}>
+              <Group justify="space-between" gap={2}>
                 <Box>
                   <IconShare stroke={1.5} size="1rem" />
                 </Box>

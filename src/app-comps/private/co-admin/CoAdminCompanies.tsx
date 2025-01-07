@@ -73,12 +73,7 @@ import {
 import { useOs } from "@mantine/hooks";
 import { NumericFormat } from "react-number-format";
 
-import { 
-  Table,
-  Checkbox,
-  ScrollArea,
-  Avatar,
-} from "@mantine/core";
+import { Table, Checkbox, ScrollArea, Avatar } from "@mantine/core";
 import {
   selectLarge,
   selectMedium,
@@ -210,7 +205,7 @@ export const CoAdminCompanies = () => {
       )}
 
       <AppHeader title={t("channel_title_companies", "Companies")}>
-        <Group mt="xs" justify="right" gap="xs">
+        <Group justify="right" gap="xs">
           <Button
             variant="default"
             onClick={(val) => {
@@ -273,7 +268,7 @@ export const CoAdminCompanies = () => {
                           key={element.id}
                           classesG={classesG}
                         >
-                          <Group justify="apart" mb="sm">
+                          <Group justify="space-between" mb="sm">
                             <Stack gap={-5} miw="100%">
                               <Box
                                 style={{
@@ -326,7 +321,7 @@ export const CoAdminCompanies = () => {
                             </Box>
                           </Group>
 
-                          <Group justify="apart" mb="md">
+                          <Group justify="space-between" mb="md">
                             <Stack gap={2} mr="md">
                               <Stack
                                 fw="bold"
@@ -470,7 +465,7 @@ export const CoAdminCompanies = () => {
                               </Text>
                             }
                           />
-                          <Group justify="apart" mb="md">
+                          <Group justify="space-between" mb="md">
                             <Stack gap={2} mr="md">
                               <Stack
                                 fw="bold"
@@ -604,7 +599,7 @@ export const CoAdminCompanies = () => {
                             </Stack>
                           </Group>
 
-                          {/* <Group justify="apart" mr={0}>
+                          {/* <Group justify="space-between" mr={0}>
                                                 <Stack fw="bold" m={0} p={0} justify="flex-end" gap={2} fz="sm">
                                                     <Text ta="left" fz="sm" style={{ opacity: 0.7 }}>{t('email', 'Email')}</Text>
 
@@ -829,14 +824,14 @@ export const CoAdminCompaniesSearch = (props) => {
           </Grid.Col>
 
           {/* <Grid.Col>
-                        <Group justify="apart" grow>
+                        <Group justify="space-between" grow>
                             <OwnershipClaimedSelect {...form.getInputProps('owner_')} />
                             <ClaimVisibilitySelect {...form.getInputProps('public_')} />
                         </Group>
 
                     </Grid.Col> 
                     <Grid.Col>
-                        <Group justify="apart" grow>
+                        <Group justify="space-between" grow>
                             
                             <DecisionInitSelect {...form.getInputProps('decision_initiated')} />
                             <VerifiedSelect {...form.getInputProps('verified')} />
@@ -878,8 +873,8 @@ const CoAdminCompaniesList = ({ data, t }) => {
   const rows = data?.map((item) => {
     const selected = selection.includes(item.id);
     return (
-      <tr key={item.id} className={selected ? classesG.rowSelected : ""}>
-        <td>
+      <Table.Tr key={item.id} className={selected ? classesG.rowSelected : ""}>
+        <Table.Td>
           <Box
             className={classesG.titleHref2}
             onClick={() => {
@@ -896,33 +891,55 @@ const CoAdminCompaniesList = ({ data, t }) => {
               {item.company_name}
             </Text>
           </Box>
-        </td>
-        <td>
-          <Text fw={600} fz={small ? "sm" : "md"} style={{alignItems:"center"}}>
+        </Table.Td>
+        <Table.Td>
+          <Text
+            fw={600}
+            fz={small ? "sm" : "md"}
+            style={{ alignItems: "center" }}
+          >
             {G.format_dash(item.active)}
           </Text>
-        </td>
-        <td>
-          <Text fw={600} fz={small ? "sm" : "md"} style={{alignItems:"center"}} c="red.4">
+        </Table.Td>
+        <Table.Td>
+          <Text
+            fw={600}
+            fz={small ? "sm" : "md"}
+            style={{ alignItems: "center" }}
+            c="red.4"
+          >
             {G.format_dash(item.reported)}
           </Text>
-        </td>
-        <td>
-          <Text fw={600} fz={small ? "sm" : "md"} style={{alignItems:"center"}}>
+        </Table.Td>
+        <Table.Td>
+          <Text
+            fw={600}
+            fz={small ? "sm" : "md"}
+            style={{ alignItems: "center" }}
+          >
             {G.format_dash(item.hidden)}
           </Text>
-        </td>
-        <td>
-          <Text fw={600} fz={small ? "sm" : "md"} style={{alignItems:"center"}}>
+        </Table.Td>
+        <Table.Td>
+          <Text
+            fw={600}
+            fz={small ? "sm" : "md"}
+            style={{ alignItems: "center" }}
+          >
             {G.format_dash(item.public_)}
           </Text>
-        </td>
-        <td>
-          <Text fw={600} fz={small ? "sm" : "md"} c="red.4" style={{alignItems:"center"}}>
+        </Table.Td>
+        <Table.Td>
+          <Text
+            fw={600}
+            fz={small ? "sm" : "md"}
+            c="red.4"
+            style={{ alignItems: "center" }}
+          >
             {item.concern_count}x
           </Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Box
             className={classesG.reportCoIcon}
             onClick={(e) => {
@@ -937,20 +954,20 @@ const CoAdminCompaniesList = ({ data, t }) => {
           >
             <IconAlertTriangle />{" "}
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text fw={600} fz="md">
             {item.country} {item.province_name != "" ? "," : ""}{" "}
             {item.province_name}
           </Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text style={{ fontSize: "0.8rem", color: "gray" }}>
             {D.utc_to_local(item.created_on)}
           </Text>
-        </td>
+        </Table.Td>
 
-        <td>
+        <Table.Td>
           <Text
             ta="right"
             fw={600}
@@ -962,14 +979,14 @@ const CoAdminCompaniesList = ({ data, t }) => {
           >
             {item.post_count}
           </Text>
-        </td>
+        </Table.Td>
 
-        <td>
+        <Table.Td>
           <Text lineClamp={1}>
             {item.first_name}, {item.last_name}
           </Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <CopyButton value={item.email}>
             {({ copied, copy }) => (
               <Text
@@ -985,8 +1002,8 @@ const CoAdminCompaniesList = ({ data, t }) => {
               </Text>
             )}
           </CopyButton>
-        </td>
-        <td style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td style={{ textAlign: "right" }}>
           <Cell
             fz="sm"
             cell={item.cell}
@@ -995,9 +1012,9 @@ const CoAdminCompaniesList = ({ data, t }) => {
             show_op="COPY_OR_SEND"
             user=""
           />
-        </td>
-        <td style={{ padding: "0px", width: "0px" }}></td>
-      </tr>
+        </Table.Td>
+        <Table.Td style={{ padding: "0px", width: "0px" }}></Table.Td>
+      </Table.Tr>
     );
   });
 
@@ -1008,27 +1025,29 @@ const CoAdminCompaniesList = ({ data, t }) => {
         highlightOnHover
         className={`${"TableCss"} ${"TableCss-Companies"}  ${classesG.table}`}
       >
-        <thead>
-          <tr>
-            <th>{t("company_name", "Company Name")}</th>
-            <th>{t("active", "Actv?")}</th>
-            <th>{t("reported", "Rep?")}</th>
-            <th>{t("hidden", "Hdn?")}</th>
-            <th>{t("public", "Pblc?")}</th>
-            <th>{t("concern", "Conc")}</th>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>{t("company_name", "Company Name")}</Table.Th>
+            <Table.Th>{t("active", "Actv?")}</Table.Th>
+            <Table.Th>{t("reported", "Rep?")}</Table.Th>
+            <Table.Th>{t("hidden", "Hdn?")}</Table.Th>
+            <Table.Th>{t("public", "Pblc?")}</Table.Th>
+            <Table.Th>{t("concern", "Conc")}</Table.Th>
 
-            <th></th>
-            <th>{t("location", "Location")}</th>
-            <th>{t("since", "Since")}</th>
+            <Table.Th></Table.Th>
+            <Table.Th>{t("location", "Location")}</Table.Th>
+            <Table.Th>{t("since", "Since")}</Table.Th>
 
-            <th style={{ textAlign: "right" }}>{t("posts", "Posts")}</th>
-            <th>{t("contact", "Contact")}</th>
-            <th>{t("email", "Email")}</th>
-            <th>{t("cell", "Cell")}</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
+            <Table.Th style={{ textAlign: "right" }}>
+              {t("posts", "Posts")}
+            </Table.Th>
+            <Table.Th>{t("contact", "Contact")}</Table.Th>
+            <Table.Th>{t("email", "Email")}</Table.Th>
+            <Table.Th>{t("cell", "Cell")}</Table.Th>
+            <Table.Th></Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
       </Table>
     </ScrollArea>
   );

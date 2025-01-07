@@ -293,7 +293,7 @@ const DefaultShareExpire = () => {
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       <Select
-        disabled={true} 
+        disabled={true}
         maxDropdownHeight={300}
         value={defaultExpireShare}
         onChange={(e) => {

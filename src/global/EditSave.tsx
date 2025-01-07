@@ -40,7 +40,7 @@ export const EditSave = ({
   return (
     <div>
       <Group
-        mt="xs"
+        
         justify="right"
         gap="xs"
         style={{ display: small && opened ? "none" : "" }}

@@ -164,8 +164,8 @@ export const Cell = ({ cell, user, fz, message, show_op, verified }) => {
             </Grid.Col>
           </Grid>
           {/* </a> */}
-          {/* <Group w="100%" justify="apart">
-                    <Group justify="apart" gap={0}>
+          {/* <Group w="100%" justify="space-between">
+                    <Group justify="space-between" gap={0}>
                         <Box mr={5}>{user}</Box>
                         <Box>{cell}</Box>
                     </Group>

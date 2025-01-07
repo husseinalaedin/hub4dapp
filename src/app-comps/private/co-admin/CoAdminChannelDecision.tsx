@@ -104,7 +104,7 @@ export const CoAdminChannelDecision = ({ data }) => {
       </Text>
 
       <Stack mb="lg">
-        <Group justify="apart" grow>
+        <Group justify="space-between" grow>
           <Textarea
             readOnly={!iscoadmin}
             defaultValue={data.note}

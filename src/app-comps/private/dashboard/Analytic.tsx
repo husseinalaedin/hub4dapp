@@ -248,7 +248,7 @@ export const Analytic = () => {
             {(isLoading || isLoadingPut) && <LoadingOverlay visible={isLoading || isLoadingPut} overlayProps={{ radius: "sm", blur: 2 }} />} */}
 
       <AppHeader title={t("analytics", "Analytics")}>
-        <Group mt="xs" justify="right" gap="xs">
+        <Group justify="right" gap="xs">
           <Button
             variant="default"
             onClick={(val) => {
@@ -528,7 +528,7 @@ const CardAnalytic = ({ title, children, onModal, miw }) => {
     <>
       <Card shadow="sm" radius="md" withBorder ref={ref}>
         <Card.Section withBorder inheritPadding py="xs">
-          <Group justify="apart">
+          <Group justify="space-between">
             <Text fw="bold">{title}</Text>
             {
               <ActionIcon
@@ -559,7 +559,7 @@ const CardAnalytic = ({ title, children, onModal, miw }) => {
       >
         <Card shadow="sm" radius="md" withBorder>
           <Card.Section withBorder inheritPadding py="xs">
-            <Group justify="apart">
+            <Group justify="space-between">
               <Text fw={500}>{title}</Text>
               <ActionIcon onClick={close}>
                 <IconMinimize size="1.2rem" />
@@ -719,7 +719,7 @@ export const AnalyticSearch = (props) => {
           </Grid.Col>
           <Grid.Col>
             {/* <DatePeriods dataLastDays={dataLastDays} {...form.getInputProps('period')} /> */}
-            <Group justify="apart" gap={4}>
+            <Group justify="space-between" gap={4}>
               <Box maw={"calc(50% - 4px)"}>
                 <HoursRangeSelect
                   data={lastXHours}
@@ -782,8 +782,8 @@ const ChannelAnalytic = ({ data }) => {
     <>
       {data && data.length > 0 && (
         <Card shadow="sm" radius="md" withBorder>
-          <Group justify="apart">
-            <Group style={{whiteSpace:"nowrap"}} fz={24} fw="bolder">
+          <Group justify="space-between">
+            <Group style={{ whiteSpace: "nowrap" }} fz={24} fw="bolder">
               <IconBrands brand={data[0].channel_group_id} size={32} />
               <Text>{data[0].channel_name}</Text>
             </Group>

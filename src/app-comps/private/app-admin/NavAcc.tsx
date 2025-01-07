@@ -255,7 +255,7 @@ export const NavAcc = (props: any) => {
   const [opened, setOpened] = useState(false);
   const is_openeds: boolean = opened;
   const theme = useMantineTheme();
-  
+
   const small = useSelector(selectSmall);
   const { userData, islogged } = useAuth();
   useEffect(() => {
@@ -278,7 +278,7 @@ export const NavAcc = (props: any) => {
   };
   return (
     <>
-      <div
+      <Box
         onClick={() => {
           setOpened((prop) => (prop = !prop));
         }}
@@ -300,7 +300,7 @@ export const NavAcc = (props: any) => {
           }
           icon={<IconSelector size={14} stroke={1.5} />}
         />
-      </div>
+      </Box>
 
       <Drawer
         opened={opened}
@@ -312,7 +312,7 @@ export const NavAcc = (props: any) => {
         position="left"
         withCloseButton={false}
       >
-        <Group justify={small?"right":"left"}>
+        <Group justify={small ? "right" : "left"}>
           <ActionIcon
             onClick={() => {
               if (props && props.state_changed) props.state_changed(false);

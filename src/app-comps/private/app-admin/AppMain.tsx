@@ -9,6 +9,7 @@ import {
   Accordion,
   Burger,
   Flex,
+  Center,
 } from "@mantine/core";
 
 import { IconX } from "@tabler/icons-react";
@@ -32,6 +33,7 @@ import { useAuth } from "../../../providers/AuthProvider";
 import { useAxiosPost } from "../../../hooks/Https";
 import { BUILD_API } from "../../../global/G";
 import {
+  selectMedium,
   selectOpened,
   selectSmall,
 } from "../../../store/features/ScreenStatus";
@@ -228,7 +230,7 @@ export const AppMain0 = () => {
 
       <div className={mainContClass}>
         <div style={{ height: 1, marginTop: -1 }}></div>
-        <Group justify="apart" style={{ width: "100%" }}>
+        <Group justify="space-between" style={{ width: "100%" }}>
           <Box
             className={
               !isTraderPage ? classesG.mainBody : classesG.mainBodyTradeNavig
@@ -247,31 +249,34 @@ export const AppMain = () => {
   const [opened, { toggle }] = useDisclosure();
   const { HeaderComponent }: any = useAppHeader();
   const small = useSelector(selectSmall);
-const { classes: classesG } = useGlobalStyl();
+  const medium = useSelector(selectMedium);
+  const padng = small ? "sm" : medium ? "md" : "lg";
+  const { classes: classesG } = useGlobalStyl();
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: small ? 60 : 66 }}
       navbar={{
         width: 300,
         breakpoint: "sm",
         collapsed: { mobile: !opened },
       }}
-      padding="md"
+      padding={padng}
     >
       <AppShell.Header className={`${classesG.mainHeader}`}>
         <Box style={{ display: "flex" }}>
           <Group
             justify="space-between"
-            style={{ flex: small ? "1" : "0 0 auto" }}
+            style={{ flex: small ? (opened? "1":"0 0 auto") : "0 0 auto" }}
           >
             <Burger
               opened={opened}
               onClick={toggle}
               hiddenFrom="sm"
               size="sm"
+              // pl={padng}
             />
             {(opened || !small) && (
-              <Box w={small ? "" : "300px"}>
+              <Box w={small ? "" : "300px"} className={classesG.userBorder}>
                 <NavAcc />
               </Box>
             )}
@@ -286,7 +291,7 @@ const { classes: classesG } = useGlobalStyl();
                   )}
                 </Box>
               </Box>
-              <Box>
+              <Box p="sm" pr={padng}>
                 {HeaderComponent && HeaderComponent.Header && (
                   <HeaderComponent.Header />
                 )}
@@ -301,6 +306,20 @@ const { classes: classesG } = useGlobalStyl();
       </AppShell.Navbar>
 
       <AppShell.Main>
+        {HeaderComponent && HeaderComponent.Title && (
+          <Center hiddenFrom="md" mb="xl">
+            <Box
+              maw={"250px"}
+              miw={"150px"}
+              p="xs"
+              className={classesG.SmallTitle}
+            >
+              <Center>
+                <HeaderComponent.Title />
+              </Center>
+            </Box>
+          </Center>
+        )}
         <Outlet />
       </AppShell.Main>
     </AppShell>

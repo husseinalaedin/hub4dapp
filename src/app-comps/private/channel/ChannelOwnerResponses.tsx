@@ -116,7 +116,7 @@ export const ChannelOwnerResponses = () => {
         />
       )}
       <AppHeader title={t("ownership_note", "Ownership Decision")}>
-        <Group mt="xs" justify="right" gap="xs">
+        <Group justify="right" gap="xs">
           <Button
             variant="default"
             onClick={(val) => {
@@ -198,7 +198,7 @@ export const ChannelOwnerResponses = () => {
             )}
           </Text>
           <Stack mb="lg">
-            <Group justify="apart" grow>
+            <Group justify="space-between" grow>
               <Textarea
                 defaultValue={data.note_by_user}
                 onChange={(e) => {

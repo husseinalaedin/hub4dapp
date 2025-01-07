@@ -90,10 +90,7 @@ import { D } from "../../../global/Date";
 import { Pages } from "../../../hooks/usePage";
 import { EditSave } from "../../../global/EditSave";
 import { SearchPannel } from "../../../global/SearchPannel";
-import {
-  ConfirmUnsaved,
-  PopShareStatInfo,
-} from "../../../global/PopUpDialogs";
+import { ConfirmUnsaved, PopShareStatInfo } from "../../../global/PopUpDialogs";
 import { ChannelGroups } from "../../../global/global-comp/ChannelGroups";
 import { ActiveSelect } from "../../../global/global-comp/ActiveSelect";
 import { CardIn } from "../../../global/CardIn";
@@ -213,8 +210,13 @@ export const Channels = () => {
         />
       )}
 
-      <AppHeader title={t("channel_title_channel", "Channels")}>
-        <Group mt="xs" justify="right" gap="xs">
+      <AppHeader
+        title={t(
+          "channel_title_channel",
+          "Channels"
+        )}
+      >
+        <Group justify="right" gap="xs">
           <Button
             variant="default"
             onClick={() => {
@@ -314,7 +316,7 @@ export const Channels = () => {
                             key={element.id}
                             classesG={classesG}
                           >
-                            <Group justify="apart" mb="sm">
+                            <Group justify="space-between" mb="sm">
                               <Box
                                 style={{
                                   overflow: "hidden",
@@ -337,7 +339,7 @@ export const Channels = () => {
                                 </Text>
                               </Box>
                               <Box>
-                                <Group justify="apart" gap={1}>
+                                <Group justify="space-between" gap={1}>
                                   <Group
                                     gap={0}
                                     justify="left"
@@ -477,7 +479,7 @@ export const Channels = () => {
                               </Box>
                             </Group>
 
-                            <Group justify="apart" mb="md">
+                            <Group justify="space-between" mb="md">
                               <Stack gap={2}>
                                 <Text fz="sm" style={{ opacity: 0.7 }}>
                                   {" "}
@@ -525,7 +527,7 @@ export const Channels = () => {
                               }
                             />
 
-                            <Group justify="apart" mr="md">
+                            <Group justify="space-between" mr="md">
                               <Stack
                                 fw="bold"
                                 m={0}
@@ -871,11 +873,11 @@ export const AddEditChannelMain = ({ fromPopup, onSaved }: any) => {
     if (id == "new") executePost();
     else executePut(BUILD_API("channels") + "/" + id);
   };
-  
-let blocker = useBlocker(
-  ({ currentLocation, nextLocation }: any) =>
-    !!form.isDirty()&& currentLocation.pathname !== nextLocation.pathname
-);
+
+  let blocker = useBlocker(
+    ({ currentLocation, nextLocation }: any) =>
+      !!form.isDirty() && currentLocation.pathname !== nextLocation.pathname
+  );
   return (
     <>
       {!fromPopup && (
@@ -946,7 +948,7 @@ let blocker = useBlocker(
                 {/* <Grid.Col sm={12} md={6}>
                                     <Text className={classesG.textAsLabel}>{t('owner', 'Owner?')}</Text>
                                     <Card className={classesG.border}>
-                                        <Group justify="apart" style={{ maxWidth: "500px" }}>
+                                        <Group justify="space-between" style={{ maxWidth: "500px" }}>
                                             <Switch disabled={!edit}
                                                 checked={owner_}
                                                 onChange={(event) => {
@@ -972,7 +974,7 @@ let blocker = useBlocker(
                 {/* <Grid.Col sm={12} md={6} opacity={owner_ ? 1 : 0.5}>
                                     <Text className={classesG.textAsLabel}>{t('public', 'Public?')}</Text>
                                     <Card className={classesG.border}>
-                                        <Group justify="apart" style={{ maxWidth: "500px" }}>
+                                        <Group justify="space-between" style={{ maxWidth: "500px" }}>
                                             <Switch disabled={!edit || !owner_}
                                                 checked={public_}
                                                 onChange={(event) => {
@@ -1035,7 +1037,7 @@ let blocker = useBlocker(
                   />
                 </Grid.Col>
                 <Grid.Col span={{ base: 12 }}>
-                  <Group justify="apart">
+                  <Group justify="space-between">
                     <a href={urlGroup} target={form.values.channel_group_id}>
                       {urlGroup}
                     </a>
@@ -1331,7 +1333,7 @@ export const ChannelSearch = (props: { grid: any; hideGridView: any }) => {
             />
           </Grid.Col>
           <Grid.Col>
-            <Group justify="apart" gap={4}>
+            <Group justify="space-between" gap={4}>
               <Box maw={"calc(50% - 4px)"}>
                 <HoursRangeSelect
                   zIndex={501}
@@ -1371,14 +1373,14 @@ export const ChannelSearch = (props: { grid: any; hideGridView: any }) => {
           </Grid.Col>
 
           {/* <Grid.Col>
-                        <Group justify="apart" grow>
+                        <Group justify="space-between" grow>
                             <OwnershipClaimedSelect {...form.getInputProps('owner_')} />
                             <ClaimVisibilitySelect {...form.getInputProps('public_')} />
                         </Group>
 
                     </Grid.Col> 
                     <Grid.Col>
-                        <Group justify="apart" grow>
+                        <Group justify="space-between" grow>
                             
                             <DecisionInitSelect {...form.getInputProps('decision_initiated')} />
                             <VerifiedSelect {...form.getInputProps('verified')} />
@@ -1537,8 +1539,8 @@ const ChannelsList = ({
     const selected = selection.includes(item.id);
     // classN a m e={cx({ [classesG.rowSelected]: selected  })}
     return (
-      <tr key={item.id} className={selected ? classesG.rowSelected : ""}>
-        <td>
+      <Table.Tr key={item.id} className={selected ? classesG.rowSelected : ""}>
+        <Table.Td>
           <Box
             className={`${classesG.cursorAsPointer}`}
             onClick={() => {
@@ -1551,8 +1553,8 @@ const ChannelsList = ({
             />
             <IconExternalLink size={small ? 18 : medium ? 20 : 22} />
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Box
             className={classesG.titleHref2}
             onClick={() => {
@@ -1570,25 +1572,25 @@ const ChannelsList = ({
               {item.channel_name}
             </Text>
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text style={{ fontSize: "0.8rem", color: "gray" }}>
             {D.utc_to_local(item.created_on)}
           </Text>
-        </td>
+        </Table.Td>
 
-        <td>
+        <Table.Td>
           <Text>
             {D.utc_to_distance(item.last_share_created_on, t("never", "Never"))}
           </Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text c="red.5">
             {D.utc_to_distance(item.last_share_expired_on, t("never", "Never"))}
           </Text>
-        </td>
+        </Table.Td>
 
-        <td className={classesG.tableBk1} style={{ textAlign: "right" }}>
+        <Table.Td className={classesG.tableBk1} style={{ textAlign: "right" }}>
           <Box fw="bold" m={0} p={0}>
             <NumericFormat
               decimalScale={0}
@@ -1599,8 +1601,8 @@ const ChannelsList = ({
               decimalSeparator={decimalSep()}
             />
           </Box>
-        </td>
-        <td className={classesG.tableBk1} style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td className={classesG.tableBk1} style={{ textAlign: "right" }}>
           <Box fw="bold" m={0} p={0}>
             <NumericFormat
               decimalScale={0}
@@ -1611,8 +1613,8 @@ const ChannelsList = ({
               decimalSeparator={decimalSep()}
             />
           </Box>
-        </td>
-        <td style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td style={{ textAlign: "right" }}>
           <Box fw="bold" m={0} p={0} c="orange.6">
             <NumericFormat
               decimalScale={0}
@@ -1623,8 +1625,8 @@ const ChannelsList = ({
               decimalSeparator={decimalSep()}
             />
           </Box>
-        </td>
-        <td style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td style={{ textAlign: "right" }}>
           <Box fw="bold" m={0} p={0} c="orange.6">
             <NumericFormat
               decimalScale={0}
@@ -1635,8 +1637,8 @@ const ChannelsList = ({
               decimalSeparator={decimalSep()}
             />
           </Box>
-        </td>
-        <td className={classesG.tableBk1} style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td className={classesG.tableBk1} style={{ textAlign: "right" }}>
           <Box fw="bold" m={0} p={0}>
             <NumericFormat
               decimalScale={0}
@@ -1647,8 +1649,8 @@ const ChannelsList = ({
               decimalSeparator={decimalSep()}
             />
           </Box>
-        </td>
-        <td className={classesG.tableBk1} style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td className={classesG.tableBk1} style={{ textAlign: "right" }}>
           <Box fw="bold" m={0} p={0}>
             <NumericFormat
               decimalScale={0}
@@ -1659,11 +1661,11 @@ const ChannelsList = ({
               decimalSeparator={decimalSep()}
             />
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Group justify="right" gap={2}>
             <PopShareStatInfo data={item}>
-              <ActionIcon>
+              <ActionIcon variant="transparent">
                 <IconFileAnalytics size={25} />
               </ActionIcon>
             </PopShareStatInfo>
@@ -1732,8 +1734,8 @@ const ChannelsList = ({
               </Menu.Dropdown>
             </Menu>
           </Group>
-        </td>
-      </tr>
+        </Table.Td>
+      </Table.Tr>
     );
   });
 
@@ -1745,16 +1747,16 @@ const ChannelsList = ({
       className={`${"TableCss"} ${"TableCss-Channels"}  ${classesG.table}`}
       mt="lg"
     >
-      <thead>
-        <tr>
-          <th>{t("group", "Group")}</th>
-          <th>{t("name", "Name")}</th>
-          <th>{t("since", "Since")}</th>
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th>{t("group", "Group")}</Table.Th>
+          <Table.Th>{t("name", "Name")}</Table.Th>
+          <Table.Th>{t("since", "Since")}</Table.Th>
 
-          <th>{t("shared", "Shared")}</th>
-          <th>{t("expire", "Expire")}</th>
+          <Table.Th>{t("shared", "Shared")}</Table.Th>
+          <Table.Th>{t("expire", "Expire")}</Table.Th>
 
-          <th
+          <Table.Th
             className={`${classesG.tableBk1} ${classesG.help}`}
             colSpan={2}
             style={{ textAlign: "center" }}
@@ -1766,8 +1768,8 @@ const ChannelsList = ({
                 1hr
               </Text>
             </Tooltip>
-          </th>
-          <th
+          </Table.Th>
+          <Table.Th
             className={`${classesG.help}`}
             colSpan={2}
             style={{ textAlign: "center" }}
@@ -1782,8 +1784,8 @@ const ChannelsList = ({
                 24hr
               </Text>
             </Tooltip>
-          </th>
-          <th
+          </Table.Th>
+          <Table.Th
             className={`${classesG.tableBk1} ${classesG.help}`}
             colSpan={2}
             style={{ textAlign: "center" }}
@@ -1793,11 +1795,11 @@ const ChannelsList = ({
                 <IconInfinity />
               </Box>
             </Tooltip>
-          </th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>{rows}</tbody>
+          </Table.Th>
+          <Table.Th></Table.Th>
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>{rows}</Table.Tbody>
     </Table>
     // </ScrollArea >
   );

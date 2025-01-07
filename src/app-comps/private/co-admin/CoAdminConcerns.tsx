@@ -312,7 +312,7 @@ export const CoAdminConcerns = () => {
       )}
 
       <AppHeader title={t("concern_title", "Concerns")}>
-        <Group mt="xs" justify="right" gap="xs">
+        <Group justify="right" gap="xs">
           <Button
             variant="default"
             onClick={(val) => {
@@ -388,7 +388,7 @@ export const CoAdminConcerns = () => {
                           key={element.id}
                           classesG={classesG}
                         >
-                          <Group justify="apart" mb="sm">
+                          <Group justify="space-between" mb="sm">
                             <Box>
                               <Box
                                 style={{ overflow: "hidden" }}
@@ -478,7 +478,7 @@ export const CoAdminConcerns = () => {
                               </Text>
                             }
                           />
-                          <Group justify="apart" mb="md">
+                          <Group justify="space-between" mb="md">
                             <Stack gap={2} mr="md">
                               <Stack
                                 fw="bold"
@@ -498,7 +498,7 @@ export const CoAdminConcerns = () => {
                                 <Text
                                   fw={600}
                                   fz={small ? "sm" : "md"}
-                                  style={{alignItems:"center"}}
+                                  style={{ alignItems: "center" }}
                                 >
                                   {element.category}
                                 </Text>
@@ -524,7 +524,7 @@ export const CoAdminConcerns = () => {
                                 <Text
                                   fw={600}
                                   fz={small ? "sm" : "md"}
-                                  style={{alignItems:"center"}}
+                                  style={{ alignItems: "center" }}
                                   c="red.4"
                                 >
                                   {element.priority}
@@ -551,7 +551,7 @@ export const CoAdminConcerns = () => {
                                 <Text
                                   fw={600}
                                   fz={small ? "sm" : "md"}
-                                  style={{alignItems:"center"}}
+                                  style={{ alignItems: "center" }}
                                 >
                                   {element.status}
                                 </Text>
@@ -731,20 +731,20 @@ const CoAdminConcernsList = ({
   const rows = data.map((item) => {
     const selected = selection.includes(item.id);
     return (
-      <tr key={item.id} className={selected ? classesG.rowSelected : ""}>
-        <td>
+      <Table.Tr key={item.id} className={selected ? classesG.rowSelected : ""}>
+        <Table.Td>
           <Text>{item.subject}</Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text>{item.company_name}</Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text>
             {item.first_name}, {item.last_name}
           </Text>
-        </td>
+        </Table.Td>
 
-        <td>
+        <Table.Td>
           <CopyButton value={item.email}>
             {({ copied, copy }) => (
               <Text
@@ -759,8 +759,8 @@ const CoAdminConcernsList = ({
               </Text>
             )}
           </CopyButton>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Spoiler
             style={{ whiteSpace: "pre-line" }}
             maxHeight={20}
@@ -769,23 +769,36 @@ const CoAdminConcernsList = ({
           >
             {item.body}
           </Spoiler>
-        </td>
-        <td>
-          <Text fw={600} fz={small ? "sm" : "md"} style={{alignItems:"center"}}>
+        </Table.Td>
+        <Table.Td>
+          <Text
+            fw={600}
+            fz={small ? "sm" : "md"}
+            style={{ alignItems: "center" }}
+          >
             {item.category}
           </Text>
-        </td>
-        <td>
-          <Text fw={600} fz={small ? "sm" : "md"} style={{alignItems:"center"}} c="red.4">
+        </Table.Td>
+        <Table.Td>
+          <Text
+            fw={600}
+            fz={small ? "sm" : "md"}
+            style={{ alignItems: "center" }}
+            c="red.4"
+          >
             {item.priority}
           </Text>
-        </td>
-        <td>
-          <Text fw={600} fz={small ? "sm" : "md"} style={{alignItems:"center"}}>
+        </Table.Td>
+        <Table.Td>
+          <Text
+            fw={600}
+            fz={small ? "sm" : "md"}
+            style={{ alignItems: "center" }}
+          >
             {item.status}
           </Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Spoiler
             style={{ whiteSpace: "pre-line" }}
             maxHeight={20}
@@ -794,8 +807,8 @@ const CoAdminConcernsList = ({
           >
             {item.co_admin_note}
           </Spoiler>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <CoAdminConcernMenu
             element={item}
             t={t}
@@ -803,8 +816,8 @@ const CoAdminConcernsList = ({
             setPopUpObj={setPopUpObj}
             setForceOpenConcernStatus={setForceOpenConcernStatus}
           />
-        </td>
-      </tr>
+        </Table.Td>
+      </Table.Tr>
     );
   });
 
@@ -815,25 +828,27 @@ const CoAdminConcernsList = ({
         highlightOnHover
         className={`${"TableCss"}  ${classesG.table}`}
       >
-        <thead>
-          <tr>
-            <th>{t("subject", "Subject")}</th>
-            <th>{t("company", "Company")}</th>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>{t("subject", "Subject")}</Table.Th>
+            <Table.Th>{t("company", "Company")}</Table.Th>
 
-            <th>{t("contact", "Contact")}</th>
-            <th>{t("email", "Email")}</th>
-            <th>{t("body", "Body")}</th>
-            <th>{t("category", "Category")}</th>
-            <th>{t("priority", "Priority")}</th>
-            <th>{t("status", "Status")}</th>
-            <th>{t("co_admin_note", "CoAdmin Note")}</th>
+            <Table.Th>{t("contact", "Contact")}</Table.Th>
+            <Table.Th>{t("email", "Email")}</Table.Th>
+            <Table.Th>{t("body", "Body")}</Table.Th>
+            <Table.Th>{t("category", "Category")}</Table.Th>
+            <Table.Th>{t("priority", "Priority")}</Table.Th>
+            <Table.Th>{t("status", "Status")}</Table.Th>
+            <Table.Th>{t("co_admin_note", "CoAdmin Note")}</Table.Th>
 
-            <th style={{ textAlign: "right" }}>{t("nb_visited", "Visited")}</th>
+            <Table.Th style={{ textAlign: "right" }}>
+              {t("nb_visited", "Visited")}
+            </Table.Th>
 
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
+            <Table.Th></Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
       </Table>
     </ScrollArea>
   );

@@ -253,7 +253,7 @@ export const LatestTrades = () => {
 
       <AppHeader title={t("latest_trades_title", "Latest Trades")}>
         {islogged && (
-          <Group mt="xs" justify="right" gap="xs">
+          <Group justify="right" gap="xs">
             <Button
               variant="default"
               onClick={(val) => {

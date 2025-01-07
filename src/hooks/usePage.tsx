@@ -64,7 +64,7 @@ export const Pages = ({ data, small }) => {
     if (refresh != 0) navigatePage();
   }, [activePage, pageSize, refresh]);
   return (
-    <Group justify="apart">
+    <Group justify="space-between">
       <Pagination
         withControls={!small}
         siblings={1}

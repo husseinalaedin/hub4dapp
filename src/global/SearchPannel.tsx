@@ -324,7 +324,7 @@ export const SearchPannel = (props) => {
             />
             {listDirs && listDirs.length > 0 && (
               <>
-                <Menu justify="bottom-end" offset={0}>
+                <Menu position="bottom-end" offset={0}>
                   <Menu.Target>
                     <Button color="dark.3" variant="default" m={0} radius={0}>
                       <IconList size={20} />
@@ -378,25 +378,27 @@ export const SearchPannel = (props) => {
                         <Menu.Item>
                           <Grid gutter={0} style={{ width: "300px" }}>
                             <Grid.Col
-                              xs={8}
-                              sm={8}
-                              md={8}
+                              span={{ base: 8 }}
                               style={{ margin: "auto" }}
                             >
                               <Text>{itm.name}</Text>
                             </Grid.Col>
                             <Grid.Col
-                              xs={2}
-                              sm={2}
-                              md={2}
+                              span={{ base: 2 }}
                               style={{ margin: "auto" }}
                             >
                               <ActionIcon
-                                className={
+                                variant="light"
+                                color={
                                   sortById == itm.id && sortDir == "asc"
-                                    ? classesG.selectedSort
+                                    ? "orange"
                                     : ""
                                 }
+                                // className={
+                                //   sortById == itm.id && sortDir == "asc"
+                                //     ? classesG.selectedSort
+                                //     : ""
+                                // }
                                 onClick={() => {
                                   setSortById(itm.id);
                                   setSortDir("asc");
@@ -410,17 +412,21 @@ export const SearchPannel = (props) => {
                               </ActionIcon>
                             </Grid.Col>
                             <Grid.Col
-                              xs={2}
-                              sm={2}
-                              md={2}
+                              span={{ base: 2 }}
                               style={{ margin: "auto" }}
                             >
                               <ActionIcon
-                                className={
+                                variant="light"
+                                color={
                                   sortById == itm.id && sortDir == "desc"
-                                    ? classesG.selectedSort
+                                    ? "orange"
                                     : ""
                                 }
+                                // className={
+                                //   sortById == itm.id && sortDir == "desc"
+                                //     ? classesG.selectedSort
+                                //     : ""
+                                // }
                               >
                                 <IconSortDescending
                                   size={22}
@@ -461,11 +467,11 @@ export const SearchPannel = (props) => {
           if (props.state_changed) props.state_changed(false);
           close();
         }}
-        justify="right"
+        position="right"
         withCloseButton={false}
       >
-        <Group justify="apart" mb="xl" mt="lg">
-          <ActionIcon onClick={close}>
+        <Group justify="space-between" m="md"  mb="xl" mt="md">
+          <ActionIcon onClick={close} variant="subtle">
             {<IconX size={30} color="red" />}
           </ActionIcon>
           {/* <Button mr="md" size="sm" variant="outline" leftIcon={<IconAdjustmentsOff style={{ transform: 'rotate(90deg)' }} />} type="button" onClick={() => {

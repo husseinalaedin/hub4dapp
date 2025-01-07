@@ -39,7 +39,7 @@ export const AppHeader = (prop: any) => {
   let title = prop?.title;
   let titleClicked = prop?.titleClicked;
   const { setHeaderComponent }: any = useAppHeader();
- 
+
   const Header = () => {
     return <>{child}</>;
   };
@@ -61,7 +61,7 @@ export const AppHeader = (prop: any) => {
       </>
     );
   };
- 
+
   useEffect(() => {
     if (!setHeaderComponent) return;
     setHeaderComponent(() => {
@@ -118,7 +118,7 @@ export const AppHeader0 = (prop: any) => {
     <>
       <Box className={`${navClasses} ${classesG.mainHeader} app-top-nav-any`}>
         <div className={classesG.navTopBorder}></div>
-        <Group justify="apart" align="start">
+        <Group justify="space-between" align="start">
           {small && (
             <div
               style={{
@@ -271,7 +271,7 @@ export const AppHeaderAI = (prop) => {
         }}
       >
         {mouseIn && <div className={classesG.navTopBorder}></div>}
-        <Group justify="apart" align="start">
+        <Group justify="space-between" align="start">
           {small && (
             <div
               style={{

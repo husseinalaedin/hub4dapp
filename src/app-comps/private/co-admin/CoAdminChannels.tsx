@@ -68,12 +68,7 @@ import {
 import { useOs } from "@mantine/hooks";
 import { NumericFormat } from "react-number-format";
 
-import {
-  Table,
-  Checkbox,
-  ScrollArea,
-  Avatar,
-} from "@mantine/core";
+import { Table, Checkbox, ScrollArea, Avatar } from "@mantine/core";
 import {
   selectLarge,
   selectMedium,
@@ -276,7 +271,7 @@ export const CoAdminChannels = () => {
       )}
 
       <AppHeader title={t("channel_title_channel", "Channels")}>
-        <Group mt="xs" justify="right" gap="xs">
+        <Group justify="right" gap="xs">
           <Button
             variant="default"
             onClick={(val) => {
@@ -349,7 +344,7 @@ export const CoAdminChannels = () => {
                           withBorder
                           key={element.id}
                         >
-                          <Group justify="apart" mb="sm">
+                          <Group justify="space-between" mb="sm">
                             <Box
                               style={{
                                 overflow: "hidden",
@@ -370,7 +365,7 @@ export const CoAdminChannels = () => {
                               </Text>
                             </Box>
                             <Box>
-                              <Group justify="apart" gap={1}>
+                              <Group justify="space-between" gap={1}>
                                 <Box
                                   className={`${classesG.cursorAsPointer}`}
                                   onClick={() => {
@@ -551,7 +546,7 @@ export const CoAdminChannels = () => {
                             </Box>
                           </Group>
 
-                          <Group justify="apart" mb="md">
+                          <Group justify="space-between" mb="md">
                             <Stack gap={2}>
                               <Text fz="sm" style={{ opacity: 0.7 }}>
                                 {" "}
@@ -600,7 +595,7 @@ export const CoAdminChannels = () => {
                             }
                           />
 
-                          <Group justify="apart">
+                          <Group justify="space-between">
                             <Box
                               fw="bold"
                               m={0}
@@ -924,7 +919,10 @@ export const AddEditChannel = () => {
                     {t("owner", "Owner?")}
                   </Text>
                   <Card className={classesG.border}>
-                    <Group justify="apart" style={{ maxWidth: "500px" }}>
+                    <Group
+                      justify="space-between"
+                      style={{ maxWidth: "500px" }}
+                    >
                       <Switch
                         disabled={!edit}
                         checked={owner_}
@@ -978,7 +976,10 @@ export const AddEditChannel = () => {
                     {t("public", "Public?")}
                   </Text>
                   <Card className={classesG.border}>
-                    <Group justify="apart" style={{ maxWidth: "500px" }}>
+                    <Group
+                      justify="space-between"
+                      style={{ maxWidth: "500px" }}
+                    >
                       <Switch
                         disabled={!edit || !owner_}
                         checked={public_}
@@ -1007,7 +1008,7 @@ export const AddEditChannel = () => {
                     </Text>
                   </Card>
                 </Grid.Col>
-                <Grid.Col span={{ base: 12}}>
+                <Grid.Col span={{ base: 12 }}>
                   {/* <MultiSelect
                                         // disabled={!edit}
                                         readOnly={!edit}
@@ -1042,7 +1043,7 @@ export const AddEditChannel = () => {
                                         }}
                                     /> */}
                 </Grid.Col>
-                <Grid.Col span={{base:12}}>
+                <Grid.Col span={{ base: 12 }}>
                   <Textarea
                     autoComplete="off"
                     readOnly={!edit}
@@ -1051,7 +1052,7 @@ export const AddEditChannel = () => {
                     {...form.getInputProps("channel_note")}
                   />
                 </Grid.Col>
-                <Grid.Col span={{base:12}}>
+                <Grid.Col span={{ base: 12 }}>
                   <TextInput
                     leftSection={
                       <IconBrands
@@ -1074,7 +1075,7 @@ export const AddEditChannel = () => {
                   />
                 </Grid.Col>
                 {form.values.channel_group_id == "WATS_APP" && (
-                  <Grid.Col span={{base:12}}>
+                  <Grid.Col span={{ base: 12 }}>
                     <Text size="xs">
                       {t(
                         "if_whats_app_change_open",
@@ -1087,7 +1088,7 @@ export const AddEditChannel = () => {
             )}
             {form.values.channel_group_id == "EMAIL" && (
               <>
-                <Grid.Col span={{base:12}}>
+                <Grid.Col span={{ base: 12 }}>
                   <Textarea
                     style={{ fontSize: "10px" }}
                     autosize={true}
@@ -1107,7 +1108,7 @@ export const AddEditChannel = () => {
                 </Grid.Col>
                 {id != "new" && (
                   <>
-                    <Grid.Col span={{base:12}}>
+                    <Grid.Col span={{ base: 12 }}>
                       <Textarea
                         style={{ fontSize: 10 }}
                         autosize={true}
@@ -1123,7 +1124,7 @@ export const AddEditChannel = () => {
                         {...form.getInputProps("to_valid_emails")}
                       />
                     </Grid.Col>
-                    <Grid.Col span={{base:12}}>
+                    <Grid.Col span={{ base: 12 }}>
                       <Textarea
                         style={{ fontSize: 10 }}
                         autosize={true}
@@ -1136,7 +1137,7 @@ export const AddEditChannel = () => {
                         {...form.getInputProps("invalid_emails")}
                       />
                     </Grid.Col>
-                    <Grid.Col span={{base:12}}>
+                    <Grid.Col span={{ base: 12 }}>
                       <Textarea
                         autoComplete="off"
                         readOnly={!edit}
@@ -1145,7 +1146,7 @@ export const AddEditChannel = () => {
                         {...form.getInputProps("channel_note")}
                       />
                     </Grid.Col>
-                    <Grid.Col span={{base:12}}>
+                    <Grid.Col span={{ base: 12 }}>
                       <Group mt="md">
                         <Alert
                           p={10}
@@ -1200,8 +1201,6 @@ export const AddEditChannel = () => {
   );
 };
 
- 
-
 const renderSelectChannelOption: SelectProps["renderOption"] = (
   item: ComboboxLikeRenderOptionInput<ComboboxItem>
 ) => (
@@ -1253,8 +1252,11 @@ const CoAdminChannelsList = ({
   const rows = data?.map((item) => {
     const selected = selection.includes(item.id);
     return (
-      <tr key={item.id} className={cx({ [classesG.rowSelected]: selected })}>
-        <td>
+      <Table.Tr
+        key={item.id}
+        className={cx({ [classesG.rowSelected]: selected })}
+      >
+        <Table.Td>
           <Box
             className={`${classesG.cursorAsPointer}`}
             onClick={() => {
@@ -1267,8 +1269,8 @@ const CoAdminChannelsList = ({
             />
             <IconExternalLink size={small ? 18 : medium ? 20 : 22} />
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Box
             className={classesG.titleHref2}
             onClick={() => {
@@ -1286,28 +1288,28 @@ const CoAdminChannelsList = ({
               {item.channel_name}
             </Text>
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text style={{ fontSize: "0.8rem", color: "gray" }}>
             {D.utc_to_local(item.created_on)}
           </Text>
-        </td>
+        </Table.Td>
 
-        <td>
+        <Table.Td>
           {item.owner_ == "X" && <Box c="teal.7">{t("yes", "Yes")}</Box>}
           {item.owner_ == "" && <Box c="orange.7">{t("no", "No")}</Box>}
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           {item.ownership_verified == "" && (
             <Box c="red.5">{t("NOT_VERIFIED", "Not Verified")}</Box>
           )}
           {item.ownership_verified == "X" && (
             <Box c="teal.9">{t("VERIFIED", "Verified")}</Box>
           )}
-        </td>
+        </Table.Td>
 
-        <td className={classesG.tableBk1} style={{ textAlign: "right" }}>
-          <Group justify="apart">
+        <Table.Td className={classesG.tableBk1} style={{ textAlign: "right" }}>
+          <Group justify="space-between">
             <Box
               fw="bold"
               m={0}
@@ -1326,9 +1328,9 @@ const CoAdminChannelsList = ({
               </Text>
             </Box>
           </Group>
-        </td>
+        </Table.Td>
 
-        <td>
+        <Table.Td>
           <Group justify="right" gap={2}>
             <Menu position="left-start" offset={0} withinPortal={true}>
               <Menu.Target>
@@ -1448,8 +1450,8 @@ const CoAdminChannelsList = ({
               </Menu.Dropdown>
             </Menu>
           </Group>
-        </td>
-      </tr>
+        </Table.Td>
+      </Table.Tr>
     );
   });
 
@@ -1460,26 +1462,26 @@ const CoAdminChannelsList = ({
         highlightOnHover
         className={`${"TableCss"} ${"TableCss-Channels"}  ${classesG.table}`}
       >
-        <thead>
-          <tr>
-            <th>{t("group", "Group")}</th>
-            <th>{t("name", "Name")}</th>
-            <th>{t("since", "Since")}</th>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>{t("group", "Group")}</Table.Th>
+            <Table.Th>{t("name", "Name")}</Table.Th>
+            <Table.Th>{t("since", "Since")}</Table.Th>
 
-            <th>{t("ownership_claimed", "Ownership Claimed?")}</th>
-            <th>{t("ownership", "Ownership?")}</th>
+            <Table.Th>{t("ownership_claimed", "Ownership Claimed?")}</Table.Th>
+            <Table.Th>{t("ownership", "Ownership?")}</Table.Th>
 
-            <th
+            <Table.Th
               className={`${classesG.tableBk1} ${classesG.help}`}
               style={{ textAlign: "center" }}
             >
               {t("created_by", "Created By")}
-            </th>
+            </Table.Th>
 
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
+            <Table.Th></Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
       </Table>
     </ScrollArea>
   );

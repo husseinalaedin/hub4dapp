@@ -71,12 +71,7 @@ import {
 import { useOs } from "@mantine/hooks";
 import { NumericFormat } from "react-number-format";
 
-import { 
-  Table,
-  Checkbox,
-  ScrollArea,
-  Avatar,
-} from "@mantine/core";
+import { Table, Checkbox, ScrollArea, Avatar } from "@mantine/core";
 import {
   selectLarge,
   selectMedium,
@@ -211,7 +206,7 @@ export const Companies = () => {
                             return 'CLEAR' + (new Date()).getTime().toString()
                         })
                     }}>
-                        <Group justify="apart">
+                        <Group justify="space-between">
                             <IconAdjustmentsOff style={{ transform: 'rotate(90deg)' }} />
                             {!small && <>{t('clear_filters', 'Clear Filters')}</>}
                         </Group>let hex = G.ifNull(searchParams.get("hex"), "");
@@ -277,7 +272,7 @@ export const Companies = () => {
                           key={element.id}
                           classesG={classesG}
                         >
-                          <Group justify="apart" mb="sm">
+                          <Group justify="space-between" mb="sm">
                             <Stack gap={-5} miw="100%">
                               <Box
                                 style={{
@@ -317,7 +312,7 @@ export const Companies = () => {
                             </Stack>
 
                             {/* <Box>
-                                                    <Group justify="apart" gap={1}>
+                                                    <Group justify="space-between" gap={1}>
 
                                                         <Box>
 
@@ -326,7 +321,7 @@ export const Companies = () => {
                                                 </Box> */}
                           </Group>
 
-                          <Group justify="apart" mb="md">
+                          <Group justify="space-between" mb="md">
                             <Stack gap={2} mr="md">
                               <Stack
                                 fw="bold"
@@ -461,7 +456,7 @@ export const Companies = () => {
                               </Stack>
                             </Grid.Col>
                           </Grid>
-                          {/* <Group justify="apart" mr={0}>
+                          {/* <Group justify="space-between" mr={0}>
                                                 <Stack fw="bold" m={0} p={0} justify="flex-end" gap={2} fz="sm">
                                                     <Text ta="left" fz="sm" style={{ opacity: 0.7 }}>{t('email', 'Email')}</Text>
 
@@ -606,14 +601,14 @@ export const CompaniesSearch = ({ action, grid }) => {
       >
         <Grid gutter={15}>
           {/* <Grid.Col>
-                        <Group justify="apart" grow>
+                        <Group justify="space-between" grow>
                             <OwnershipClaimedSelect {...form.getInputProps('owner_')} />
                             <ClaimVisibilitySelect {...form.getInputProps('public_')} />
                         </Group>
 
                     </Grid.Col> 
                     <Grid.Col>
-                        <Group justify="apart" grow>
+                        <Group justify="space-between" grow>
                             
                             <DecisionInitSelect {...form.getInputProps('decision_initiated')} />
                             <VerifiedSelect {...form.getInputProps('verified')} />
@@ -655,14 +650,14 @@ const CompaniesList = ({ data, t }) => {
   const rows = data?.map((item) => {
     const selected = selection.includes(item.id);
     return (
-      <tr
+      <Table.Tr
         key={item.id}
         className={
           // {cx({ [classesG.rowSelected]: selected })}
           selected ? classesG.rowSelected : ""
         }
       >
-        <td>
+        <Table.Td>
           <Box
             className={classesG.titleHref2}
             onClick={() => {
@@ -679,8 +674,8 @@ const CompaniesList = ({ data, t }) => {
               {item.company_name}
             </Text>
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Box
             className={classesG.reportCoIcon}
             onClick={(e) => {
@@ -695,20 +690,20 @@ const CompaniesList = ({ data, t }) => {
           >
             <IconAlertTriangle />{" "}
           </Box>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text fw={600} fz="md">
             {item.country} {item.province_name != "" ? "," : ""}{" "}
             {item.province_name}
           </Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <Text style={{ fontSize: "0.8rem", color: "gray" }}>
             {D.utc_to_local(item.created_on)}
           </Text>
-        </td>
+        </Table.Td>
 
-        <td>
+        <Table.Td>
           <Text
             ta="right"
             fw={600}
@@ -720,14 +715,14 @@ const CompaniesList = ({ data, t }) => {
           >
             {item.deal_count}
           </Text>
-        </td>
+        </Table.Td>
 
-        <td>
+        <Table.Td>
           <Text lineClamp={1}>
             {item.first_name}, {item.last_name}
           </Text>
-        </td>
-        <td>
+        </Table.Td>
+        <Table.Td>
           <CopyButton value={item.email}>
             {({ copied, copy }) => (
               <Text
@@ -743,8 +738,8 @@ const CompaniesList = ({ data, t }) => {
               </Text>
             )}
           </CopyButton>
-        </td>
-        <td style={{ textAlign: "right" }}>
+        </Table.Td>
+        <Table.Td style={{ textAlign: "right" }}>
           <Cell
             fz="sm"
             cell={item.cell}
@@ -753,9 +748,9 @@ const CompaniesList = ({ data, t }) => {
             show_op="COPY_OR_SEND"
             user=""
           />
-        </td>
-        <td></td>
-      </tr>
+        </Table.Td>
+        <Table.Td></Table.Td>
+      </Table.Tr>
     );
   });
 
@@ -766,21 +761,23 @@ const CompaniesList = ({ data, t }) => {
         highlightOnHover
         className={`${"TableCss"} ${"TableCss-Companies"}  ${classesG.table}`}
       >
-        <thead>
-          <tr>
-            <th>{t("company_name", "Company Name")}</th>
-            <th></th>
-            <th>{t("location", "Location")}</th>
-            <th>{t("since", "Since")}</th>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>{t("company_name", "Company Name")}</Table.Th>
+            <Table.Th></Table.Th>
+            <Table.Th>{t("location", "Location")}</Table.Th>
+            <Table.Th>{t("since", "Since")}</Table.Th>
 
-            <th style={{ textAlign: "right" }}>{t("deals", "Deals")}</th>
-            <th>{t("contact", "Contact")}</th>
-            <th>{t("email", "Email")}</th>
-            <th>{t("cell", "Cell")}</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
+            <Table.Th style={{ textAlign: "right" }}>
+              {t("deals", "Deals")}
+            </Table.Th>
+            <Table.Th>{t("contact", "Contact")}</Table.Th>
+            <Table.Th>{t("email", "Email")}</Table.Th>
+            <Table.Th>{t("cell", "Cell")}</Table.Th>
+            <Table.Th></Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
       </Table>
     </ScrollArea>
   );

@@ -8,7 +8,7 @@ import {
   FloatingMenu,
   useEditor,
   mergeAttributes,
-} from "@tiptap/react"; 
+} from "@tiptap/react";
 
 import Highlight from "@tiptap/extension-highlight";
 import StarterKit from "@tiptap/starter-kit";
@@ -137,7 +137,7 @@ import Paragraph from "@tiptap/extension-paragraph";
 import { IconMoon } from "@tabler/icons-react";
 import { useEmoji } from "../hooks/useEmoji";
 import { UseThemeSave, useGlobalStyl } from "../hooks/useTheme";
- 
+
 import { IconChecks } from "@tabler/icons-react";
 import { convertTablesToCSV, parseContent } from "./Convert";
 
@@ -274,7 +274,7 @@ export const AppEditorObsolote = ({
         }}>
             Copy
         </Button> */}
-      <Group justify="apart" mb={2}>
+      <Group justify="space-between" mb={2}>
         {left && <Group justify="left">{left}</Group>}
         <Box></Box>
         <Group justify="right">
@@ -289,7 +289,7 @@ export const AppEditorObsolote = ({
                 copy();
               }}
             >
-              <Group justify="apart">
+              <Group justify="space-between">
                 <Box c={copying ? "blue" : ""}>
                   {!copying && <IconCopy size={24} />}
                   {copying && <IconCheck size={24} />}
@@ -305,7 +305,7 @@ export const AppEditorObsolote = ({
           <Box pos="relative">
             <LoadingOverlay
               // loader={<Loader variant="oval" />}
-              
+
               visible={!show2}
               overlayProps={{ radius: "sm", blur: 2 }}
               opacity={1}
@@ -373,7 +373,7 @@ export const AppEditorObsolote = ({
         }
       </div>
       <Paper p="sm" mb="xs" style={{ borderTop: "1px solid silver" }}>
-        <Group style={{whiteSpace:"nowrap"}} gap={2}>
+        <Group style={{ whiteSpace: "nowrap" }} gap={2}>
           <Button
             variant="light"
             size="xs"
@@ -403,33 +403,6 @@ export const AppEditorObsolote = ({
   );
 };
 
-// const content =
-//     '<h2 style="text-align: center;">Welcome to Mantine rich text editor</h2><p><code>RichTextEditor</code> component focuses on usability and is designed to be as simple as possible to bring a familiar editing experience to regular users. <code>RichTextEditor</code> is based on <a href="https://tiptap.dev/" rel="noopener noreferrer" target="_blank">Tiptap.dev</a> and supports all of its features:</p><ul><li>General text formatting: <strong>bold</strong>, <em>italic</em>, <u>underline</u>, <s>strike-through</s> </li><li>Headings (h1-h6)</li><li>Sub and super scripts (<sup>&lt;sup /&gt;</sup> and <sub>&lt;sub /&gt;</sub> tags)</li><li>Ordered and bullet lists</li><li>Text align&nbsp;</li><li>And all <a href="https://tiptap.dev/extensions" target="_blank" rel="noopener noreferrer">other extensions</a></li></ul>';
-const content_html = `
-    <table style = "border-collapse:collapse !important;table-layout:fixed !important;margin: 0;overflow: hidden !important;">
-        <tr>
-            <th>Item</th>
-            <th>Quantity</th>
-            <th>Price</th>
-        </tr>
-        <tr>
-            <td>Iphone 13 pro max</td>
-            <td>400</td>
-            <td>50</td>
-        </tr>
-        <tr>
-            <td>Iphone 13 pro</td>
-            <td>455</td>
-            <td>94</td>
-        </tr>
-        <tr>
-            <td>Iphone 15 pro max</td>
-            <td>32</td>
-            <td>80</td>
-        </tr>
-  </table>
-  
-`;
 const CustomTableHeader = TableHeader.extend({
   addAttributes() {
     return {
@@ -848,7 +821,11 @@ export const EditorApp = forwardRef(({ edit, content }: any, ref): any => {
                         }
                         onClick={editorObject.toggle}
                       >
-                        <Box c={editorObject.fullscreen ? "red" : ""}>
+                        <Box
+                          c={editorObject.fullscreen ? "red" : ""}
+                          h="16px"
+                          w="16px"
+                        >
                           {!editorObject.fullscreen && (
                             <IconArrowsMinimize stroke={1.5} size="1rem" />
                           )}
@@ -925,7 +902,7 @@ export const EditorApp = forwardRef(({ edit, content }: any, ref): any => {
             </RichTextEditor>
             {editorObject.showThemeToggle && (
               <Paper p="sm" withBorder mt="2px">
-                <Group style={{whiteSpace:"nowrap"}} gap={2}>
+                <Group style={{ whiteSpace: "nowrap" }} gap={2}>
                   <Button
                     variant="light"
                     size="xs"
@@ -1127,7 +1104,7 @@ const EditorAppPost = forwardRef(({ edit, content }: any, ref): any => {
             </RichTextEditor>
             {editorObject.showThemeToggle && (
               <Paper p="sm" withBorder mt="2px">
-                <Group style={{whiteSpace:"nowrap"}} gap={2}>
+                <Group style={{ whiteSpace: "nowrap" }} gap={2}>
                   <Button
                     variant="light"
                     size="xs"
@@ -1243,10 +1220,10 @@ const TableControl = ({
               </RichTextEditor.ControlsGroup>
             )}
           </BubbleMenu>
-          <BubbleMenu
+          {/* <BubbleMenu
             editor={editor}
             shouldShow={({ editor, view, state, oldState, from, to }) => {
-              // only show the bubble menu for links.
+              
               return (
                 from == to &&
                 editor.can().deleteTable() &&
@@ -1264,7 +1241,7 @@ const TableControl = ({
                 editorObject={editorObject}
               />
             </RichTextEditor.ControlsGroup>
-          </BubbleMenu>
+          </BubbleMenu> */}
           <TableAdd
             t={t}
             onAddTable={(rows, cols) => {
@@ -1287,8 +1264,13 @@ const TableControl = ({
                         break;
                     }
                     content_html =
-                      content_html + "<td><div>" + cont + "</div></td>";
-                  } else content_html = content_html + "<td><div></div></td>";
+                      content_html +
+                      "<td><div>" +
+                      cont +
+                      "</div></td>";
+                  } else
+                    content_html =
+                      content_html + "<td><div></div></td>";
                 }
                 content_html = content_html + "</tr>";
               }
@@ -1310,7 +1292,9 @@ const TableControl = ({
             aria-label={t("fix_tables", "Fix tables")}
             title={t("fix_tables", "Fix tables")}
           >
-            <IconEyeTable stroke={1.5} size="1rem" />
+            <Box h="16px" w="16px">
+              <IconEyeTable stroke={1.5} size="1rem" />
+            </Box>
           </RichTextEditor.Control>
 
           <RichTextEditor.Control
@@ -1321,7 +1305,7 @@ const TableControl = ({
             aria-label={t("del_table", "Delete table")}
             title={t("del_table", "Delete table")}
           >
-            <Box c="red">
+            <Box c="red" h="16px" w="16px">
               <IconTableMinus stroke={1.5} size="1rem" />
             </Box>
           </RichTextEditor.Control>
@@ -1350,7 +1334,9 @@ const TableControl = ({
             aria-label={t("merge_cells", "Merge cells")}
             title={t("merge_cells", "Merge cells")}
           >
-            <IconArrowsJoin2 stroke={1.5} size="1rem" />
+            <Box h="16px" w="16px">
+              <IconArrowsJoin2 stroke={1.5} size="1rem" />
+            </Box>
           </RichTextEditor.Control>
 
           <RichTextEditor.Control
@@ -1361,7 +1347,9 @@ const TableControl = ({
             aria-label={t("split_cell", "Split cell")}
             title={t("split_cell", "Split cell")}
           >
-            <IconArrowsSplit2 stroke={1.5} size="1rem" />
+            <Box h="16px" w="16px">
+              <IconArrowsSplit2 stroke={1.5} size="1rem" />
+            </Box>
           </RichTextEditor.Control>
         </RichTextEditor.ControlsGroup>
       )}
@@ -1392,7 +1380,9 @@ const TableColsManipMenu = ({ editor, classesG, t, isIn }) => {
             aria-label={t("add_col_before", "Add column before")}
             title={t("add_col_before", "Add column before")}
           >
-            <IconColumnInsertLeft stroke={1.5} size="1rem" />
+            <Box h="16px" w="16px">
+              <IconColumnInsertLeft stroke={1.5} size="1rem" />
+            </Box>
           </RichTextEditor.Control>
 
           <RichTextEditor.Control
@@ -1407,7 +1397,9 @@ const TableColsManipMenu = ({ editor, classesG, t, isIn }) => {
             aria-label={t("add_col_after", "Add column after")}
             title={t("add_col_after", "Add column after")}
           >
-            <IconColumnInsertRight stroke={1.5} size="1rem" />
+            <Box h="16px" w="16px">
+              <IconColumnInsertRight stroke={1.5} size="1rem" />
+            </Box>
           </RichTextEditor.Control>
 
           <RichTextEditor.Control
@@ -1422,7 +1414,7 @@ const TableColsManipMenu = ({ editor, classesG, t, isIn }) => {
             aria-label={t("del_col", "Delete column")}
             title={t("del_col", "Delete column")}
           >
-            <Box c="red">
+            <Box c="red" h="16px" w="16px">
               <IconColumnRemove stroke={1.5} size="1rem" />
             </Box>
           </RichTextEditor.Control>
@@ -1448,7 +1440,9 @@ const TableRowsManipMenu = ({ editor, classesG, t, isIn }) => {
             aria-label={t("add_row_before", "Add row before")}
             title={t("add_row_before", "Add row before")}
           >
-            <IconRowInsertTop stroke={1.5} size="1rem" />
+            <Box h="16px" w="16px">
+              <IconRowInsertTop stroke={1.5} size="1rem" />
+            </Box>
           </RichTextEditor.Control>
 
           <RichTextEditor.Control
@@ -1463,7 +1457,9 @@ const TableRowsManipMenu = ({ editor, classesG, t, isIn }) => {
             aria-label={t("add_row_after", "Add row after")}
             title={t("add_row_after", "Add row after")}
           >
-            <IconRowInsertBottom stroke={1.5} size="1rem" />
+            <Box h="16px" w="16px">
+              <IconRowInsertBottom stroke={1.5} size="1rem" />
+            </Box>
           </RichTextEditor.Control>
 
           <RichTextEditor.Control
@@ -1478,7 +1474,7 @@ const TableRowsManipMenu = ({ editor, classesG, t, isIn }) => {
             aria-label={t("del_row", "Delete row")}
             title={t("del_row", "Delete row")}
           >
-            <Box c="red">
+            <Box c="red" h="16px" w="16px">
               <IconRowRemove stroke={1.5} size="1rem" />
             </Box>
           </RichTextEditor.Control>
@@ -1640,10 +1636,12 @@ const TableEnableBubbleMenu = ({ editor, t, editorObject, classesG, isIn }) => {
           }
         >
           {!enableTableBubbleMenu && (
-            <IconTableOptions stroke={1.5} size="1rem" />
+            <Box c="red" h="16px" w="16px">
+              <IconTableOptions stroke={1.5} size="1rem" />
+            </Box>
           )}
           {enableTableBubbleMenu && (
-            <Box c="red">
+            <Box c="red" h="16px" w="16px">
               <IconTableOff stroke={1.5} size="1rem" />
             </Box>
           )}
@@ -1674,9 +1672,9 @@ const TableAdd = ({ t, onAddTable }) => {
       cells.push({ id: i });
     }
     const rows = cells?.map((row) => (
-      <tr key={row.id}>
+      <Table0.Tr key={row.id}>
         {cells?.map((col, idx) => (
-          <td
+          <Table0.Td
             key={idx}
             className={
               row.id <= rowId && rowId >= 0 && col.id <= colId && colId >= 0
@@ -1687,19 +1685,19 @@ const TableAdd = ({ t, onAddTable }) => {
               setRowId(row.id);
               setColId(col.id);
             }}
-            onClick={() => {
+            onMouseDown={() => {
               onAddTable(row.id + 1, col.id + 1);
               setOpened(false);
             }}
           >
             {}
-          </td>
+          </Table0.Td>
         ))}
-      </tr>
+      </Table0.Tr>
     ));
     return (
       <Table0 unstyled className={classesG.editorTableDraft}>
-        <tbody>{rows}</tbody>
+        <Table0.Tbody>{rows}</Table0.Tbody>
       </Table0>
     );
   };
@@ -1710,7 +1708,7 @@ const TableAdd = ({ t, onAddTable }) => {
           aria-label={t("insert_table", "Insert table")}
           title={t("insert_table", "Insert table")}
         >
-          <Box ref={ref}>
+          <Box ref={ref} h="16px" w="16px">
             <Popover
               opened={opened}
               width={180}
@@ -1731,12 +1729,12 @@ const TableAdd = ({ t, onAddTable }) => {
               </Popover.Target>
 
               <Popover.Dropdown
-                // sx={(theme) => ({
-                //   background:
-                //     theme.colorScheme === "dark"
-                //       ? theme.colors.dark[7]
-                //       : theme.white,
-                // })}
+              // sx={(theme) => ({
+              //   background:
+              //     theme.colorScheme === "dark"
+              //       ? theme.colors.dark[7]
+              //       : theme.white,
+              // })}
               >
                 {createTableDraft()}
                 <Group justify="center" gap="xs" mt="md">
@@ -1804,7 +1802,7 @@ const Colors = ({ t, purpose, title, ...others }) => {
     <>
       {editor && (
         <RichTextEditor.Control aria-label={title} title={title}>
-          <Box ref={ref}>
+          <Box ref={ref} h="16px" w="16px">
             <Popover
               opened={opened}
               width={300}
@@ -1832,12 +1830,12 @@ const Colors = ({ t, purpose, title, ...others }) => {
               </Popover.Target>
 
               <Popover.Dropdown
-                // sx={(theme) => ({
-                //   background:
-                //     theme.colorScheme === "dark"
-                //       ? theme.colors.dark[7]
-                //       : theme.white,
-                // })}
+              // sx={(theme) => ({
+              //   background:
+              //     theme.colorScheme === "dark"
+              //       ? theme.colors.dark[7]
+              //       : theme.white,
+              // })}
               >
                 <Box ref={ref2}>
                   <ColorInput
@@ -1913,7 +1911,9 @@ const Colors = ({ t, purpose, title, ...others }) => {
                       onMouseDown={() => update("", true)}
                       title={t("unset_color", "Unset color")}
                     >
-                      <IconCircleOff stroke={1.5} size="1rem" />
+                      <Box h="16px" w="16px">
+                        <IconCircleOff stroke={1.5} size="1rem" />
+                      </Box>
                     </ActionIcon>
                     <ActionIcon
                       variant="filled"
@@ -1944,7 +1944,7 @@ const LineHeight = ({ t }) => {
           aria-label={t("line_height", "Line height")}
           title={t("line_height", "Line height")}
         >
-          <Box ref={ref}>
+          <Box ref={ref} h="16px" w="16px">
             <Menu shadow="md" width={50} opened={opened}>
               <Menu.Target>
                 {/* <IconLineHeight stroke={1.5} size="1rem" /> */}
@@ -2030,7 +2030,7 @@ const TextAlign2 = ({ t }) => {
           aria-label={t("align", "Align")}
           title={t("align", "Align")}
         >
-          <Box ref={ref}>
+          <Box ref={ref} h="16px" w="16px">
             <Menu shadow="md" width={50} opened={opened}>
               <Menu.Target>
                 {/* <IconBaselineDensitySmall stroke={1.5} size="1rem" /> */}
@@ -2096,7 +2096,7 @@ const Heading = ({ t }) => {
           aria-label={t("heading", "Heading")}
           title={t("heading", "Heading")}
         >
-          <Box ref={ref}>
+          <Box ref={ref} h="16px" w="16px">
             <Menu shadow="md" width={50} opened={opened}>
               <Menu.Target>
                 {/* <IconHeading stroke={1.5} size="1rem" /> */}
@@ -2178,7 +2178,7 @@ const FontSize = ({ t }) => {
           aria-label={t("size", "Size")}
           title={t("size", "Size")}
         >
-          <Box ref={ref}>
+          <Box ref={ref} h="16px" w="16px">
             <Menu shadow="md" width={150} opened={opened}>
               <Menu.Target>
                 <Box
@@ -2287,8 +2287,8 @@ const Copy = ({ t, editor }) => {
             aria-label={t("copy", "Copy")}
             title={t("copy", "Copy")}
           >
-            <Box c="blue.7">
-              <IconCopy stroke={1.5} size="1rem" />
+            <Box c="blue.7" h="16px" w="16px">
+              <IconCopy stroke={1.5} size="16px" />
             </Box>
           </RichTextEditor.Control>
         </>
@@ -2350,6 +2350,8 @@ const ThemeToggle = ({ t, onThemeToggle }) => {
                   onMouseDown={() => {
                     setOpened((o) => !o);
                   }}
+                  h="16px"
+                  w="16px"
                 >
                   <IconBrightness stroke={1.5} size="1rem" />
                   {/* {current === 'light' && <IconBrightnessUp stroke={1.5} size="1rem" />}
@@ -2360,12 +2362,12 @@ const ThemeToggle = ({ t, onThemeToggle }) => {
               </Popover.Target>
 
               <Popover.Dropdown
-                // sx={(theme) => ({
-                //   background:
-                //     theme.colorScheme === "dark"
-                //       ? theme.colors.dark[7]
-                //       : theme.white,
-                // })}
+              // sx={(theme) => ({
+              //   background:
+              //     theme.colorScheme === "dark"
+              //       ? theme.colors.dark[7]
+              //       : theme.white,
+              // })}
               >
                 <Group justify="right">
                   <SegmentedControl
@@ -2597,7 +2599,7 @@ const EmojiPickerControl = ({ t, classesG, editor, ...others }) => {
               >
                 <Group justify="center" w="100%" gap={0} ref={ref2} p={5} m={0}>
                   <Group
-                    justify="apart"
+                    justify="space-between"
                     w="100% !important"
                     p={5}
                     pl={15}
@@ -2917,401 +2919,84 @@ export const FontSizeStyle = Extension.create<ColorOptions>({
     };
   },
 });
-
-function DemoTable() {
-  const elements = [
-    { position: 6, mass: 12.011, symbol: "C", name: "Carbon" },
-    { position: 7, mass: 14.007, symbol: "N", name: "Nitrogen" },
-    { position: 39, mass: 88.906, symbol: "Y", name: "Yttrium" },
-    { position: 56, mass: 137.33, symbol: "Ba", name: "Barium" },
-    { position: 58, mass: 140.12, symbol: "Ce", name: "Cerium" },
-  ];
-  const rows = elements.map((element) => (
-    <tr key={element.name}>
-      <td>{element.position}</td>
-      <td>{element.name}</td>
-      <td>{element.symbol}</td>
-      <td>{element.mass}</td>
-    </tr>
-  ));
-
-  return (
-    <>
-      <Table0>
-        <thead>
-          <tr>
-            <th>Element position</th>
-            <th>Element name</th>
-            <th>Symbol</th>
-            <th>Atomic mass</th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </Table0>
-
-      <Table0 unstyled>
-        <thead>
-          <tr>
-            <th>Element position</th>
-            <th>Element name</th>
-            <th>Symbol</th>
-            <th>Atomic mass</th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </Table0>
-    </>
-  );
-}
-
-// export const AppEditor = ({ error, editorFor, content, onChange, edit, left, right, extra, refreshStamp, ...others }) => {
-
-//     const editorForS = !editorFor || editorFor == '' ? EditorFor.ANY : editorFor
-//     const showThemeToggle = others && others.showThemeToggle ? others.showThemeToggle : false
-//     const { ref: refSize, width, height } = useElementSize();
-//     const { ref, toggle, fullscreen } = useFullscreen();
-//     let { postTheme } = UseThemeSave()
-//     const { t } = useTranslation('common', { keyPrefix: 'tool' });
-//     const [themePreview, setThemePreview] = useState<any>(null)
-//     const small = useSelector(selectSmall);
-//     const medium = useSelector(selectMedium);
-//     const clipboard = useClipBoarHtml({ timeout: 750, timeouthtml: 10000, t: t });
-
-//     const { classes: classesG } = useGlobalStyl();
-
-//     let { toggleTheme } = useAppTheme();
-//     let onPopover = others.onPopover
-//     const [editable, setEditable] = useState(true)
-
-//     useEffect(() => {
-//         editor?.commands.clearContent(true)
-//         editor?.chain().focus().insertContent(content, {
-//             parseOptions: {
-//                 preserveWhitespace: false,
-//             }
-//         }).run()
-//     }, [content, refreshStamp])
-//     const editor = useEditor({
-//         editable: editable,
-//         onBlur({ editor }) {
-//             if (onChange) {
-//                 // let js = JSON.stringify(editor.getJSON())
-//                 let txt = editor.getText()
-//                 // let txt2 = editor.view.dom.innerText.replace(/\t\n/g, '\t');
-//                 let html = editor.getHTML();
-//                 onChange(html, txt)
-//             }
+// export const FontSizeStyle = Extension.create<ColorOptions>({
+//   name: "fontSize",
+//   addOptions() {
+//     return {
+//       types: ["textStyle"],
+//     };
+//   },
+//   addGlobalAttributes() {
+//     return [
+//       {
+//         types: this.options.types,
+//         attributes: {
+//           fontSize: {
+//             default: null,
+//             parseHTML: (element) =>
+//               element.style.fontSize.replace(/['"]+/g, ""),
+//             renderHTML: (attributes) => {
+//               if (!attributes.fontSize) {
+//                 return {};
+//               }
+//               return {
+//                 style: `font-size: ${attributes.fontSize}`,
+//               };
+//             },
+//           },
 //         },
-//         extensions: [
-//             StarterKit,
-//             Paragraph.extend({
-//                 parseHTML() {
-//                     return [{ tag: 'div' }]
-//                 },
-//                 renderHTML({ HTMLAttributes }) {
-//                     return ['div', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0]
-//                 },
-//             }),
-//             Underline,
-//             LinkTip,
-//             CustomTable2.configure(
-//                 {
-//                     resizable: true
-//                 }
-//             ),
-//             TableRow,
-//             CustomTableHeader,
-//             Highlight,
-//             TextAlign.configure({ types: ['heading', 'paragraph'] }),
-//             CustomTableCell,
-//             TextStyle,
-//             Color,
-//             BackColorStyle,
-//             LineHeightStyle,
-//             FontSizeStyle,
+//       },
+//     ];
+//   },
 
-//         ],
-//         content: content
-//     });
+//   addCommands() {
+//     return {
+//       setFontSize:
+//         (fontSize) =>
+//         ({ chain }) => {
+//           return chain().setMark("textStyle", { fontSize: fontSize }).run();
+//         },
+//       unsetFontSize:
+//         () =>
+//         ({ chain }) => {
+//           return chain()
+//             .setMark("textStyle", { fontSize: null })
+//             .removeEmptyTextStyle()
+//             .run();
+//         },
+//     };
+//   },
+// });
+ 
+//   return (
+//     <>
+//       <Table0>
+//         <Table0.Thead>
+//           <Table0.Tr>
+//             <Table0.Th>Element position</Table0.Th>
+//             <Table0.Th>Element name</Table0.Th>
+//             <Table0.Th>Symbol</Table0.Th>
+//             <Table0.Th>Atomic mass</Table0.Th>
+//           </Table0.Tr>
+//         </Table0.Thead>
+//         <Table0.Tbody>{rows}</Table0.Tbody>
+//       </Table0>
 
-//     const getThemPreviewClass = () => {
-//         if (themePreview == 'light')
-//             return classesG.editorThemeLight
-//         if (themePreview == 'dark')
-//             return classesG.editorThemeDark
-//         if (themePreview == 'dim')
-//             return classesG.editorThemeDim
-//         return ''
-//     }
-//     return (
-//         <>
-//             {editorForS == EditorFor.ANY && <EditorAny error={error} edit={edit} refSize={refSize} ref={ref} editor={editor} getThemPreviewClass={getThemPreviewClass} t={t} classesG={classesG} onPopover={onPopover} setThemePreview={setThemePreview} fullscreen={fullscreen} toggle={toggle} small={small} medium={medium} toggleTheme={toggleTheme} postTheme={postTheme} showThemeToggle={showThemeToggle} />}
-//             {editorForS == EditorFor.DEAL_ITEM && <EditorPost error={error} edit={edit} refSize={refSize} ref={ref} editor={editor} getThemPreviewClass={getThemPreviewClass} t={t} classesG={classesG} onPopover={onPopover} setThemePreview={setThemePreview} fullscreen={fullscreen} toggle={toggle} small={small} medium={medium} toggleTheme={toggleTheme} postTheme={postTheme} showThemeToggle={showThemeToggle} />}
-
-//         </>
-//     )
+//       <Table0 unstyled>
+//         <Table0.Thead>
+//           <Table0.Tr>
+//             <Table0.Th>Element position</Table0.Th>
+//             <Table0.Th>Element name</Table0.Th>
+//             <Table0.Th>Symbol</Table0.Th>
+//             <Table0.Th>Atomic mass</Table0.Th>
+//           </Table0.Tr>
+//         </Table0.Thead>
+//         <Table0.Tbody>{rows}</Table0.Tbody>
+//       </Table0>
+//     </>
+//   );
 // }
-// const EditorAny = ({ error, edit, refSize, ref, editor, getThemPreviewClass, t, classesG, onPopover, setThemePreview, fullscreen, toggle, small, medium, toggleTheme, postTheme, showThemeToggle }) => {
-//     return (<Box ref={refSize}>
-//         <Box ref={ref} maw='760px' >
-//             <RichTextEditor editor={editor} withTypographyStyles={false} className={getThemPreviewClass()} style={{ border: error ? "1px solid red" : "" }}>
-
-//                 {edit && <RichTextEditor.Toolbar sticky stickyOffset={0}>
-//                     <RichTextEditor.ControlsGroup>
-//                         <UndoRedo t={t} />
-//                     </RichTextEditor.ControlsGroup>
-//                     {editor && (
-//                         <BubbleMenu editor={editor}
-//                             shouldShow={({ editor, view, state, oldState, from, to }) => {
-//                                 // only show the bubble menu for links.
-//                                 return from != to
-
-//                             }}
-//                         >
-//                             <RichTextEditor.ControlsGroup style={{ backgroundColor: "black" }}>
-//                                 <RichTextEditor.Bold />
-//                                 <RichTextEditor.Italic />
-//                                 <Colors t={t} purpose={ColorContrlPurpoese.BACK} title={t('background_color', 'Background color')} onPopover={onPopover} />
-//                                 <Colors t={t} purpose={ColorContrlPurpoese.TEXT} title={t('text_color', 'Text color')} onPopover={onPopover} />
-
-//                             </RichTextEditor.ControlsGroup>
-//                         </BubbleMenu>
-//                     )}
-
-//                     {editor && (
-//                         <FloatingMenu editor={editor}>
-//                             <RichTextEditor.ControlsGroup>
-//                                 <RichTextEditor.H1 />
-//                                 <RichTextEditor.H2 />
-//                                 <RichTextEditor.BulletList />
-//                             </RichTextEditor.ControlsGroup>
-//                         </FloatingMenu>
-//                     )}
-
-//                     <RichTextEditor.ControlsGroup>
-//                         <EmojiPickerControl t={t} classesG={classesG} editor={editor} onPopover={onPopover} />
-//                         <RichTextEditor.Bold />
-//                         <RichTextEditor.Italic />
-//                         <RichTextEditor.Underline />
-
-//                         <RichTextEditor.Strikethrough />
-//                         <RichTextEditor.ClearFormatting />
-//                         <RichTextEditor.Highlight />
-
-//                     </RichTextEditor.ControlsGroup>
-//                     <RichTextEditor.ControlsGroup>
-//                         <Copy t={t} editor={editor} />
-//                         <ThemeToggle t={t} onThemeToggle={(val) => {
-//                             setThemePreview(val)
-//                         }} />
-//                         {editor && <RichTextEditor.Control
-
-//                             aria-label={fullscreen ? t('exit_fullscreen', 'Exit fullscreen') : t('fullscreen', 'Fullscreen')}
-//                             title={fullscreen ? t('exit_fullscreen', 'Exit fullscreen') : t('fullscreen', 'Fullscreen')}
-//                             onClick={toggle}
-//                         >
-//                             <Box c={fullscreen ? 'red' : ''}>
-//                                 {!fullscreen && <IconArrowsMinimize stroke={1.5} size="1rem" />}
-//                                 {fullscreen && <IconArrowsMaximize stroke={1.5} size="1rem" />}
-//                             </Box>
-//                         </RichTextEditor.Control>}
-//                     </RichTextEditor.ControlsGroup>
-//                     <RichTextEditor.ControlsGroup>
-//                         <Colors t={t} purpose={ColorContrlPurpoese.BACK} title={t('background_color', 'Background color')} onPopover={onPopover} />
-//                         <Colors t={t} purpose={ColorContrlPurpoese.TEXT} title={t('text_color', 'Text color')} onPopover={onPopover} />
-//                         <RichTextEditor.UnsetColor />
-//                     </RichTextEditor.ControlsGroup>
-//                     <RichTextEditor.ControlsGroup>
-//                         <Heading t={t} />
-//                         <FontSize t={t} />
-//                     </RichTextEditor.ControlsGroup>
-
-//                     <RichTextEditor.ControlsGroup>
-//                         <RichTextEditor.BulletList />
-//                         <RichTextEditor.OrderedList />
-//                     </RichTextEditor.ControlsGroup>
-
-//                     <RichTextEditor.ControlsGroup>
-//                         <LineHeight t={t} />
-//                         <TextAlign2 t={t} />
-//                     </RichTextEditor.ControlsGroup>
-
-//                     <TableControl t={t} editor={editor} showCellManip={true} />
-//                 </RichTextEditor.Toolbar>
-//                 }
-//                 <ScrollArea.Autosize mah={!fullscreen ? '500px' : small || medium ? '70vh' : '80vh'}
-//                     mih="150px" mx="auto" mt="0px" style={{ overflow: "auto" }}>
-//                     <RichTextEditor.Content mt={0} mih={!fullscreen ? '150px' : small || medium ? '70vh' : '80vh'} />
-//                 </ScrollArea.Autosize>
-//             </RichTextEditor>
-//             {showThemeToggle && <Paper p="sm" withBorder mt="2px">
-//                 <Group noWrap gap={2}>
-//                     <Button variant="light" size='xs' type="button" onClick={
-//                         () => {
-
-//                             toggleTheme()
-//                             postTheme()
-//                         }
-//                     }>
-//                         <Group>
-//                             <IconSwitchHorizontal size={18} />
-//                         </Group>
-//                     </Button>
-//                     <Box className={classesG.fontNotes}>
-//                         <span style={{ marginTop: 20 }}>
-//                             {t('please_switch_themes', "**Please toggle between the dark and light themes to see how the editor content appears in each.")}
-//                         </span>
-//                     </Box>
-//                 </Group>
-//             </Paper>
-//             }
-//         </Box>
-//     </Box>
-//     );
-// }
-
-// const EditorPost = ({ error, edit, refSize, ref, editor, getThemPreviewClass, t, classesG, onPopover, setThemePreview, fullscreen, toggle, small, medium, toggleTheme, postTheme, showThemeToggle }) => {
-//     // const [initiated, setInitiated] = useState(false)
-//     useEffect(() => {
-//         if (editor) {
-//             // setInitiated(true)
-//             editor.on('transaction', ({ editor: editor0, event }) => {
-//                 if (!edit)
-//                     editor.setOptions({ editable: false });
-//                 else {
-//                     let edita = editor ? editor.can().deleteTable() : false
-//                     editor.setOptions({ editable: edita });
-//                 }
-//             })
-//         }
-//     }, [editor, edit])
-//     const countTables = () => {
-//         if (!editor)
-//             return 'NO'
-//         const { $head } = editor.view.state.selection
-//         if (!$head)
-//             return 'NO4'
-//         // if (myNodePos){
-//         //     console.log(myNodePos)
-//         // }
-//         // // editor.view.state.selection
-
-//         // const { selection } = editor.state;
-//         // const { head } = selection;
-//         // if (!head || !head.closest)
-//         //     return 'NO2'
-//         try {
-//             const myNodePos = editor.$pos($head.pos)
-//             if (myNodePos && myNodePos.closest) {
-//                 let before = null
-//                 let closestTableRow = myNodePos.closest('tableRow')
-//                 // let closestTableCell = myNodePos.closest('tableCell')
-//                 // let closestTableHeader = myNodePos.closest('tableHeader')
-//                 if (closestTableRow && closestTableRow.parent && closestTableRow.parent.children) {
-//                     for (let i = 0; i < closestTableRow.parent.children.length; i++) {
-//                         if (closestTableRow.parent.firstChild.content == closestTableRow.content)
-//                             return 'YES'
-//                     }
-
-//                 }
-//                 // if ((closestTableCell || closestTableHeader) && (closestTableRow)) {
-//                 //     return 'YES'
-//                 // }
-//                 // if (closest && closest.before.node.type.name)
-//                 //     console.log(closest.before.node.type.name)
-//             }
-//         } catch (error) {
-
-//         }
-//         return 'NO'
-//         // const isInFirstRow = $head.node().type.name === 'tableRow' && $head.index(0) === 0;
-//         // return isInFirstRow ? 'YES' : 'NO2'
-//         // const tables = editor.$nodes('table')
-//         // return tables && tables.length > 0 ? tables.length : 0
-//     }
-//     const isTableHeaderSelected = () => {
-
-//         try {
-//             if (!editor)
-//                 return false
-//             const { $head } = editor.view.state.selection
-//             if (!$head)
-//                 return false
-//             const myNodePos = editor.$pos($head.pos)
-//             if (myNodePos && myNodePos.closest) {
-//                 let closestTableRow = myNodePos.closest('tableRow')
-//                 if (closestTableRow && closestTableRow.parent && closestTableRow.parent.children) {
-//                     for (let i = 0; i < closestTableRow.parent.children.length; i++) {
-//                         if (closestTableRow.parent.firstChild.content == closestTableRow.content)
-//                             return true
-//                     }
-//                 }
-//             }
-//         } catch (error) {
-
-//         }
-//         return false
-//     }
-//     return (<Box ref={refSize}>
-//         <Box ref={ref} maw='760px' >
-//             {countTables()}
-//             <RichTextEditor editor={editor} withTypographyStyles={false} className={getThemPreviewClass()} style={{ border: error ? "1px solid red" : "" }}>
-
-//                 {edit && <RichTextEditor.Toolbar sticky stickyOffset={0}>
-//                     <RichTextEditor.ControlsGroup>
-//                         <UndoRedo t={t} />
-//                     </RichTextEditor.ControlsGroup>
-//                     <RichTextEditor.ControlsGroup>
-//                         <Copy t={t} editor={editor} />
-//                         <ThemeToggle t={t} onThemeToggle={(val) => {
-//                             setThemePreview(val)
-//                         }} />
-//                         {editor && <RichTextEditor.Control
-
-//                             aria-label={fullscreen ? t('exit_fullscreen', 'Exit fullscreen') : t('fullscreen', 'Fullscreen')}
-//                             title={fullscreen ? t('exit_fullscreen', 'Exit fullscreen') : t('fullscreen', 'Fullscreen')}
-//                             onClick={toggle}
-//                         >
-//                             <Box c={fullscreen ? 'red' : ''}>
-//                                 {!fullscreen && <IconArrowsMinimize stroke={1.5} size="1rem" />}
-//                                 {fullscreen && <IconArrowsMaximize stroke={1.5} size="1rem" />}
-//                             </Box>
-//                         </RichTextEditor.Control>}
-//                     </RichTextEditor.ControlsGroup>
-
-//                     <TableControl t={t} editor={editor} showCellManip={false} />
-//                 </RichTextEditor.Toolbar>
-//                 }
-//                 <ScrollArea.Autosize mah={!fullscreen ? '500px' : small || medium ? '70vh' : '80vh'}
-//                     mih="150px" mx="auto" mt="0px" style={{ overflow: "auto" }}>
-//                     <RichTextEditor.Content mt={0} mih={!fullscreen ? '150px' : small || medium ? '70vh' : '80vh'} />
-//                 </ScrollArea.Autosize>
-//             </RichTextEditor>
-//             {showThemeToggle && <Paper p="sm" withBorder mt="2px">
-//                 <Group noWrap gap={2}>
-//                     <Button variant="light" size='xs' type="button" onClick={
-//                         () => {
-
-//                             toggleTheme()
-//                             postTheme()
-//                         }
-//                     }>
-//                         <Group>
-//                             <IconSwitchHorizontal size={18} />
-//                         </Group>
-//                     </Button>
-//                     <Box className={classesG.fontNotes}>
-//                         <span style={{ marginTop: 20 }}>
-//                             {t('please_switch_themes', "**Please toggle between the dark and light themes to see how the editor content appears in each.")}
-//                         </span>
-//                     </Box>
-//                 </Group>
-//             </Paper>
-//             }
-//         </Box>
-//     </Box>
-//     );
-// }
+ 
 
 const message_to_post_fields_map = {
   item: ["item", "items", "name", "names", "description"],

@@ -161,7 +161,7 @@ export const Team = () => {
       )}
 
       <AppHeader title={teamTitle}>
-        <Group mt="xs" justify="right" gap="xs">
+        <Group justify="right" gap="xs">
           <Button
             variant="default"
             onClick={(val) => {

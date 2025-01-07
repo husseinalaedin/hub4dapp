@@ -62,7 +62,7 @@ export const InputPopUpListSelect = (props) => {
   useEffect(() => {
     if (!dataListLcl || !dataListLcl.map) return;
     const rows2 = dataListLcl.map((element) => (
-      <tr
+      <Table.Tr
         key={element.label}
         style={{ cursor: "pointer" }}
         onClick={() => {
@@ -77,8 +77,8 @@ export const InputPopUpListSelect = (props) => {
           }
         }}
       >
-        <td>{element[labelSearch]}</td>
-      </tr>
+        <Table.Td>{element[labelSearch]}</Table.Td>
+      </Table.Tr>
     ));
     setRows(rows2);
   }, [dataListLcl]);
@@ -96,9 +96,9 @@ export const InputPopUpListSelect = (props) => {
   }, [form?.values[formKey], textBeforeEdit]);
 
   const ths = (
-    <tr>
-      <th></th>
-    </tr>
+    <Table.Tr>
+      <Table.Th></Table.Th>
+    </Table.Tr>
   );
 
   return (
@@ -174,9 +174,8 @@ export const InputPopUpListSelect = (props) => {
             ></TextInput>
           </Paper>
           <Box mr="md">
-            <Table highlightOnHover>
-              {/* <thead>{ths}</thead> */}
-              <tbody>{rows}</tbody>
+            <Table highlightOnHover> 
+              <Table.Tbody>{rows}</Table.Tbody>
             </Table>
             {/* {dataList.map((item, index) => {
                         return <div key={index} style={{cursor:"pointer"}}>{item[label]}</div>

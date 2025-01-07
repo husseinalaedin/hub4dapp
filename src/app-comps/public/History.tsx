@@ -34,7 +34,7 @@ export const History = () => {
   return (
     <>
       <AppHeader title={t("history", "Histories")}>
-        <Group mt="xs" justify="right" gap="xs">
+        <Group justify="right" gap="xs">
           <Button
             variant="outline"
             c="red"

@@ -56,7 +56,7 @@ export const Usage = () => {
         />
       )}
       <AppHeader title={t("plan_usage", "Plan Usage")}>
-        <Group mt="xs" justify="right" gap="xs">
+        <Group justify="right" gap="xs">
           <Button
             variant="default"
             onClick={(val) => {
@@ -96,10 +96,10 @@ export const Usage = () => {
                   }}
                   // sx={(theme) => ({
                   //   transition: "text-decoration 0.2s, color 0.2s",
-                  //   color: theme.colors.blue[6],  
+                  //   color: theme.colors.blue[6],
                   //   "&:hover": {
                   //     textDecoration: "underline",
-                  //     color: theme.colors.blue[8],  
+                  //     color: theme.colors.blue[8],
                   //   },
                   // })}
                 >
@@ -111,7 +111,11 @@ export const Usage = () => {
               </Alert>
             )}
             <Card m={0} shadow="md" mt="md" withBorder>
-              <Group gap="4px" justify="apart" style={{ width: "100%" }}>
+              <Group
+                gap="4px"
+                justify="space-between"
+                style={{ width: "100%" }}
+              >
                 <Group gap="4px" justify="left">
                   {/* <IconCircleCheck size="1rem" /> */}
                   <Box opacity="0.75">
@@ -139,7 +143,7 @@ export const Usage = () => {
                   </Box>
                 </Group>
               </Group>
-              <Group justify="apart">
+              <Group justify="space-between">
                 <Box opacity="0.75">
                   {t("you_can_post_deals", "You can still post deals — up to")}
                 </Box>
@@ -149,7 +153,11 @@ export const Usage = () => {
               </Group>
             </Card>
             <Card mt="lg" shadow="md" withBorder>
-              <Group gap="4px" justify="apart" style={{ width: "100%" }}>
+              <Group
+                gap="4px"
+                justify="space-between"
+                style={{ width: "100%" }}
+              >
                 <Group gap="4px" justify="left">
                   {/* <IconCircleCheck size="1rem" /> */}
                   <Box opacity="0.75">
@@ -178,7 +186,7 @@ export const Usage = () => {
                   </Box>
                 </Group>
               </Group>
-              <Group justify="apart">
+              <Group justify="space-between">
                 <Box opacity="0.75">
                   {t(
                     "you_can_use_channels",
@@ -192,7 +200,11 @@ export const Usage = () => {
             </Card>
 
             <Card mt="lg" shadow="md" withBorder>
-              <Group gap="4px" justify="apart" style={{ width: "100%" }}>
+              <Group
+                gap="4px"
+                justify="space-between"
+                style={{ width: "100%" }}
+              >
                 <Group gap="4px" justify="left">
                   {/* <IconCircleCheck size="1rem" /> */}
                   <Box opacity="0.75">
@@ -220,7 +232,7 @@ export const Usage = () => {
                   </Box>
                 </Group>
               </Group>
-              <Group justify="apart">
+              <Group justify="space-between">
                 <Box opacity="0.75">
                   {t("you_can_share", "You can still share — up to")}
                 </Box>
@@ -230,7 +242,7 @@ export const Usage = () => {
               </Group>
             </Card>
             <Card mt="lg" shadow="md" withBorder>
-              <Group justify="apart">
+              <Group justify="space-between">
                 <Box opacity="0.75">
                   {t(
                     "dash_performance_analytics",
@@ -244,7 +256,7 @@ export const Usage = () => {
                   <Box opacity="0.75">{t("days", "Days")}</Box>
                 </Group>
               </Group>
-              <Group justify="apart">
+              <Group justify="space-between">
                 <Box opacity="0.75">{t("starting_on", "Starting On")}</Box>
                 <Box c="violet">
                   <strong>{`${D.utc_to_local(

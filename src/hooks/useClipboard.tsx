@@ -176,9 +176,7 @@ const ClipBoardPopCom = ({
       clearTimeout(tim);
     };
   }, []);
-  // const tbl = (cont) => {
-  //     return `<table align="center" valign="top"><tr><td>${cont}</td></tr></table>`
-  // }
+  
   return (
     <Center mah={"calc(100vh - 20px)"} mt="10px" mb="10px">
       <Box
