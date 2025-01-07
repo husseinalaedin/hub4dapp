@@ -163,10 +163,11 @@ export const AppGlobalStylProvider = ({ children }:any) => {
           colorScheme === "dark"
             ? darken(theme.colors.dark[7], 0.5)
             : lighten(theme.colors.gray[1], 0.5),
-        borderBottom: `3px solid ${
-          colorScheme === "dark" ? theme.colors.gray[7] : theme.colors.gray[6]
-        }`,
+        // borderBottom: `3px solid ${
+        //   colorScheme === "dark" ? theme.colors.gray[7] : theme.colors.gray[6]
+        // }`,
         borderRadius: "10px",
+        "*": { fontSize: "1rem" },
       },
       navTop: {
         backgroundColor:
