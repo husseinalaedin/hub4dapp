@@ -226,7 +226,7 @@ export const Nav = () => {
       pathsToMatch.some((path) => matchPath(path, location.pathname))
     );
   };
- 
+   
   // location.pathname.indexOf('app/trades') >= 0 || location.pathname.indexOf('app/latest-trades') >= 0 || location.pathname.indexOf('app/history') >= 0 || islogged
   const items = nav_items.map((item, index) => {
     if (
