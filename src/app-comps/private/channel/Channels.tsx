@@ -210,12 +210,7 @@ export const Channels = () => {
         />
       )}
 
-      <AppHeader
-        title={t(
-          "channel_title_channel",
-          "Channels"
-        )}
-      >
+      <AppHeader title={t("channel_title_channel", "Channels")}>
         <Group justify="right" gap="xs">
           <Button
             variant="default"
@@ -1194,7 +1189,7 @@ export const AddEditChannelMain = ({ fromPopup, onSaved }: any) => {
   );
 };
 
-export const ChannelSearch = (props: { grid: any; hideGridView: any }) => {
+export const ChannelSearch = (props) => {
   let { lastXDays, lastXHours } = useDateValues({
     fill: DATETIMEVALUES_FILL.ALL,
   });
@@ -1251,6 +1246,7 @@ export const ChannelSearch = (props: { grid: any; hideGridView: any }) => {
   const initForm = () => {
     G.clearForm(form);
   };
+ 
   return (
     <>
       <SearchPannel
@@ -1336,9 +1332,10 @@ export const ChannelSearch = (props: { grid: any; hideGridView: any }) => {
             <Group justify="space-between" gap={4}>
               <Box maw={"calc(50% - 4px)"}>
                 <HoursRangeSelect
-                  zIndex={501}
+                {...form.getInputProps("period_hours")}
                   data={lastXHours}
-                  {...form.getInputProps("period_hours")}
+                  
+                  zIndex={501}
                   label={t("created_last_hours", "Created last(hours)")}
                   placeholder={t(
                     "created_last_hours",
@@ -1348,8 +1345,9 @@ export const ChannelSearch = (props: { grid: any; hideGridView: any }) => {
               </Box>
               <Box maw={"calc(50% - 4px)"}>
                 <HoursRangeSelect
+                {...form.getInputProps("period_days")}
                   data={lastXDays}
-                  {...form.getInputProps("period_days")}
+                  
                   label={t("created_days", "Created(days)")}
                   placeholder={t(
                     "created_last_days",

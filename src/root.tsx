@@ -4,6 +4,8 @@ import "./Editor.css";
 import "@mantine/tiptap/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/carousel/styles.css";
+import "@mantine/dates/styles.css";
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">

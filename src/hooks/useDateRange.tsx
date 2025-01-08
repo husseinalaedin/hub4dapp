@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DatePickerInput, DatesProvider } from "@mantine/dates";
+import { DateInput, DatePickerInput, DatesProvider } from "@mantine/dates";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { selectMedium, selectSmall } from "../store/features/ScreenStatus";
@@ -28,6 +28,7 @@ import {
   selectDateLastXDateTime,
 } from "../store/features/DateValues";
 import { useAxiosGet } from "./Https";
+import { AppSelect } from "../global/global-comp/AppSelect";
 
 const useDateRange = () => {};
 
@@ -57,18 +58,21 @@ export const DateRange = ({ form, fromD, toD, ...others }) => {
   return (
     <DatesProvider settings={{ locale: lang }}>
       <DatePickerInput
-        icon={<IconCalendar size="1.1rem" stroke={1.5} />}
+        popoverProps={{ withinPortal: false }}
+        leftSection={<IconCalendar size="1.1rem" stroke={1.5} />}
         // size={small ? "sm" : "md"}
+
         type="range"
-        {...others}
+        // valueFormat="YYYY-MM-DD"
         value={value}
         onChange={(val: any) => {
+          setValue(val);
           form.setFieldValue(fromD, D.local_to_utc(val[0], "yyyy-MM-dd"));
           form.setFieldValue(toD, D.local_to_utc(val[1], "yyyy-MM-dd"));
-          setValue(val);
         }}
         mx="auto"
         maw={400}
+        {...others}
       />
     </DatesProvider>
   );
@@ -76,23 +80,25 @@ export const DateRange = ({ form, fromD, toD, ...others }) => {
 
 export const HoursRangeSelect = ({ data, ...others }) => {
   return (
-    <Select
-      {...others}
-      zIndex={501}
-      withinPortal={true}
+    <AppSelect
+     {...others}
+      
       searchable
       clearable
       maxDropdownHeight={300}
       data={data}
+     
     />
   );
 };
 export const DaysRangeSelect = ({ data, ...others }) => {
   return (
     <Select
+      // zIndex={501}
+      // withinPortal={true}
+
       {...others}
-      zIndex={501}
-      withinPortal={true}
+      comboboxProps={{ withinPortal: false }}
       searchable
       clearable
       maxDropdownHeight={300}

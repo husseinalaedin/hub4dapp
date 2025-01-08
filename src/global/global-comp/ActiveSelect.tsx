@@ -1,5 +1,7 @@
 import { Group, Select, Text } from "@mantine/core" 
 import { useTranslation } from "react-i18next"; 
+import { renderSelectOption } from "./RenderOptions";
+import { AppSelect } from "./AppSelect";
 export const ActiveSelect = ({ ...others }) => {
     const { t } = useTranslation('common', { keyPrefix: 'global-comp' });
     let data = [{
@@ -13,13 +15,16 @@ export const ActiveSelect = ({ ...others }) => {
         label: t('both', 'Both')
     }]
     return (
-        <Select
-            searchable clearable
-            {...others}
-            label={t('channel_active', "Active?")}
-            placeholder={t('channel_active', "Active?")}
-            maxDropdownHeight={300}
-            data={data}
-        />
-    )
+      <AppSelect
+        label={t("channel_active", "Active?")}
+        searchable
+        clearable
+        {...others}
+
+        placeholder={t("channel_active", "Active?")}
+        maxDropdownHeight={300}
+        data={data}
+        // comboboxProps={{ withinPortal: false }}
+      />
+    );
 }

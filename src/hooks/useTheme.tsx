@@ -94,9 +94,9 @@ export const Themes = () => {
   // };
 
   let { updateTheme } = useAppTheme();
-  const setThem_ = (new_theme:any) => {
-     if (new_theme == "dark" || new_theme == "dim") setColorScheme("dark");
-   else setColorScheme(new_theme);
+  const setThem_ = (new_theme: any) => {
+    if (new_theme == "dark" || new_theme == "dim") setColorScheme("dark");
+    else setColorScheme(new_theme);
     themesList.map((them) => {
       if (them.theme != new_theme) them.active = false;
       else them.active = true;
@@ -104,7 +104,6 @@ export const Themes = () => {
 
     updateTheme(new_theme);
     postTheme();
-
   };
   // useEffect(() => {
   //     if (post_succeeded) {
@@ -143,14 +142,14 @@ const GlobalStyleContext = React.createContext<any>({});
 export const useGlobalStyl = () => {
   return useContext(GlobalStyleContext);
 };
-export const AppGlobalStylProvider = ({ children }:any) => {
-   let { colorScheme } = useMantineColorScheme();
+export const AppGlobalStylProvider = ({ children }: any) => {
+  let { colorScheme } = useMantineColorScheme();
   const small = useSelector(selectSmall);
   const medium = useSelector(selectMedium);
   const large = useSelector(selectLarge);
   const xlarger = useSelector(selectxLarger);
   const restrictWidthLargeScreen = useSelector(selectRestrictWidthLargeScreen);
-  let classes0 = createStyles((theme:any):any => {
+  let classes0 = createStyles((theme: any): any => {
     return {
       mainHeader: {
         backgroundColor:
@@ -759,6 +758,15 @@ export const AppGlobalStylProvider = ({ children }:any) => {
         color:
           colorScheme == "dark" ? theme.colors.teal[9] : theme.colors.indigo[9],
         fontWeight: "bold",
+      },
+      comboBoxSelectedOption: {
+        backgroundColor:
+          colorScheme == "dark" ? theme.colors.teal[9] : theme.colors.indigo[9],
+      },
+      comboBoxPlaceHolder: {
+        whiteSpace: "nowrap",
+        overFlow: "hidden",
+        textOverflow: "ellipsis",
       },
       seperator: {
         borderBottom: `1px solid #ffbf00`,

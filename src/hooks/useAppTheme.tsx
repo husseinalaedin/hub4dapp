@@ -272,6 +272,9 @@ let default_loader={
     MultiSelect: {
       defaultProps: default_size_select,
     },
+    AppSelect: { defaultProps: default_size_select },
+    Combobox: { defaultProps: default_size_select },
+    InputBase: { defaultProps: default_size_select },
     Table: {
       defaultProps: {
         verticalSpacing: "md",

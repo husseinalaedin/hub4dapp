@@ -607,6 +607,10 @@ export const AnalyticSearch = (props) => {
       channel_name: G.ifNull(searchParams.get("channel_name"), ""),
       channel_data: G.ifNull(searchParams.get("channel_data"), ""),
       searchterm: G.ifNull(searchParams.get("searchterm"), ""),
+      fromD: G.ifNull(searchParams.get("fromD"), ""),
+      toD: G.ifNull(searchParams.get("toD"), ""),
+      period_hours: G.ifNull(searchParams.get("period_hours"), ""),
+      period_days: G.ifNull(searchParams.get("period_days"), ""),
     },
   });
   useEffect(() => {

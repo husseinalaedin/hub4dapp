@@ -24,6 +24,7 @@ export const ChannelGroups = ({ dataChannelsGroups, ...others }) => {
   const { t } = useTranslation("common", { keyPrefix: "global-comp" });
   return (
     <Select
+      comboboxProps={{ withinPortal: false }}
       style={{ zIndex: 501 }}
       // withinPortal={true}
       // dropdownjustify="bottom"
