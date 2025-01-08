@@ -82,9 +82,11 @@ export function AppSelect({
         if (onChange) onChange(val);
         combobox.closeDropdown();
       }}
+      width="100%"
     >
       <Combobox.Target>
         <InputBase
+          w="100%"
           component="button"
           type="button"
           pointer
