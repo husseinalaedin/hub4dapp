@@ -93,12 +93,12 @@ export const HoursRangeSelect = ({ data, ...others }) => {
 };
 export const DaysRangeSelect = ({ data, ...others }) => {
   return (
-    <Select
+    <AppSelect
       // zIndex={501}
       // withinPortal={true}
 
       {...others}
-      comboboxProps={{ withinPortal: false }}
+      // comboboxProps={{ withinPortal: false }}
       searchable
       clearable
       maxDropdownHeight={300}

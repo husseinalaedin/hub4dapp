@@ -1,10 +1,11 @@
 import { Select } from "@mantine/core"
 import { useTranslation } from "react-i18next";
+import { AppSelect } from "./AppSelect";
 
 export const DatePeriods = ({ dataLastDays, ...others }) => {
     const { t } = useTranslation('common', { keyPrefix: 'global-comp' });
     return (
-      <Select
+      <AppSelect
         defaultValue={"1"}
         style={{ zIndex: 501 }}
         // withinPortal={true}

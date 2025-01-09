@@ -1,5 +1,6 @@
 import { Group, Select, Text } from "@mantine/core"
 import { useTranslation } from "react-i18next";
+import { AppSelect } from "./AppSelect";
 export const YesNoBoth = ({label,placeholder, ...others }) => {
     const { t } = useTranslation('common', { keyPrefix: 'global-comp' });
     let data = [{
@@ -13,8 +14,9 @@ export const YesNoBoth = ({label,placeholder, ...others }) => {
         label: t('both', 'Both')
     }]
     return (
-        <Select
-            searchable clearable
+        <AppSelect
+            searchable 
+            clearable
             {...others}
             label={label}
             placeholder={placeholder}

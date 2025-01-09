@@ -115,6 +115,7 @@ import { selectMenu, useSelection } from "../../../hooks/useSelection";
 
 import { useDbData } from "../../../global/DbData";
 import { IconShare } from "@tabler/icons-react";
+import { AppSelect } from "../../../global/global-comp/AppSelect";
 
 export const Shares = () => {
   const grid_name = "SHARES";
@@ -1180,7 +1181,10 @@ const SharesList = ({
   const rows = data.map((item) => {
     // const selected = true;//selection.includes(item.id);
     return (
-      <Table.Tr key={item.id} className={item.isSelected ? classesG.rowSelected : ""}>
+      <Table.Tr
+        key={item.id}
+        className={item.isSelected ? classesG.rowSelected : ""}
+      >
         <Table.Td
           style={{ cursor: "pointer !important" }}
           onClick={() => {
@@ -1350,7 +1354,9 @@ const SharesList = ({
             <Table.Th>{t("shared", "Shared")}</Table.Th>
             <Table.Th>{t("expire", "Expire")}</Table.Th>
 
-            <Table.Th style={{ textAlign: "right" }}>{t("nb_visited", "Visited")}</Table.Th>
+            <Table.Th style={{ textAlign: "right" }}>
+              {t("nb_visited", "Visited")}
+            </Table.Th>
 
             <Table.Th></Table.Th>
           </Table.Tr>
@@ -1451,6 +1457,7 @@ export const useShareExpire = ({ t }) => {
 export const ShareExpirationManip = ({ t, ids, expire, withinPortal }) => {
   const { error, succeed } = useMessage();
   const [shareExpire, setShareExpire] = useState<any>(null);
+  const [data, setData] = useState<any>([]);
   let {
     data: dataPut,
     isLoading: isLoadingPut,
@@ -1468,15 +1475,22 @@ export const ShareExpirationManip = ({ t, ids, expire, withinPortal }) => {
       succeed(succeededMsg);
     }
   }, [succeededPut, errorMessagePut]);
+  useEffect(() => {
+    setData(
+      shareExpirationPeriodList({ t, is_for: "share", expire: 1 })
+    );
+  }, []);
   return (
     <Box pos="relative">
       <LoadingOverlay
         visible={isLoadingPut}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-      <Select
+      
+      <AppSelect
         style={{ zIndex: 501 }}
-        // withinPortal={withinPortal}
+        // comboboxProps={{withinPortal:true}}
+        withinPortal={withinPortal}
         maxDropdownHeight={300}
         value={shareExpire}
         onChange={(e: any) => {
@@ -1489,8 +1503,8 @@ export const ShareExpirationManip = ({ t, ids, expire, withinPortal }) => {
           "feel_free_to_modify_as_necessary",
           "Feel free to modify as necessary."
         )}
-        limit={6}
-        data={shareExpirationPeriodList({ t, is_for: "app", expire })}
+        // limit={6}
+        data={data}
         error={errorMessagePut}
       />
     </Box>

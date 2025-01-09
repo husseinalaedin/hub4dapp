@@ -10,6 +10,7 @@ import { change_language } from "../store/features/CurrentSettings";
 
 import { BUILD_API, useMessage } from "./G";
 import { initLang, setSettingLocal } from "./Misc";
+import { AppSelect } from "./global-comp/AppSelect";
 // import i18next from "i18next";
 const languageMap = {
   en: { label: "English", active: true },
@@ -84,7 +85,7 @@ export const LanguageSelect = () => {
         visible={isLoading}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-      <Select
+      <AppSelect
         value={selected}
         // defaultValue={selected}
         label={t("select_language", "Select Language")}

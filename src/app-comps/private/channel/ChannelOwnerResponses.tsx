@@ -47,6 +47,7 @@ import { changeActive } from "../../../store/features/ActiveNav";
 import { useAuth } from "../../../providers/AuthProvider";
 import { CoAdminChannelDecision } from "../co-admin/CoAdminChannelDecision";
 import { IconQuestionMark } from "@tabler/icons-react";
+import { AppSelect } from "../../../global/global-comp/AppSelect";
 
 export const ChannelOwnerResponses = () => {
   const { iscoadmin, islogged } = useAuth();
@@ -304,7 +305,7 @@ export const OwnerChannelDecisionSelect = ({ ...others }) => {
     },
   ];
   return (
-    <Select
+    <AppSelect
       {...others}
       label={t("channel_owner_decision", "Owenership Decision")}
       placeholder={t("channel_owner_decision", "Owenership Decision")}

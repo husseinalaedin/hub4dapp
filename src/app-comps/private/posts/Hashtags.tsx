@@ -38,12 +38,13 @@ import {
   selectSmall,
 } from "../../../store/features/ScreenStatus";
 import { useSelector } from "react-redux";
-import { WtsWtbDropV } from "../../../global/WtsWtbDropV";
+import { renderWtsWtbDropVOption, WtsWtbDropV } from "../../../global/WtsWtbDropV";
 import { useForm } from "@mantine/form";
 import { IconAdjustmentsOff } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { NoDataFound } from "../../../global/NoDataFound";
 import { useNavigate } from "react-router";
+import { AppSelect } from "../../../global/global-comp/AppSelect";
 export const TradeHashTagsPop = ({ src }) => {
   const { t } = useTranslation("private", { keyPrefix: "trades" });
   const [opened, { open, close }] = useDisclosure(false);
@@ -219,7 +220,7 @@ export const TradeHashTags = ({ close, src }) => {
       <Box>
         <Grid gutter={5}>
           <Grid.Col span={small ? 12 : large || medium ? 3 : 2}>
-            <Select
+            <AppSelect
               // withinPortal={true}
               label={t("in_want_to", "In Want To")}
               clearable
@@ -229,7 +230,7 @@ export const TradeHashTags = ({ close, src }) => {
               size="lg"
               placeholder={t("e_g_All", "e.g All")}
               data={wtsbOpt()}
-              // itemComponent={WtsWtbDropV}
+              renderOption={renderWtsWtbDropVOption}
               maxDropdownHeight={500}
             />
           </Grid.Col>
@@ -303,7 +304,7 @@ export const TradeHashTags = ({ close, src }) => {
             />
           </Grid.Col>
           <Grid.Col span={small ? 4 : large || medium ? 3 : 2}>
-            <Select
+            <AppSelect
               label={t("show_hash", "Show Hash")}
               {...form.getInputProps("showhash")}
               defaultValue={"both"}

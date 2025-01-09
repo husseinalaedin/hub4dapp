@@ -28,6 +28,7 @@ import { changeActive } from "../../../store/features/ActiveNav";
 import { AppHeader } from "../app-admin/AppHeader";
 import { LocalsAvail } from "../../../global/Locals";
 import { useChangeLocal } from "../../../hooks/useChangeLanLocal";
+import { AppSelect } from "../../../global/global-comp/AppSelect";
 
 export const UserSetings = () => {
   const { t } = useTranslation("common", { keyPrefix: "tool" });
@@ -113,7 +114,7 @@ const NumberSeperator = () => {
         visible={isLoading}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-      <Select
+      <AppSelect
         value={numberSep}
         onChange={(e) => {
           setNumbSep(e);
@@ -233,7 +234,7 @@ const Local = () => {
         visible={isLoading}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-      <Select
+      <AppSelect
         w={"100%"}
         maw={400}
         value={local}
@@ -258,10 +259,12 @@ const DefaultShareExpire = () => {
   const { t } = useTranslation("common", { keyPrefix: "tool" });
   const { error, succeed, warning } = useMessage();
   const { setUserData, userData } = useAuth();
+  const [data, setData] = useState<any>([]);
   let [defaultExpireShare, setDefaultExpireShare] = useState(() => {
     let val = userData["default_expire_share_in_days"];
     if (!val) val = 2;
-    return userData["default_expire_share_in_days"];
+    console.log(val,"FFFF")
+    return val;
   });
   let {
     data: post_data,
@@ -285,15 +288,17 @@ const DefaultShareExpire = () => {
 
     if (errorMessage) error(errorMessage);
   }, [post_succeeded, errorMessage]);
-
+  useEffect(() => {
+    setData(shareExpirationPeriodList({ t, is_for: "settings", expire: 1 }));
+  }, []);
   return (
     <Box pos="relative">
       <LoadingOverlay
         visible={isLoading}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-      <Select
-        disabled={true}
+      <AppSelect
+        // disabled={true}
         maxDropdownHeight={300}
         value={defaultExpireShare}
         onChange={(e) => {
@@ -308,8 +313,8 @@ const DefaultShareExpire = () => {
           "default_link_expiration_perion.",
           "Default link expiration period(in days)."
         )}
-        limit={8}
-        data={shareExpirationPeriodList({ t, is_for: "settings", expire: 1 })}
+        // limit={8}
+        data={data}
       />
     </Box>
   );

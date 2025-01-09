@@ -2,6 +2,7 @@ import { Group, Pagination, Select } from "@mantine/core";
 import { useWindowEvent, useWindowScroll } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
+import { AppSelect } from "../global/global-comp/AppSelect";
 export const pageSizes = [
   { value: "1", label: "1" },
   { value: "6", label: "6" },
@@ -64,12 +65,12 @@ export const Pages = ({ data, small }) => {
     if (refresh != 0) navigatePage();
   }, [activePage, pageSize, refresh]);
   return (
-    <Group justify="space-between">
+    <Group justify="space-between" mt="md">
       <Pagination
         withControls={!small}
         siblings={1}
-        size="lg"
-        mt="lg"
+        size="md"
+        // mt="lg"
         value={+activePage}
         total={totalPage}
         onChange={(pg) => {
@@ -77,18 +78,19 @@ export const Pages = ({ data, small }) => {
           setRefresh(new Date().getTime());
         }}
       />
-      <Select
+      <AppSelect
         size="md"
-        mt="lg"
+        // mt="lg"
+        maw="100"
         value={pageSize.toString()}
-        style={{ maxWidth: 100 }}
+        // style={{ maxWidth: 100 }}
         onChange={(ps) => {
           setActivePage(1);
           setPageSize(ps);
           setRefresh(new Date().getTime());
         }}
         data={pageSizes}
-      ></Select>
+      />
     </Group>
   );
 };

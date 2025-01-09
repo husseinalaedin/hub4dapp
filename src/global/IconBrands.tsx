@@ -1,4 +1,3 @@
- 
 import {
   IconBrandFacebook,
   IconBrandGoogle,
@@ -15,8 +14,9 @@ import {
   IconBrandPinterest,
   IconBrandReddit,
   IconBrandX,
+  IconFaviconFilled,
 } from "@tabler/icons-react";
-export const BRANDS:any = {
+export const BRANDS: any = {
   WATS_APP: "WATS_APP",
   LINK_IN: "LINK_IN",
   FB: "FB",
@@ -60,12 +60,13 @@ export const IconBrands = ({ brand, size }) => {
       {BRANDS[brand] == BRANDS.DFLT && (
         <IconCircleFilled size={size} style={{ color: "#842727" }} />
       )}
-      
 
       {(BRANDS[brand] == BRANDS.OTHR ||
-        !BRANDS[brand] ||
-        BRANDS[brand] == "") && (
+        (!BRANDS[brand] && BRANDS[brand] == "")) && (
         <IconLink size={size} style={{ color: "red" }} />
+      )}
+      {!BRANDS[brand] && (
+        <IconFaviconFilled size={size} style={{ opacity:0.5}} />
       )}
     </>
   );

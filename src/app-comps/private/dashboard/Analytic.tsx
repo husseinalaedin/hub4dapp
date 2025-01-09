@@ -63,8 +63,7 @@ import {
 import { useForm } from "@mantine/form";
 import { SearchPannel } from "../../../global/SearchPannel";
 import { ChannelGroups } from "../../../global/global-comp/ChannelGroups";
-import { ActiveSelect } from "../../../global/global-comp/ActiveSelect";
-import { DatePeriods } from "../../../global/global-comp/DatePeriods";
+import { ActiveSelect } from "../../../global/global-comp/ActiveSelect"; 
 import { IconBrands } from "../../../global/IconBrands";
 import {
   DATETIMEVALUES_FILL,

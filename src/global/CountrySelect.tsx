@@ -14,6 +14,7 @@ import de from 'react-phone-number-input/locale/de.json'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';  
 import { selectLanguage } from '../store/features/CurrentSettings';
+import { AppSelect } from './global-comp/AppSelect';
 
 
 // export const CountrySelect = ({ value, onChange, labels, ...rest }) => (
@@ -86,28 +87,30 @@ export const CountrySelectLang = ({ onChange, lang, ...rest }) => {
         setCountries2(countries22)
     }, [countries])
     return (
-        // <select
-        //     {...rest}
-        //     value={value}
-        //     onChange={event => onChange(event.target.value || undefined)}>
-        //     <option value="">
-        //         {countries['ZZ']}
-        //     </option>
-        //     {countries2.map((country) => (
-        //         <option key={country.key} value={country.key}>
-        //             {country.name} +{country.code}
-        //         </option>
-        //     ))}
-        // </select>
-        <Select searchable clearable required
-            // size="xl"
-            // label={t("select_language", 'Select Language')}
-            // placeholder={t("select_language", 'Select Language')}
-            data={countries2}
+      // <select
+      //     {...rest}
+      //     value={value}
+      //     onChange={event => onChange(event.target.value || undefined)}>
+      //     <option value="">
+      //         {countries['ZZ']}
+      //     </option>
+      //     {countries2.map((country) => (
+      //         <option key={country.key} value={country.key}>
+      //             {country.name} +{country.code}
+      //         </option>
+      //     ))}
+      // </select>
+      <AppSelect
+        searchable
+        clearable
+        withAsterisk
+        // size="xl"
+        // label={t("select_language", 'Select Language')}
+        // placeholder={t("select_language", 'Select Language')}
+        data={countries2}
         // onChange={lang_changed}
-        >
-        </Select >
-    )
+      ></AppSelect>
+    );
 }
 export const useCountryCode = () => {
     let [countryCode, setCountryCode] = useState<string>('')

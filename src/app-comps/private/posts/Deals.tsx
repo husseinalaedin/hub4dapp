@@ -119,6 +119,7 @@ import { useAppTheme } from "../../../hooks/useAppTheme";
 import { ClearButton } from "../../../global/ClearButton";
 import { useAuth } from "../../../providers/AuthProvider";
 import { closeModal, modals } from "@mantine/modals";
+import { AppSelect } from "../../../global/global-comp/AppSelect";
 
 export const SHARES_TYPE = {
   SHARE_BY_DEFAULT: "share_by_default",
@@ -186,26 +187,22 @@ export const CompanyDeals = () => {
     return layout();
   });
   let { theme } = useAppTheme();
-  const [popUpObj, setPopUpObj] = useState<any>("");
-  const [data22, setData22] = useState<any>([]);
+  const [popUpObj, setPopUpObj] = useState<any>(""); 
   const [forceOpenLinkInfo, setForceOpenLinkInfo] = useState<any>("");
   const {
     data,
     setData: setDataGet,
-    getData2,
-    getError,
+    
     errorMessage,
     succeeded,
     isLoading,
     executeGet,
   } = useAxiosGet(BUILD_API("deals/company"), searchMyDeals);
   let {
-    data: dataPut,
-    setData: setDataPut,
+    data: dataPut, 
     isLoading: isLoadingPut,
     succeeded: succeededPut,
-    errorMessage: errorMessagePut,
-    executePut,
+    errorMessage: errorMessagePut 
   } = useAxiosPut(BUILD_API("deals/company"), {});
   let {
     openToShare: openToShare_share,
@@ -221,8 +218,7 @@ export const CompanyDeals = () => {
   const large = useSelector(selectLarge);
   const xlarge = useSelector(selectxLarge);
   const xlarger = useSelector(selectxLarger);
-  const { classes: classesG } = useGlobalStyl();
-  const { hovered, ref } = useHover();
+  const { classes: classesG } = useGlobalStyl(); 
   const [objectUpdated, setObjectUpdated] = useState<any>({});
   const [showHiddenMsg, setShowHiddenMsg] = useState(true);
   // const [isBusy,setIsBusy]=useState(false)
@@ -948,7 +944,7 @@ export const AddEditDeal0 = () => {
     },
     validate: {
       wtsb: (value) =>
-        value.length < 1
+        !value|| value.length < 1
           ? t("deal_type_cannot_be_blank", "Deal type cannot be blank")
           : null,
       title: (value) =>
@@ -1166,6 +1162,8 @@ export const AddEditDeal0 = () => {
   }, [unsavedChanges]);
 
   const save = () => {
+    // form.setValues({wtsb:""});
+    // form.validate();
     // e.preventDefault();
     // if (bodyBeforeSave == '') {
     //     return
@@ -1266,13 +1264,14 @@ export const AddEditDeal0 = () => {
           />
           <Grid gutter={small ? 5 : medium ? 10 : 15}>
             <Grid.Col span={{ base: 12, md: 6 }}>
-              <Select
+              <AppSelect
+                {...form.getInputProps("wtsb")}
+                onBlur={() => form.validateField("wtsb")}
                 readOnly={disableSave}
                 renderOption={renderWtsWtbDropVOption}
                 searchable
                 withAsterisk
                 clearable
-                {...form.getInputProps("wtsb")}
                 label={t("deal_type", "Deal Type")}
                 placeholder={t("deal_type", "Deal Type")}
                 limit={8}
@@ -1351,9 +1350,10 @@ export const AddEditDeal0 = () => {
                   label={t("deal_quantity", "Quantity")}
                   placeholder={t("deal_quantity", "Quantity")}
                 />
-                <Select
+                <AppSelect
                   withAsterisk
                   {...form.getInputProps("uom")}
+                  onBlur={() => form.validateField("uom")}
                   label={t("uom", "UOM")}
                   placeholder={t("uom", "UOM")}
                   limit={8}
@@ -1393,9 +1393,10 @@ export const AddEditDeal0 = () => {
                   placeholder={t("deal_price", "Price")}
                 />
 
-                <Select
+                <AppSelect
                   withAsterisk
                   {...form.getInputProps("curr")}
+                  onBlur={() => form.validateField("curr")}
                   label={t("currency", "Currency")}
                   placeholder={t("currency", "Currency")}
                   limit={8}
@@ -2243,8 +2244,7 @@ const DealMenu = ({
 
 const ParseDeal = ({ onApply }) => {
   const small = useSelector(selectSmall);
-  const { t } = useTranslation("private", { keyPrefix: "deals" });
-  const { error, succeed, info } = useMessage();
+  const { t } = useTranslation("private", { keyPrefix: "deals" }); 
   const [value, setValue] = useState("");
   const { classes: classesG } = useGlobalStyl();
   const { data, isLoading, errorMessage, succeeded, executePost } =

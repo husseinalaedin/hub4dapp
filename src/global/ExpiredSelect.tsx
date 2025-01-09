@@ -1,5 +1,6 @@
 import { Select } from "@mantine/core";
 import { useTranslation } from "react-i18next";
+import { AppSelect } from "./global-comp/AppSelect";
 
 export const ExpiredSelect = ({ ...others }) => {
     const { t } = useTranslation('private', { keyPrefix: 'shares' });
@@ -14,10 +15,10 @@ export const ExpiredSelect = ({ ...others }) => {
         label: t('both', 'Both')
     }]
     return (
-        <Select
-            zIndex={501}
-            
-            withinPortal={true}
+        <AppSelect
+            // zIndex={501}
+            clearable
+            withinPortal={false}
             {...others}
             label={t('share_expired_option', "Expired?")}
             placeholder={t('share_expired_option', "Expired?")}

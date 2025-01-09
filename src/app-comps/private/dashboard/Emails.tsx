@@ -70,9 +70,7 @@ import {
 } from "../../../store/features/ScreenStatus";
 import { AppHeader } from "../app-admin/AppHeader";
 
-import { Test } from "./Test";
-import { DatePeriods } from "../../../global/global-comp/DatePeriods";
-import { NumericFormat } from "react-number-format";
+import { Test } from "./Test"; 
 import { GridLayOut, decimalSep, thousandSep } from "../../../global/Misc";
 import { IconBrands } from "../../../global/IconBrands";
 import { CardIn } from "../../../global/CardIn";

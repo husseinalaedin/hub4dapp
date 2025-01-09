@@ -17,7 +17,7 @@ export const ActiveSelect = ({ ...others }) => {
     return (
       <AppSelect
         label={t("channel_active", "Active?")}
-        searchable
+        // searchable
         clearable
         {...others}
 

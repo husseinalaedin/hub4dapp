@@ -99,8 +99,8 @@ import {
   DateRange,
   HoursRangeSelect,
   useDateValues,
-} from "../../../hooks/useDateRange";
-import { useAppHeader } from "../../../hooks/useAppHeader";
+} from "../../../hooks/useDateRange"; 
+import { AppSelect } from "../../../global/global-comp/AppSelect";
 
 export const Channels = () => {
   const grid_name = "CHANNELS";
@@ -178,7 +178,7 @@ export const Channels = () => {
     if (errorMessagePut) error(errorMessagePut);
   }, [errorMessagePut, succeededPut]);
 
-  const activate_or_deactivate = (id: string, action: string) => {
+  const activate_or_deactivate = (id: any, action: string) => {
     executePut(BUILD_API("channels/") + id + "/" + action);
   };
   useEffect(() => {
@@ -1426,7 +1426,7 @@ export const VerifiedSelect = ({ ...others }) => {
     },
   ];
   return (
-    <Select
+    <AppSelect
       searchable
       clearable
       {...others}
@@ -1454,11 +1454,11 @@ export const DecisionInitSelect = ({ ...others }) => {
     },
   ];
   return (
-    <Select
+    <AppSelect
       searchable
       clearable
       {...others}
-      label={t("decision_iniitated", "Ownshp Decision Initiated?")}
+      label={t("decision_initated", "Ownshp Decision Initiated?")}
       placeholder={t("decision_iniitated", "Owenership Decision Initiated?")}
       maxDropdownHeight={300}
       data={data}
@@ -1482,7 +1482,7 @@ export const OwnershipClaimedSelect = ({ ...others }) => {
     },
   ];
   return (
-    <Select
+    <AppSelect
       searchable
       clearable
       {...others}
@@ -1510,7 +1510,7 @@ export const ClaimVisibilitySelect = ({ ...others }) => {
     },
   ];
   return (
-    <Select
+    <AppSelect
       searchable
       clearable
       {...others}
