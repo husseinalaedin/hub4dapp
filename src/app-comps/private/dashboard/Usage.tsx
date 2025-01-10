@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BUILD_API } from "../../../global/G";
 import { useAxiosGet } from "../../../hooks/Https";
 import {
@@ -11,6 +11,7 @@ import {
   Group,
   List,
   LoadingOverlay,
+  MultiSelect,
   Overlay,
 } from "@mantine/core";
 import { AppHeader } from "../app-admin/AppHeader";
@@ -26,6 +27,10 @@ import { useGlobalStyl } from "../../../hooks/useTheme";
 import { D } from "../../../global/Date";
 import { useAuth } from "../../../providers/AuthProvider";
 import { useNavigate } from "react-router";
+import { AppMultiSelect } from "../../../global/global-comp/AppMultiSelect";
+import { AppSelect } from "../../../global/global-comp/AppSelect";
+import { useForm } from "@mantine/form";
+import { ArrayToAppSelect } from "../../../global/Hashtags";
 export const Usage = () => {
   const { t } = useTranslation("private", { keyPrefix: "usage" });
   const { hidden } = useAuth();
@@ -48,6 +53,7 @@ export const Usage = () => {
   }, []);
   return (
     <>
+      <MultiTest />
       {isLoading && <Overlay opacity={1} color="#000" zIndex={5} />}
       {isLoading && (
         <LoadingOverlay
@@ -269,6 +275,76 @@ export const Usage = () => {
         )}
       </Box>
       {/* </Group> */}
+    </>
+  );
+};
+
+const MultiTest = () => {
+  const form = useForm({
+    initialValues: {
+      multi: [],
+    },
+
+    // functions will be used to validate values at corresponding key
+
+    validate: {
+      multi: (value) =>
+        value.length < 1 ? "please select at least one value" : null,
+    },
+  });
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [read, setRead] = useState(true);
+  let data: any = [
+    {
+      value: 1,
+      label: "hash1",
+    },
+  ];
+  let data2: any = ["1"];
+  for (let i = 2; i < 20; i++) {
+    data.push({
+      value: i,
+      label: "hash" + i.toString(),
+    });
+    data2.push(i.toString());
+  }
+  useEffect(() => {
+    let vv = data//ArrayToAppSelect(data2);
+    console.log(vv);
+  }, []);
+  return (
+    <>
+      <Button
+        onClick={() => {
+          form.validate();
+          setRead((prev) => !prev);
+        }}
+      >
+        valifate
+      </Button>
+      {searchValue}
+      <AppMultiSelect
+        required={true}
+        renderSelectedValue={(item) => {
+          return <Box c="red">{item.label}</Box>;
+        }}
+        maxDropdownHeight={300}
+        // defaultValue={[1, 12, 7]} //onChange={(val)=>setValue(val)}
+        data={ArrayToAppSelect(data2)}
+        // {...form.getInputProps("multi")}
+        readOnly={false}
+        withAsterisk
+        label="Multi test"
+        description="pleas enter"
+        searchable
+        searchValue={searchValue}
+        onSearchChange={setSearchValue}
+      />
+      {/* <MultiSelect //value={value} onChange={(val)=>setValue(val)}
+        data={data2}
+        searchable
+        onSearchChange={()=>{}}
+      /> */}
     </>
   );
 };

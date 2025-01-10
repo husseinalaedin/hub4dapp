@@ -1,5 +1,4 @@
-import { Box, CloseButton, Flex, MultiSelectValueProps, SelectItemProps, rem } from "@mantine/core";
-import { IconHash } from "@tabler/icons-react";
-import { G } from "./G";
-import { forwardRef } from "react";
-
+export const ArrayToAppSelect = (arr) =>
+  arr?.length
+    ? arr.map((val) => ({ value: String(val), label: String(val) }))
+    : [];

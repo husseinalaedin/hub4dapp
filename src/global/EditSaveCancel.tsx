@@ -56,7 +56,7 @@ export const EditSaveCancel = ({
       >
         {!edit && (
           <Button
-            leftIcon={<IconPencil size={18} />}
+            leftSection={<IconPencil size={18} />}
             type="button"
             onClick={go_edit}
           >
@@ -75,7 +75,7 @@ export const EditSaveCancel = ({
         )}
         {edit && (
           <Button
-            leftIcon={<IconDeviceFloppy size={18} />}
+            leftSection={<IconDeviceFloppy size={18} />}
             type="submit"
             onClick={go_save}
           >

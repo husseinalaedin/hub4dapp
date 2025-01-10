@@ -1,17 +1,11 @@
 import { useEffect, useState } from "react";
 import {
-  Button,
   CloseButton,
   Combobox,
-  Input,
   InputBase,
-  MantineFontSize,
   MantineSize,
   MantineStyleProps,
-  ScrollArea,
-  SelectProps,
-  StyleProp,
-  Text,
+  ScrollArea, 
   useCombobox,
 } from "@mantine/core";
 import { useGlobalStyl } from "../../hooks/useTheme";
@@ -20,30 +14,24 @@ interface AppSelectProps
   extends Omit<React.ComponentPropsWithoutRef<"div">, "onChange">,
     MantineStyleProps {
   value?: string | number | readonly string[] | undefined;
-//   defaultValue?: string | number | readonly string[] | undefined;
-  onChange?: any; 
+  onChange?: any;
   error?: React.ReactNode;
   data?: any;
   placeholder?: string | undefined;
-  label?: string | React.ReactNode; 
+  label?: string | React.ReactNode;
   maxDropdownHeight?: number | string;
   searchable?: boolean;
   clearable?: boolean;
-//   w?: string | number | undefined;
-//   maw?: number | string;
   limit?: number | undefined;
   disabled?: boolean;
   readOnly?: boolean;
   renderOption?: any;
   withAsterisk?: boolean;
-//   validate?: any;
-//   fz?: StyleProp<
-//     MantineFontSize | `h${1 | 2 | 3 | 4 | 5 | 6}` | number | (string & {})
-//   >;
   size?: MantineSize | (string & {});
-//   description?: React.ReactNode;
   withinPortal?: boolean;
   leftSection?: React.ReactNode;
+  description?: React.ReactNode;
+  required?: boolean;
 }
 export function AppSelect({
   value,
@@ -66,6 +54,8 @@ export function AppSelect({
   onBlur,
   withinPortal,
   leftSection,
+  description,
+  required,
   ...others
 }: AppSelectProps) {
   const { classes: classesG } = useGlobalStyl();
@@ -87,9 +77,8 @@ export function AppSelect({
   });
   const [search, setSearch] = useState<string>("");
   useEffect(() => {
-
-    SetSearchDrop(value);
-  }, [value,data]);
+    SetSearchDrop(_value);
+  }, [_value, data]);
   const _data = data && data.length > 0 ? data : [];
   const shouldFilterOptions = _data.every((item) => item.label !== search);
   const filteredOptions = shouldFilterOptions
@@ -116,20 +105,14 @@ export function AppSelect({
     return { value: null, label: null };
   };
 
-  //   const [valueLabel, setValueLabel] = useState<string|null>("");
-
-  //   useEffect(() => {
-  //     setValueLabel(current_object().label);
-  //   }, [_value]);
   const _renderOption = (item) => {
     if (renderOption) return renderOption(item);
     return item.label;
   };
-  const options = filteredOptions?.map((item, index) => (
+  const options = filteredOptions?.map((item) => (
     <Combobox.Option
       value={item.value}
       key={item.value}
-      //   onMouseOver={() => combobox.selectOption(index)}
       className={value === item.value ? classesG.comboBoxSelectedOption : ""}
     >
       {_renderOption(item)}
@@ -146,16 +129,15 @@ export function AppSelect({
       store={combobox}
       withinPortal={withinPortal}
       onOptionSubmit={(val: any) => {
-        // SetSearchDrop(val);
+        if (readOnly) return;
         setValue(val);
         if (onChange) onChange(val);
         combobox.closeDropdown();
       }}
+      readOnly={readOnly}
     >
       <Combobox.Target>
         <InputBase
-          //   component="button"
-          //   type="button"
           leftSection={leftSection}
           withAsterisk={withAsterisk}
           disabled={disabled}
@@ -164,16 +146,14 @@ export function AppSelect({
           readOnly={!searchable || readOnly}
           pointer
           rightSection={
-            value != null && value != "" && clearable ? (
+            value != null && value != "" && clearable && !readOnly ? (
               <CloseButton
                 size="sm"
                 onMouseDown={(event) => {
                   event.preventDefault();
-                  //   setValue(null);
-                  //   if (onChange) onChange(null);
                 }}
                 onClick={() => {
-                  //   SetSearchDrop("");
+                  if (readOnly) return;
                   setValue(null);
                   if (onChange) onChange(null);
                 }}
@@ -183,41 +163,36 @@ export function AppSelect({
               <Combobox.Chevron />
             )
           }
-          onClick={() => combobox.openDropdown()}
-          //   rightSectionPointerEvents="none"
+          onClick={() => {
+            if (readOnly) return;
+            combobox.openDropdown();
+          }}
           label={label}
           value={search}
           placeholder={placeholder}
-          onFocus={() => combobox.openDropdown()}
+          description={description}
+          required={required}
+          onFocus={() => {
+            if (readOnly) return;
+            combobox.openDropdown();
+          }}
           onBlur={(e) => {
+            if (readOnly) return;
             combobox.closeDropdown();
             SetSearchDrop(value);
             if (onBlur) onBlur(e);
           }}
           onChange={(event) => {
+            if (readOnly) return;
             combobox.openDropdown();
             combobox.updateSelectedOptionIndex();
             setSearch(event.currentTarget.value);
           }}
           {...others}
           error={error}
-
-          //   onInvalid={(e)=>{
-          //     setError(true);
-          //   }}
         />
-        {/* {valueLabel || (
-            <Input.Placeholder className={classesG.comboBoxPlaceHolder}>
-              {placeholder}
-            </Input.Placeholder>
-          )} */}
-        {/* </InputBase> */}
       </Combobox.Target>
-      {/* {<Text c="red">{limit}</Text>} */}
-
-      <Combobox.Dropdown
-      //   onMouseLeave={() => combobox.resetSelectedOption()}
-      >
+      <Combobox.Dropdown>
         <Combobox.Options>
           <ScrollArea.Autosize
             mah={

@@ -35,7 +35,7 @@ export const ShareOrShareNOpen = ({
           {({ copied, copy }) => (
             <Button
               disabled={disableShare || disablesharenopen}
-              leftIcon={<IconShare size={18} />}
+              leftSection={<IconShare size={18} />}
               type="button"
               onClick={() => {
                 copy();
@@ -57,7 +57,7 @@ export const ShareOrShareNOpen = ({
           {({ copied, copy }) => (
             <Button
               disabled={disableShare}
-              leftIcon={<IconShare size={18} />}
+              leftSection={<IconShare size={18} />}
               type="button"
               onClick={() => {
                 copy();

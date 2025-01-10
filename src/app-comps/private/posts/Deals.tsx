@@ -120,6 +120,8 @@ import { ClearButton } from "../../../global/ClearButton";
 import { useAuth } from "../../../providers/AuthProvider";
 import { closeModal, modals } from "@mantine/modals";
 import { AppSelect } from "../../../global/global-comp/AppSelect";
+import { AppMultiSelect } from "../../../global/global-comp/AppMultiSelect";
+import { ArrayToAppSelect } from "../../../global/Hashtags";
 
 export const SHARES_TYPE = {
   SHARE_BY_DEFAULT: "share_by_default",
@@ -187,22 +189,22 @@ export const CompanyDeals = () => {
     return layout();
   });
   let { theme } = useAppTheme();
-  const [popUpObj, setPopUpObj] = useState<any>(""); 
+  const [popUpObj, setPopUpObj] = useState<any>("");
   const [forceOpenLinkInfo, setForceOpenLinkInfo] = useState<any>("");
   const {
     data,
     setData: setDataGet,
-    
+
     errorMessage,
     succeeded,
     isLoading,
     executeGet,
   } = useAxiosGet(BUILD_API("deals/company"), searchMyDeals);
   let {
-    data: dataPut, 
+    data: dataPut,
     isLoading: isLoadingPut,
     succeeded: succeededPut,
-    errorMessage: errorMessagePut 
+    errorMessage: errorMessagePut,
   } = useAxiosPut(BUILD_API("deals/company"), {});
   let {
     openToShare: openToShare_share,
@@ -218,7 +220,7 @@ export const CompanyDeals = () => {
   const large = useSelector(selectLarge);
   const xlarge = useSelector(selectxLarge);
   const xlarger = useSelector(selectxLarger);
-  const { classes: classesG } = useGlobalStyl(); 
+  const { classes: classesG } = useGlobalStyl();
   const [objectUpdated, setObjectUpdated] = useState<any>({});
   const [showHiddenMsg, setShowHiddenMsg] = useState(true);
   // const [isBusy,setIsBusy]=useState(false)
@@ -944,7 +946,7 @@ export const AddEditDeal0 = () => {
     },
     validate: {
       wtsb: (value) =>
-        !value|| value.length < 1
+        !value || value.length < 1
           ? t("deal_type_cannot_be_blank", "Deal type cannot be blank")
           : null,
       title: (value) =>
@@ -1303,7 +1305,7 @@ export const AddEditDeal0 = () => {
             </Grid.Col>
             <Grid.Col span={{ base: 12 }}>
               <Box>{"create multi select hastag"}</Box>
-              {/* <MultiSelect
+              <AppMultiSelect
                 readOnly={disableSave}
                 {...form.getInputProps("hashtags")}
                 onKeyDown={(event) => {
@@ -1312,31 +1314,34 @@ export const AddEditDeal0 = () => {
                   }
                 }}
                 required
-                data={hashData && hashData.length > 0 ? hashData : []}
+                withAsterisk
+                data={ArrayToAppSelect(
+                  hashData && hashData.length > 0 ? hashData : []
+                )}
                 label="Hashtag#"
                 placeholder="#"
                 searchable
-                searchValue={searchValue}
+                // searchValue={searchValue}
                 onSearchChange={(event) => {
+                  onSearchChange(event);
                   executeHashGet();
-                  return onSearchChange(event);
                 }}
                 clearable
                 maxDropdownHeight={250}
-                valueComponent={HashValue}
-                itemComponent={HashItem}
+                // valueComponent={HashValue}
+                // itemComponent={HashItem}
                 limit={20}
-                nothingFoundMessage={(query) => `+ Create ${query}`}
-                onCreate={(query) => {
-                  const item = { value: query, label: query };
-                  setHashData((current) => [...current, item]);
-                  return item;
-                }}
+                // nothingFoundMessage={(query) => `+ Create ${query}`}
+                // onCreate={(query) => {
+                //   const item = { value: query, label: query };
+                //   setHashData((current) => [...current, item]);
+                //   return item;
+                // }}
                 description={t(
                   "hashtags_infor_message",
                   "Add hashtags that best fit your deal, as they will help improve its visibility in searches."
                 )}
-              /> */}
+              />
             </Grid.Col>
             <Grid.Col span={{ base: 12 }}>
               <Group gap={0} justify="left">
@@ -2244,7 +2249,7 @@ const DealMenu = ({
 
 const ParseDeal = ({ onApply }) => {
   const small = useSelector(selectSmall);
-  const { t } = useTranslation("private", { keyPrefix: "deals" }); 
+  const { t } = useTranslation("private", { keyPrefix: "deals" });
   const [value, setValue] = useState("");
   const { classes: classesG } = useGlobalStyl();
   const { data, isLoading, errorMessage, succeeded, executePost } =

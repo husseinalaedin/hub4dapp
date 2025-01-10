@@ -51,7 +51,7 @@ export const AppRoutes = () => (
         <Route path="out-response/:purpose" element={<OutResponse />} />
       </Route>
       <Route path="/app" element={<AppMain />}>
-        <Route path="" element={<Analytic />} />
+        <Route path="" element={<Usage />} />
         <Route path="shareresponse/:shareidhex" element={<AppEntry />} />
         <Route
           path="decision-noted/:short_link"
