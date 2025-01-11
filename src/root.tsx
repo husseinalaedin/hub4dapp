@@ -5,6 +5,7 @@ import "@mantine/tiptap/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/carousel/styles.css";
 import "@mantine/dates/styles.css";
+import "./TableStyles.css"; // Create a CSS file to style the table
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (

@@ -120,9 +120,10 @@ import { ClearButton } from "../../../global/ClearButton";
 import { useAuth } from "../../../providers/AuthProvider";
 import { closeModal, modals } from "@mantine/modals";
 import { AppSelect } from "../../../global/global-comp/AppSelect";
-import { AppMultiSelect } from "../../../global/global-comp/AppMultiSelect";
+import { AppMultiSelect, useAppMultiSelectToAddMissedSearchVal } from "../../../global/global-comp/AppMultiSelect";
 import { ArrayToAppSelect } from "../../../global/Hashtags";
-
+import { AppTable } from "./Table";
+ 
 export const SHARES_TYPE = {
   SHARE_BY_DEFAULT: "share_by_default",
   SHARE_BY_CHANNEL: "share_by_channel",
@@ -1189,6 +1190,7 @@ export const AddEditDeal0 = () => {
   const [hashData, setHashData] = useState<any>(() => {
     return [];
   });
+   let handlnotfound = useAppMultiSelectToAddMissedSearchVal<any>(setHashData);
   // const [currentHash, setCurrentHash] = useState<any>('')
   // const [searchValue, onSearchChange] = useState<any>('');
   let blocker = useBlocker(
@@ -1229,6 +1231,7 @@ export const AddEditDeal0 = () => {
         </Group>
       </AppHeader>
       <ConfirmUnsaved blocker={blocker} />
+      <AppTable />
       <Box
         className={classesG.editMax800}
         opacity={blocker.state === "blocked" ? 0.1 : 1}
@@ -1304,15 +1307,14 @@ export const AddEditDeal0 = () => {
               </Text>
             </Grid.Col>
             <Grid.Col span={{ base: 12 }}>
-              <Box>{"create multi select hastag"}</Box>
               <AppMultiSelect
                 readOnly={disableSave}
                 {...form.getInputProps("hashtags")}
-                onKeyDown={(event) => {
-                  if (event.code === "Space") {
-                    event.preventDefault();
-                  }
-                }}
+                // onKeyDown={(event) => {
+                //   if (event.code === "Space") {
+                //     event.preventDefault();
+                //   }
+                // }}
                 required
                 withAsterisk
                 data={ArrayToAppSelect(
@@ -1321,7 +1323,7 @@ export const AddEditDeal0 = () => {
                 label="Hashtag#"
                 placeholder="#"
                 searchable
-                // searchValue={searchValue}
+                searchValue={searchValue}
                 onSearchChange={(event) => {
                   onSearchChange(event);
                   executeHashGet();
@@ -1337,6 +1339,10 @@ export const AddEditDeal0 = () => {
                 //   setHashData((current) => [...current, item]);
                 //   return item;
                 // }}
+
+                createOnNotFound={async (val) => {
+                  return await handlnotfound({ value: val, label: val });
+                }}
                 description={t(
                   "hashtags_infor_message",
                   "Add hashtags that best fit your deal, as they will help improve its visibility in searches."
@@ -2381,5 +2387,4 @@ const useAiParser = (onApply) => {
   };
   return { open };
 };
-
-const HashTagsComp = () => {};
+  

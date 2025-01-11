@@ -27,7 +27,7 @@ import { useGlobalStyl } from "../../../hooks/useTheme";
 import { D } from "../../../global/Date";
 import { useAuth } from "../../../providers/AuthProvider";
 import { useNavigate } from "react-router";
-import { AppMultiSelect } from "../../../global/global-comp/AppMultiSelect";
+import { AppMultiSelect, useAppMultiSelectToAddMissedSearchVal } from "../../../global/global-comp/AppMultiSelect";
 import { AppSelect } from "../../../global/global-comp/AppSelect";
 import { useForm } from "@mantine/form";
 import { ArrayToAppSelect } from "../../../global/Hashtags";
@@ -292,8 +292,10 @@ const MultiTest = () => {
         value.length < 1 ? "please select at least one value" : null,
     },
   });
-  const [searchValue, setSearchValue] = useState<string>('');
+  const [searchValue, setSearchValue] = useState<string>("");
   const [read, setRead] = useState(true);
+  const [data22, setData22] = useState<any>([]);
+  let handlnotfound = useAppMultiSelectToAddMissedSearchVal<any>(setData22);
   let data: any = [
     {
       value: 1,
@@ -309,28 +311,18 @@ const MultiTest = () => {
     data2.push(i.toString());
   }
   useEffect(() => {
-    let vv = data//ArrayToAppSelect(data2);
-    console.log(vv);
+    setData22(data);
   }, []);
   return (
     <>
-      <Button
-        onClick={() => {
-          form.validate();
-          setRead((prev) => !prev);
-        }}
-      >
-        valifate
-      </Button>
-      {searchValue}
+       
       <AppMultiSelect
         required={true}
         renderSelectedValue={(item) => {
           return <Box c="red">{item.label}</Box>;
         }}
-        maxDropdownHeight={300}
-        // defaultValue={[1, 12, 7]} //onChange={(val)=>setValue(val)}
-        data={ArrayToAppSelect(data2)}
+        maxDropdownHeight={300} 
+        data={data22} 
         // {...form.getInputProps("multi")}
         readOnly={false}
         withAsterisk
@@ -339,12 +331,10 @@ const MultiTest = () => {
         searchable
         searchValue={searchValue}
         onSearchChange={setSearchValue}
-      />
-      {/* <MultiSelect //value={value} onChange={(val)=>setValue(val)}
-        data={data2}
-        searchable
-        onSearchChange={()=>{}}
-      /> */}
+        createOnNotFound={async (val) => {
+          return await handlnotfound({ value: val, label: val });
+        }}
+      /> 
     </>
   );
 };

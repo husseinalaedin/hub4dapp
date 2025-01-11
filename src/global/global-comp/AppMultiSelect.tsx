@@ -38,6 +38,7 @@ interface AppMultiSelectProps
   leftSection?: React.ReactNode;
   description?: React.ReactNode;
   required?: boolean;
+  createOnNotFound?: any;
 }
 export function AppMultiSelect({
   value,
@@ -65,6 +66,8 @@ export function AppMultiSelect({
   leftSection,
   description,
   required,
+  createOnNotFound,
+
   ...others
 }: AppMultiSelectProps) {
   const { classes: classesG } = useGlobalStyl();
@@ -88,14 +91,11 @@ export function AppMultiSelect({
     onChange,
   });
   const [_searchValue, setSearch] = useUncontrolled<string>({
-    value: searchValue ,
+    value: searchValue,
     // defaultValue: "",
     // finalValue: "",
     onChange: onSearchChange,
   });
-  // const [search, setSearch] = useState<string>("");
-
-  useEffect(() => {}, [data, _value]);
 
   useEffect(() => {
     if (defaulted) return;
@@ -109,21 +109,36 @@ export function AppMultiSelect({
         ? current.filter((v) => v !== val)
         : [...current, val];
     });
-    setSearch('')
+    setSearch("");
+  };
+  const handleValueByEnter = async () => {
+    if (!searchValue || searchValue == "") return;
+    let item: any = current_object(searchValue);
+    if (!(!item || !item.value)) {
+      handleValueSelect(item.label);
+      return;
+    }
+    if (createOnNotFound) {
+      let result = await createOnNotFound(searchValue);
+      if (result.added) {
+        handleValueSelect(String(searchValue));
+      }
+    }
   };
   const handleValueRemove = (val: string) =>
     setValue((current) => current.filter((v) => v !== val));
 
   const _data = data && data.length > 0 ? data : [];
   const shouldFilterOptions =
-    _searchValue && _searchValue !== "" &&
+    _searchValue &&
+    _searchValue !== "" &&
     _data.every((item) => item.label !== _searchValue);
   const filteredOptions = shouldFilterOptions
     ? _data
         .filter((item) => {
           const label = item.label.toLowerCase();
           const searchText = _searchValue?.toLowerCase().trim();
-          return label.includes(searchText);
+          return  label.includes(searchText);
         })
         .slice(0, limit)
     : _data.slice(0, limit);
@@ -133,7 +148,7 @@ export function AppMultiSelect({
     label: string | null | undefined;
   } = (val) => {
     for (let i = 0; i < _data.length; i++)
-      if (_data[i]["value"] === val) return _data[i];
+      if (_data[i]["label"] === val) return _data[i];
     return { value: null, label: null };
   };
 
@@ -144,17 +159,21 @@ export function AppMultiSelect({
   const _renderSelectedValue = (val) => {
     let item: any = current_object(val);
     if (renderSelectedValue) return renderSelectedValue(item);
+    if(!item||!item.label)
+        return val
     return item.label;
   };
-  const options = filteredOptions?.map((item) => (
-    <Combobox.Option
-      value={item.value}
-      key={item.value}
-      className={value === item.value ? classesG.comboBoxSelectedOption : ""}
-    >
-      {_renderOption(item)}
-    </Combobox.Option>
-  ));
+  const options = filteredOptions
+    ?.filter((item) => !_value?.includes(item.label))
+    ?.map((item) => (
+      <Combobox.Option
+        value={item.label}
+        key={item.value}
+        className={value === item.value ? classesG.comboBoxSelectedOption : ""}
+      >
+        {_renderOption(item)}
+      </Combobox.Option>
+    ));
 
   const values = _value?.map((val) => (
     <Pill
@@ -207,16 +226,23 @@ export function AppMultiSelect({
                 value={_searchValue}
                 placeholder={placeholder}
                 onChange={(event) => {
-                  if (readOnly) return; 
+                  if (readOnly) return;
                   combobox.updateSelectedOptionIndex();
                   setSearch(event.currentTarget.value);
                 }}
                 onKeyDown={(event) => {
                   if (readOnly) return;
-                  if (event.key === "Backspace" && _searchValue?.length === 0) {
+                  let lnt = _searchValue && _searchValue.length>0?_searchValue.length:0
+                  if (event.key === "Backspace" && lnt === 0) {
+                    
+                    console.log(event.key, "DELETE", lnt, "VALUE", _value);
                     event.preventDefault();
-                    if (value && value.length > 0)
-                      handleValueRemove(value[value.length - 1]);
+                    if (_value && _value.length > 0)
+                      handleValueRemove(_value[_value.length - 1]);
+                  }
+                  if (event.key === "Enter" && lnt > 0) {
+                    event.preventDefault();
+                    handleValueByEnter();
                   }
                 }}
                 {...others}
@@ -244,4 +270,36 @@ export function AppMultiSelect({
       </Combobox.Dropdown>
     </Combobox>
   );
+}
+
+export function useAppMultiSelectToAddMissedSearchVal<T>(
+  setData: React.Dispatch<React.SetStateAction<T[]>>
+) {
+  const [pendingUpdate, setPendingUpdate] = useState<{
+    value: T;
+    callback: (result: { added: boolean }) => void;
+  } | null>(null);
+
+  useEffect(() => {
+    if (pendingUpdate !== null) {
+      // Update the data array
+      setData((prevData) => {
+        const updatedData = [...prevData, pendingUpdate.value];
+        // Call the callback after the update
+        pendingUpdate.callback({ added: true });
+        return updatedData;
+      });
+
+      // Clear the pending update
+      setPendingUpdate(null);
+    }
+  }, [pendingUpdate, setData]);
+
+  const addPendingUpdate = (value: T) => {
+    return new Promise<{ added: boolean }>((resolve) => {
+      setPendingUpdate({ value, callback: resolve });
+    });
+  };
+
+  return addPendingUpdate;
 }

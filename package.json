@@ -22,6 +22,7 @@
     "@react-router/serve": "^7.1.1",
     "@reduxjs/toolkit": "^2.5.0",
     "@tabler/icons-react": "^3.27.1",
+    "@tanstack/react-table": "^8.20.6",
     "@tinymce/tinymce-react": "^5.1.1",
     "@tiptap/extension-color": "^2.11.0",
     "@tiptap/extension-highlight": "^2.11.0",
@@ -49,6 +50,7 @@
     "react-phone-number-input": "^3.4.10",
     "react-redux": "^9.2.0",
     "react-router": "^7.1.1",
+    "react-table": "^7.8.0",
     "tinymce": "^7.6.0",
     "unicode-emoji-json": "^0.8.0"
   },
