@@ -246,6 +246,29 @@ export const AppGlobalStylProvider = ({ children }: any) => {
             : lighten(theme.colors.red[6], 0.9)
         }  !important`,
       },
+      inputT: {
+        position: "absolute",
+
+        padding: "0px",
+        paddingLeft: "2px",
+        paddingRight: "2px",
+        backgroundColor: `${
+          colorScheme === "dark"
+            ? darken(theme.colors.green[9], 0.9)
+            : lighten(theme.colors.green[1], 0.9)
+        }  !important`,
+        border: "1px solid blue",
+        height: "20px !important",
+        fontSize: "8px" /* Adjust the font size if needed */,
+        lineHeight: "18px !important",
+      },
+      inputExcel: {
+        border: "2px solid #ccc",
+        outline: "none", // Removes default browser focus
+        "&:focus": {
+          border: "2px solid blue",
+        },
+      },
       tableRenew: {
         td: {
           backgroundColor: `${
