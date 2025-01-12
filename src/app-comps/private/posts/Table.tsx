@@ -9,7 +9,7 @@ import {
   RowData,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-import { Box, Button, Input, Table, Textarea, TextInput } from "@mantine/core";
+import { Box, Button, Input, ScrollArea, Table, Textarea, TextInput } from "@mantine/core";
 import { getFilteredRowModel } from "@tanstack/react-table";
 import { useGlobalStyl } from "../../../hooks/useTheme";
 
@@ -427,110 +427,113 @@ export function AppTable() {
         Copy Selected Range
       </Button>
       <Box pb="xl">
-        <table
-          {...{
-            style: {
-              width: table.getCenterTotalSize(),
-            },
-          }}
-          //   striped
-          //   verticalSpacing={0}
-          //   horizontalSpacing={0}
-          //   withTableBorder
-          //   withColumnBorders
-          //   className="excel-table"
-        >
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    {...{
-                      key: header.id,
-                      colSpan: header.colSpan,
-                      style: {
-                        width: header.getSize(),
-                      },
-                    }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                    <div
+        <ScrollArea  maw={"100%"} mx="auto" type="auto">
+            
+          <table
+            {...{
+              style: {
+                width: table.getCenterTotalSize(),
+              },
+            }} 
+          >
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
                       {...{
-                        onDoubleClick: () => header.column.resetSize(),
-                        onMouseDown: header.getResizeHandler(),
-                        onTouchStart: header.getResizeHandler(),
-                        className: `resizer ${
-                          table.options.columnResizeDirection
-                        } ${header.column.getIsResizing() ? "isResizing" : ""}`,
+                        key: header.id,
+                        colSpan: header.colSpan,
                         style: {
-                          transform:
-                            columnResizeMode === "onEnd" &&
-                            header.column.getIsResizing()
-                              ? `translateX(${
-                                  (table.options.columnResizeDirection === "rtl"
-                                    ? -1
-                                    : 1) *
-                                  (table.getState().columnSizingInfo
-                                    .deltaOffset ?? 0)
-                                }px)`
-                              : "",
+                          width: header.getSize(),
                         },
                       }}
-                    />
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row, rowIndex) => (
-              <tr key={row.id}>
-                {row.getVisibleCells().map((cell, colIndex) => (
-                  <td
-                    {...{
-                      key: cell.id,
-                      "data-row": rowIndex, // Add data-row attribute
-                      "data-col": colIndex, // Add data-col attribute
-                      style: {
-                        position: "relative",
-                        width: cell.column.getSize(),
-                        backgroundColor: isHighlighted(rowIndex, colIndex) // Check if the cell should be highlighted
-                          ? "#0650eb1a"
-                          : "transparent",
-                        userSelect: isHighlighted(rowIndex, colIndex)
-                          ? "none"
-                          : "inherit",
-                        border: isHighlighted(rowIndex, colIndex)
-                          ? "1.5px solid #d3d3d366"
-                          : "1.5px solid lightgray",
-                      },
-                      onDoubleClick: (event) => {
-                        setEditingCell([rowIndex, colIndex, cell.column.id]);
-                      },
-                      onMouseDown: (event) =>
-                        handleMouseDown(event, rowIndex, colIndex),
-                      onMouseMove: (event) => {
-                        handleMouseMove(event, rowIndex, colIndex);
-                      },
-                      onTouchStart: (event) => {
-                        event.preventDefault();
-                        handleMouseDown(event, rowIndex, colIndex);
-                      },
-                      onTouchMove: handleTouchMove,
-                    }}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                      <div
+                        {...{
+                          onDoubleClick: () => header.column.resetSize(),
+                          onMouseDown: header.getResizeHandler(),
+                          onTouchStart: header.getResizeHandler(),
+                          className: `resizer ${
+                            table.options.columnResizeDirection
+                          } ${
+                            header.column.getIsResizing() ? "isResizing" : ""
+                          }`,
+                          style: {
+                            transform:
+                              columnResizeMode === "onEnd" &&
+                              header.column.getIsResizing()
+                                ? `translateX(${
+                                    (table.options.columnResizeDirection ===
+                                    "rtl"
+                                      ? -1
+                                      : 1) *
+                                    (table.getState().columnSizingInfo
+                                      .deltaOffset ?? 0)
+                                  }px)`
+                                : "",
+                          },
+                        }}
+                      />
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.map((row, rowIndex) => (
+                <tr key={row.id}>
+                  {row.getVisibleCells().map((cell, colIndex) => (
+                    <td
+                      {...{
+                        key: cell.id,
+                        "data-row": rowIndex, 
+                        "data-col": colIndex,
+                        style: {
+                          position: "relative",
+                          width: cell.column.getSize(),
+                          backgroundColor: isHighlighted(rowIndex, colIndex)
+                            ? "#0650eb1a"
+                            : "transparent",
+                          userSelect: isHighlighted(rowIndex, colIndex)
+                            ? "none"
+                            : "inherit",
+                          border: isHighlighted(rowIndex, colIndex)
+                            ? "1.5px solid #d3d3d366"
+                            : "1.5px solid lightgray",
+                        },
+                        onDoubleClick: (event) => {
+                          setEditingCell([rowIndex, colIndex, cell.column.id]);
+                        },
+                        onMouseDown: (event) =>
+                          handleMouseDown(event, rowIndex, colIndex),
+                        onMouseMove: (event) => {
+                          handleMouseMove(event, rowIndex, colIndex);
+                        },
+                        onTouchStart: (event) => {
+                          event.preventDefault();
+                          handleMouseDown(event, rowIndex, colIndex);
+                        },
+                        onTouchMove: handleTouchMove,
+                      }}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </ScrollArea>
       </Box>
     </>
   );
