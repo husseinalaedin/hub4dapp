@@ -40,6 +40,8 @@ interface AppMultiSelectProps
   description?: React.ReactNode;
   required?: boolean;
   createOnNotFound?: any;
+  onEscape?: any;
+  rightSection?:any;
   ref?: any;
 }
 export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
@@ -72,6 +74,8 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       required,
       createOnNotFound,
       style,
+      onEscape,
+      rightSection,
       ...others
     }: AppMultiSelectProps,
     ref // Receive the ref as the second argument
@@ -218,6 +222,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
           required={required}
           label={label}
           style={style}
+          rightSection={rightSection}
         >
           <Pill.Group>
             {values}
@@ -260,6 +265,10 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
                   if (event.key === "Enter" && lnt > 0) {
                     event.preventDefault();
                     handleValueByEnter();
+                  }
+                  if (event.key === "Escape" && lnt > 0) {
+                    event.preventDefault();
+                    onEscape(event);
                   }
                 }}
               />

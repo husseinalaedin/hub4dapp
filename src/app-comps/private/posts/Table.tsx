@@ -18,6 +18,7 @@ import {
   Input,
   Menu,
   ScrollArea,
+  Stack,
   Table,
   Textarea,
   TextInput,
@@ -28,6 +29,7 @@ import { useTranslation } from "react-i18next";
 import {
   IconArrowBackUp,
   IconArrowForwardUp,
+  IconCheck,
   IconCopy,
   IconCopyPlus,
   IconDeselect,
@@ -35,6 +37,7 @@ import {
   IconMenu,
   IconSelectAll,
   IconTrash,
+  IconX,
 } from "@tabler/icons-react";
 import { G, useMessage } from "../../../global/G";
 import { HashTagsInput } from "../../../global/global-comp/Hashtags";
@@ -130,6 +133,10 @@ const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
     HandleOnEdit(false);
     table.options.meta?.updateData(index, id, value);
   };
+  const onCancel=()=>{
+    setValue(beforEditingValue);
+    table.options.meta?.cancelEditing();
+  }
   React.useEffect(() => {
     setValue(getValue());
   }, [initialValue]);
@@ -165,18 +172,25 @@ const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
       {onEdit && (
         <HashTagsInput
           //   ref={inputRef}
+          h="100%"
           defaultValue={initialValue}
           value={value}
           onChange={setValue}
           onBlur={onSave}
           readOnly={false}
-          onKeyDown={(event) => {
-            // if (event.key == "Enter") onSave();
-            if (event.key == "Escape") {
-              setValue(beforEditingValue);
-              table.options.meta?.cancelEditing();
-            }
-          }}
+          onEscape={onCancel}
+          rightSection={
+            <>
+              <Group gap={"2px"}>
+                <ActionIcon variant="light" onClick={onSave}>
+                  <IconCheck stroke={1.5} size="1.2rem" />
+                </ActionIcon>
+                <ActionIcon c="red" variant="subtle" onClick={onCancel}>
+                  <IconX stroke={1.5} size="1.2rem" />
+                </ActionIcon>
+              </Group>
+            </>
+          }
         />
       )}
     </>
@@ -809,6 +823,7 @@ export function AppTable() {
                         style: {
                           width: header_idx == 0 ? "30px" : header.getSize(),
                           maxWidth: header_idx == 0 ? "30px" : "auto",
+                          height:"30px"
                         },
                       }}
                     >
