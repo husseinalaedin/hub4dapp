@@ -667,11 +667,11 @@ export const TradesSearch = ({ action, grid, src }) => {
   const form = useForm({
     initialValues: {
       title: G.ifNull(searchParams.get("title"), ""),
-      wtsb: G.paramToArr(searchParams.get("wtsb")),
+      wtsb: G.anyToArr(searchParams.get("wtsb")),
       searchterm: G.ifNull(searchParams.get("searchterm"), ""),
       company_name: G.ifNull(searchParams.get("company_name"), ""),
-      hashtags_and: G.paramToArr(searchParams.get("hashtags_and")),
-      hashtags_or: G.paramToArr(searchParams.get("hashtags_or")),
+      hashtags_and: G.anyToArr(searchParams.get("hashtags_and")),
+      hashtags_or: G.anyToArr(searchParams.get("hashtags_or")),
     },
   });
   useEffect(() => {
@@ -708,16 +708,16 @@ export const TradesSearch = ({ action, grid, src }) => {
   const [searchValue2, onSearch2Change] = useState("");
   const [hashData, setHashData] = useState<any>(() => {
     // console.log(searchParams.get('hashtags_and'))
-    return G.paramToArr(searchParams.get("hashtags_and"));
+    return G.anyToArr(searchParams.get("hashtags_and"));
   });
 
   const [hashData2, setHash2Data] = useState<any>(() => {
-    return G.paramToArr(searchParams.get("hashtags_or"));
+    return G.anyToArr(searchParams.get("hashtags_or"));
   });
   useEffect(() => {
     let trm = searchParams.get("searchterm");
-    let hashtags_and = G.paramToArr(searchParams.get("hashtags_and"));
-    let hashtags_or = G.paramToArr(searchParams.get("hashtags_or"));
+    let hashtags_and = G.anyToArr(searchParams.get("hashtags_and"));
+    let hashtags_or = G.anyToArr(searchParams.get("hashtags_or"));
     // if (trm != form.values.searchterm)
 
     setHashData(hashtags_and);

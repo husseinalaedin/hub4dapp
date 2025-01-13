@@ -120,10 +120,13 @@ import { ClearButton } from "../../../global/ClearButton";
 import { useAuth } from "../../../providers/AuthProvider";
 import { closeModal, modals } from "@mantine/modals";
 import { AppSelect } from "../../../global/global-comp/AppSelect";
-import { AppMultiSelect, useAppMultiSelectToAddMissedSearchVal } from "../../../global/global-comp/AppMultiSelect";
+import {
+  AppMultiSelect,
+  useAppMultiSelectToAddMissedSearchVal,
+} from "../../../global/global-comp/AppMultiSelect";
 import { ArrayToAppSelect } from "../../../global/Hashtags";
 import { AppTable } from "./Table";
- 
+
 export const SHARES_TYPE = {
   SHARE_BY_DEFAULT: "share_by_default",
   SHARE_BY_CHANNEL: "share_by_channel",
@@ -1190,7 +1193,7 @@ export const AddEditDeal0 = () => {
   const [hashData, setHashData] = useState<any>(() => {
     return [];
   });
-   let handlnotfound = useAppMultiSelectToAddMissedSearchVal<any>(setHashData);
+  let handlnotfound = useAppMultiSelectToAddMissedSearchVal<any>(setHashData);
   // const [currentHash, setCurrentHash] = useState<any>('')
   // const [searchValue, onSearchChange] = useState<any>('');
   let blocker = useBlocker(
@@ -1486,15 +1489,15 @@ export const DealSearch = (props) => {
       expired: G.ifNull(searchParams.get("expired"), "no"),
       expired_in_hours: G.ifNull(searchParams.get("expired_in_hours"), ""),
       title: G.ifNull(searchParams.get("title"), ""),
-      wtsb: G.paramToArr(searchParams.get("wtsb")),
+      wtsb: G.anyToArr(searchParams.get("wtsb")),
       privacy: G.ifNull(searchParams.get("privacy"), ""),
       searchterm: G.ifNull(searchParams.get("searchterm"), ""),
       fromD: G.ifNull(searchParams.get("fromD"), ""),
       toD: G.ifNull(searchParams.get("toD"), ""),
       period_hours: G.ifNull(searchParams.get("period_hours"), ""),
       period_days: G.ifNull(searchParams.get("period_days"), ""),
-      hashtags_and: G.paramToArr(searchParams.get("hashtags_and")),
-      hashtags_or: G.paramToArr(searchParams.get("hashtags_or")),
+      hashtags_and: G.anyToArr(searchParams.get("hashtags_and")),
+      hashtags_or: G.anyToArr(searchParams.get("hashtags_or")),
     },
   });
 
@@ -1530,10 +1533,10 @@ export const DealSearch = (props) => {
   const [searchValue, onSearchChange] = useState("");
   const [searchValue2, onSearch2Change] = useState("");
   const [hashData, setHashData] = useState<any>(() => {
-    return G.paramToArr(searchParams.get("hashtags_and"));
+    return G.anyToArr(searchParams.get("hashtags_and"));
   });
   const [hashData2, setHash2Data] = useState<any>(() => {
-    return G.paramToArr(searchParams.get("hashtags_or"));
+    return G.anyToArr(searchParams.get("hashtags_or"));
   });
   const {
     data: hashGet,
@@ -2387,4 +2390,3 @@ const useAiParser = (onApply) => {
   };
   return { open };
 };
-  

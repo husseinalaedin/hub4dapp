@@ -2,8 +2,10 @@ table,
 .divTable {
   border: 1px solid lightgray;
   width: fit-content;
+  table-layout: fixed;
   border-collapse: collapse; /* Ensures borders collapse and touch each other */
   border-spacing: 0; /* Removes any default spacing between cells */
+  width: 100%;
 }
 
 .tr {

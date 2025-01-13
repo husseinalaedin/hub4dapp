@@ -248,7 +248,6 @@ export const AppGlobalStylProvider = ({ children }: any) => {
       },
       inputT: {
         position: "absolute",
-
         padding: "0px",
         paddingLeft: "2px",
         paddingRight: "2px",
@@ -268,6 +267,13 @@ export const AppGlobalStylProvider = ({ children }: any) => {
         "&:focus": {
           border: "2px solid blue",
         },
+      },
+      actionSides: {
+        backgroundColor: `${
+          colorScheme === "dark"
+            ? darken(theme.colors.dark[9], 0.9)
+            : lighten(theme.colors.gray[1], 0.9)
+        }  !important`,
       },
       tableRenew: {
         td: {

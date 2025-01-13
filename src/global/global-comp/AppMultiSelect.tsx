@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import {
   CloseButton,
   Combobox,
   InputBase,
   MantineSize,
+  MantineStyleProp,
   MantineStyleProps,
   Pill,
   PillsInput,
@@ -39,37 +40,42 @@ interface AppMultiSelectProps
   description?: React.ReactNode;
   required?: boolean;
   createOnNotFound?: any;
+  ref?: any;
 }
-export function AppMultiSelect({
-  value,
-  searchValue,
-  defaultValue,
-  onChange,
-  onSearchChange,
-  error,
-  label,
-  placeholder,
-  maxDropdownHeight,
-  searchable,
-  clearable,
-  data,
-  w,
-  maw,
-  limit,
-  disabled,
-  readOnly,
-  renderOption,
-  renderSelectedValue,
-  withAsterisk,
-  onBlur,
-  withinPortal,
-  leftSection,
-  description,
-  required,
-  createOnNotFound,
-
-  ...others
-}: AppMultiSelectProps) {
+export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
+  (
+    {
+      value,
+      searchValue,
+      defaultValue,
+      onChange,
+      onSearchChange,
+      error,
+      label,
+      placeholder,
+      maxDropdownHeight,
+      searchable,
+      clearable,
+      data,
+      w,
+      maw,
+      limit,
+      disabled,
+      readOnly,
+      renderOption,
+      renderSelectedValue,
+      withAsterisk,
+      onBlur,
+      withinPortal,
+      leftSection,
+      description,
+      required,
+      createOnNotFound,
+      style,
+      ...others
+    }: AppMultiSelectProps,
+    ref // Receive the ref as the second argument
+  ) => {
   const { classes: classesG } = useGlobalStyl();
   searchable = !!searchable;
   clearable = !!clearable;
@@ -103,6 +109,12 @@ export function AppMultiSelect({
     if (defaultValue && defaultValue.length > 0) setValue(defaultValue);
   }, [defaultValue]);
   const handleValueSelect = (val: string) => {
+    //  const newArr = !value
+    //    ? [val]
+    //    : value.includes(val)
+    //    ? value
+    //    : [...value, val];
+    //  setValue(newArr);
     setValue((current) => {
       if (!current) return [val];
       return current.includes(val)
@@ -138,7 +150,7 @@ export function AppMultiSelect({
         .filter((item) => {
           const label = item.label.toLowerCase();
           const searchText = _searchValue?.toLowerCase().trim();
-          return  label.includes(searchText);
+          return label.includes(searchText);
         })
         .slice(0, limit)
     : _data.slice(0, limit);
@@ -159,8 +171,7 @@ export function AppMultiSelect({
   const _renderSelectedValue = (val) => {
     let item: any = current_object(val);
     if (renderSelectedValue) return renderSelectedValue(item);
-    if(!item||!item.label)
-        return val
+    if (!item || !item.label) return val;
     return item.label;
   };
   const options = filteredOptions
@@ -206,12 +217,15 @@ export function AppMultiSelect({
           description={description}
           required={required}
           label={label}
+          style={style}
         >
           <Pill.Group>
             {values}
 
             <Combobox.EventsTarget>
               <PillsInput.Field
+                {...others}
+                ref={ref}
                 required={required}
                 readOnly={readOnly}
                 onFocus={() => {
@@ -231,10 +245,13 @@ export function AppMultiSelect({
                   setSearch(event.currentTarget.value);
                 }}
                 onKeyDown={(event) => {
+                  console.log(event.key, "ENTER");
                   if (readOnly) return;
-                  let lnt = _searchValue && _searchValue.length>0?_searchValue.length:0
+                  let lnt =
+                    _searchValue && _searchValue.length > 0
+                      ? _searchValue.length
+                      : 0;
                   if (event.key === "Backspace" && lnt === 0) {
-                    
                     console.log(event.key, "DELETE", lnt, "VALUE", _value);
                     event.preventDefault();
                     if (_value && _value.length > 0)
@@ -245,7 +262,6 @@ export function AppMultiSelect({
                     handleValueByEnter();
                   }
                 }}
-                {...others}
               />
             </Combobox.EventsTarget>
           </Pill.Group>
@@ -271,7 +287,7 @@ export function AppMultiSelect({
     </Combobox>
   );
 }
-
+)
 export function useAppMultiSelectToAddMissedSearchVal<T>(
   setData: React.Dispatch<React.SetStateAction<T[]>>
 ) {

@@ -9,16 +9,42 @@ import {
   RowData,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-import { Box, Button, Input, ScrollArea, Table, Textarea, TextInput } from "@mantine/core";
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Center,
+  Group,
+  Input,
+  Menu,
+  ScrollArea,
+  Table,
+  Textarea,
+  TextInput,
+} from "@mantine/core";
 import { getFilteredRowModel } from "@tanstack/react-table";
 import { useGlobalStyl } from "../../../hooks/useTheme";
-
+import { useTranslation } from "react-i18next";
+import {
+  IconArrowBackUp,
+  IconArrowForwardUp,
+  IconCopy,
+  IconCopyPlus,
+  IconDeselect,
+  IconDotsVertical,
+  IconMenu,
+  IconSelectAll,
+  IconTrash,
+} from "@tabler/icons-react";
+import { G, useMessage } from "../../../global/G";
+import { HashTagsInput } from "../../../global/global-comp/Hashtags";
+const MAX_HISTORY_SIZE = 40;
 type Deal = {
   dealtype: string;
   title: string;
   quantity: string;
   price: string;
-  hashtags: string;
+  hashtags: string[];
   description: string;
 };
 
@@ -28,7 +54,7 @@ const defaultData: Deal[] = [
     title: "iPhone 14 pro max",
     quantity: "400pcs",
     price: "500$",
-    hashtags: "iphone 13,iphone 14,new",
+    hashtags: "iphone 13,iphone 14,new".split(","),
     description:
       "Grade A/A-, Fully Tested, Pack Boxes included, Grade B condition.",
   },
@@ -37,7 +63,7 @@ const defaultData: Deal[] = [
     title: "iPhone 13 Pro Max 128GB Grade A/A-",
     quantity: "500pcs",
     price: "600$",
-    hashtags: "iPhone13ProMax,128GB,GradeA",
+    hashtags: "iPhone13ProMax,128GB,GradeA".split(","),
     description:
       "Fully Tested with HSO BATTERY 80%+, Grade B, Pack Boxes included.",
   },
@@ -46,7 +72,7 @@ const defaultData: Deal[] = [
     title: "iPhone 13 Pro Max 128GB Grade A/A-",
     quantity: "500pcs",
     price: "600$",
-    hashtags: "iPhone13ProMax,128GB,GradeA",
+    hashtags: "iPhone13ProMax,128GB,GradeA".split(","),
     description:
       "Fully Tested with HSO BATTERY 80%+, Grade B, Pack Boxes included.",
   },
@@ -55,7 +81,7 @@ const defaultData: Deal[] = [
     title: "iPhone 13 Pro Max 128GB Grade A/A-",
     quantity: "500pcs",
     price: "600$",
-    hashtags: "iPhone13ProMax,128GB,GradeA",
+    hashtags: "iPhone13ProMax,128GB,GradeA".split(","),
     description:
       "Fully Tested with HSO BATTERY 80%+, Grade B, Pack Boxes included.",
   },
@@ -64,7 +90,7 @@ const defaultData: Deal[] = [
     title: "iPhone 13 Pro Max 128GB Grade A/A-",
     quantity: "500pcs",
     price: "600$",
-    hashtags: "iPhone13ProMax,128GB,GradeA",
+    hashtags: "iPhone13ProMax,128GB,GradeA".split(","),
     description:
       "Fully Tested with HSO BATTERY 80%+, Grade B, Pack Boxes included.",
   },
@@ -73,42 +99,196 @@ const defaultData: Deal[] = [
     title: "iPhone 13 Pro Max 128GB Grade A/A-",
     quantity: "500pcs",
     price: "600$",
-    hashtags: "iPhone13ProMax,128GB,GradeA",
+    hashtags: "iPhone13ProMax,128GB,GradeA".split(","),
     description:
       "Fully Tested with HSO BATTERY 80%+, Grade B, Pack Boxes included.",
   },
 ];
+const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
+  const inputRef = useRef<any>(null);
+  const { classes: classesG } = useGlobalStyl();
+  const editingCell = table.options.meta?.editingCell;
+  const onEdit =
+    editingCell && editingCell[0] === index && editingCell[2] === id;
 
+  const initialValue = getValue();
+  const [beforEditingValue, setBeforEditingValue] =
+    React.useState(initialValue);
+  const [value, setValue] = React.useState(initialValue);
+  const HandleOnEdit = (val) => {
+    table.options.meta?.onEdit(val);
+  };
+  useEffect(() => {
+    console.log(inputRef);
+    if (onEdit && inputRef.current && inputRef.current.focus) {
+      inputRef.current.focus();
+      resizeInput();
+      setBeforEditingValue(value);
+    }
+  }, [onEdit]);
+  const onSave = () => {
+    HandleOnEdit(false);
+    table.options.meta?.updateData(index, id, value);
+  };
+  React.useEffect(() => {
+    setValue(getValue());
+  }, [initialValue]);
+  const resizeInput = () => {
+    if (inputRef.current) {
+      inputRef.current.style.width = "auto";
+      inputRef.current.style.width = `${inputRef.current.scrollWidth + 10}px`;
+    }
+  };
+  useEffect(() => {
+    resizeInput();
+  }, [value]);
+
+  return (
+    <>
+      {!onEdit && (
+        <Box
+          bg="red"
+          pl="2px"
+          pr="2px"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            fontFamily: "inherit",
+            fontSize: "inherit",
+            fontWeight: "inherit",
+            pointerEvents: "none",
+          }}
+        >
+          {value && value.length > 0 ? value.join(",") : ""}
+        </Box>
+      )}
+      {onEdit && (
+        <HashTagsInput
+          //   ref={inputRef}
+          defaultValue={initialValue}
+          value={value}
+          onChange={setValue}
+          onBlur={onSave}
+          readOnly={false}
+          onKeyDown={(event) => {
+            // if (event.key == "Enter") onSave();
+            if (event.key == "Escape") {
+              setValue(beforEditingValue);
+              table.options.meta?.cancelEditing();
+            }
+          }}
+        />
+      )}
+    </>
+  );
+};
+const ActionMenuCell = ({
+  getValue,
+  row: { index },
+  column: { id },
+  table,
+}) => {
+  const { t } = useTranslation("common", { keyPrefix: "table" });
+  const inputRef = useRef<any>(null);
+  const { classes: classesG } = useGlobalStyl();
+  const editingCell = table.options.meta?.editingCell;
+  const onEdit =
+    editingCell && editingCell[0] === index && editingCell[2] === id;
+
+  const initialValue = getValue();
+  const [beforEditingValue, setBeforEditingValue] =
+    React.useState(initialValue);
+  const [value, setValue] = React.useState(initialValue);
+  const HandleOnEdit = (val) => {
+    table.options.meta?.onEdit(val);
+  };
+  useEffect(() => {
+    console.log(inputRef);
+    if (onEdit && inputRef.current && inputRef.current.focus) {
+      inputRef.current.focus();
+      resizeInput();
+      setBeforEditingValue(value);
+    }
+  }, [onEdit]);
+  const onSave = () => {
+    HandleOnEdit(false);
+    table.options.meta?.updateData(index, id, value);
+  };
+  React.useEffect(() => {
+    setValue(getValue());
+  }, [initialValue]);
+  const resizeInput = () => {
+    if (inputRef.current) {
+      inputRef.current.style.width = "auto";
+      inputRef.current.style.width = `${inputRef.current.scrollWidth + 10}px`;
+    }
+  };
+  useEffect(() => {
+    resizeInput();
+  }, [value]);
+
+  return (
+    <Center>
+      <Menu shadow="md" width={200} position="bottom-start">
+        <Menu.Target>
+          <ActionIcon
+            variant="subtle"
+            //   onClick={undo}
+            title={t("action_menu", "Action Menu")}
+          >
+            <IconDotsVertical stroke={1.5} size="1.2rem" />
+          </ActionIcon>
+        </Menu.Target>
+
+        <Menu.Dropdown>
+          <Menu.Item
+            c="red"
+            leftSection={
+              <Box>
+                <IconTrash stroke={1.5} size="1rem" />
+              </Box>
+            }
+            onClick={() => {
+              table.options.meta?.deleteRow(index);
+            }}
+          >
+            {t("delete", "Delete Record")}
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+    </Center>
+  );
+};
 const defaultColumns: ColumnDef<Deal>[] = [
+  {
+    accessorKey: "action",
+    header: "#",
+    cell: ActionMenuCell,
+  },
   {
     accessorKey: "dealtype",
     header: "Type",
-    // cell: (info) => info.getValue(),
   },
   {
     accessorKey: "title",
     header: "Title",
-    // cell: (info) => info.getValue(),
   },
   {
     accessorKey: "quantity",
     header: "Quantity",
-    // cell: (info) => info.getValue(),
   },
   {
     accessorKey: "price",
     header: "Price",
-    // cell: (info) => info.getValue(),
   },
   {
     accessorKey: "hashtags",
     header: "Hashtags",
-    // cell: (info) => info.getValue(),
+    cell: HashTagCell,
   },
   {
     accessorKey: "description",
     header: "Description",
-    // cell: (info) => info.getValue(),
   },
 ];
 declare module "@tanstack/react-table" {
@@ -117,63 +297,43 @@ declare module "@tanstack/react-table" {
     onEdit: (onEdit_: boolean) => void;
     editingCell: [number, number, string] | null;
     cellIsHighlighted: (rowIndex: number, columnIndex: number) => boolean;
-    cancelEditing:()=>void
+    cancelEditing: () => void;
+    deleteRow: (rowIndex: number) => void;
   }
 }
 
-// Give our default column cell renderer editing superpowers!
 const defaultColumn: Partial<ColumnDef<Deal>> = {
   cell: ({ getValue, row: { index }, column: { id }, table }) => {
     const inputRef = useRef<any>(null);
     const { classes: classesG } = useGlobalStyl();
-    // const [onEdit, setOnEdit] = useState(false);
-    const columnIndex = table.getColumn(id)?.getIndex();
-
     const editingCell = table.options.meta?.editingCell;
-    const highlitedCell =
-      columnIndex &&
-      columnIndex >= 0 &&
-      table.options.meta?.cellIsHighlighted(
-        index,
-        columnIndex && columnIndex >= 0 ? columnIndex : -1
-      );
-    const onEdit = editingCell && editingCell[0] === index && editingCell[2] === id;
-
+    const onEdit =
+      editingCell && editingCell[0] === index && editingCell[2] === id;
     const initialValue = getValue();
-    const [beforEditingValue, setBeforEditingValue]=React.useState(initialValue);
-    // We need to keep and update the state of the cell normally
+    const [beforEditingValue, setBeforEditingValue] =
+      React.useState(initialValue);
     const [value, setValue] = React.useState(initialValue);
     const HandleOnEdit = (val) => {
-      //   setOnEdit(val);
       table.options.meta?.onEdit(val);
     };
     useEffect(() => {
       if (onEdit && inputRef.current && inputRef.current.focus) {
         inputRef.current.focus();
         resizeInput();
-        setBeforEditingValue(value)
+        setBeforEditingValue(value);
       }
     }, [onEdit]);
-    // When the input is blurred, we'll call our table meta's updateData function
     const onSave = () => {
       HandleOnEdit(false);
       table.options.meta?.updateData(index, id, value);
-      
     };
- 
-    // If the initialValue is changed external, sync it up with our state
     React.useEffect(() => {
       setValue(initialValue);
     }, [initialValue]);
     const resizeInput = () => {
       if (inputRef.current) {
-        // Reset width to get the right size
         inputRef.current.style.width = "auto";
-        // inputRef.current.style.height = "auto";
-
-        // Set width and height based on content size
         inputRef.current.style.width = `${inputRef.current.scrollWidth + 10}px`;
-        // inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
       }
     };
     useEffect(() => {
@@ -184,14 +344,9 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
       <>
         {!onEdit && (
           <Box
-            // w="100%"
-            // h="100%"
             bg="transparent"
             pl="2px"
             pr="2px"
-            // onDoubleClick={() => {
-            //   HandleOnEdit(true);
-            // }}
             style={{
               display: "flex",
               alignItems: "center",
@@ -199,10 +354,6 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
               fontSize: "inherit",
               fontWeight: "inherit",
               pointerEvents: "none",
-              //   border: highlitedCell
-              //     ? "1px solid #d3d3d366"
-              //     : "1px solid transparent",
-              //   justifyContent: "center",
             }}
           >
             {value as string}
@@ -210,24 +361,15 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
         )}
         {onEdit && (
           <input
-            // size="sm"
-            // p="0px"
-            // h="30px"
-            
             className={classesG.inputExcel}
             ref={inputRef}
-            onKeyDown={(event) => { 
+            onKeyDown={(event) => {
               if (event.key == "Enter") onSave();
               if (event.key == "Escape") {
                 setValue(beforEditingValue);
-                table.options.meta?.cancelEditing()
+                table.options.meta?.cancelEditing();
               }
             }}
-            // w="100%"
-            // h="30px"
-            // classNames={{ input: classesG.inputT, wrapper: classesG.inputW }}
-            // bg="violet.9"
-            // variant="filled"
             value={value as string}
             onChange={(e) => setValue(e.target.value)}
             onBlur={onSave}
@@ -235,19 +377,15 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
               fontFamily: "inherit",
               fontSize: "inherit",
               fontWeight: "inherit",
-              whiteSpace: "nowrap", // Prevent line breaks
-              overflow: "hidden", // Prevent horizontal overflow
-
-              //   height: "100%",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
               border: "1px solid red;",
-              position: "absolute", // Position input absolutely within the td
+              position: "absolute",
               top: 0,
               left: 0,
               bottom: 0,
-              width: "auto", // Allow input width to grow with content
-              // Allow input height to grow with content
-              //   resize: "none", // Prevent manual resizing
-              minWidth: "100px", // Minimum width for the input
+              width: "auto",
+              minWidth: "100px",
               zIndex: 4000,
             }}
           />
@@ -273,14 +411,26 @@ function useSkipper() {
   return [shouldSkip, skip] as const;
 }
 export function AppTable() {
+  const { classes: classesG } = useGlobalStyl();
+  const { succeed } = useMessage();
+  const { t } = useTranslation("common", { keyPrefix: "table" });
+  const [data, setData] = useState<any>(() => [...defaultData]);
+  const [history, setHistory] = useState<any>([]);
+  const [redoStack, setRedoStack] = useState<any>([]);
+  const [deletedIds, setDeletedIds] = useState<any>([]);
   const [startCell, setStartCell] = useState<any>(null); // Starting cell coordinates
   const [endCell, setEndCell] = useState<any>(null); // Ending cell coordinates
   const [onEdit, setOnEdit] = useState(false);
   const [editingCell, setEditingCell] = useState<
     [number, number, string] | null
   >(null);
+  const [isShiftPressed, setIsShiftPressed] = useState(false);
 
   const handleMouseDown = (event, row, col) => {
+    if (isShiftPressed) {
+      setEndCell({ row, col });
+      return;
+    }
     if (event.buttons === 1) {
       // Left mouse button
       setStartCell({ row, col });
@@ -310,7 +460,7 @@ export function AppTable() {
       }
     }
   };
-  const [data, setData] = React.useState(() => [...defaultData]);
+
   const [columns] = React.useState<typeof defaultColumns>(() => [
     ...defaultColumns,
   ]);
@@ -331,6 +481,209 @@ export function AppTable() {
     const maxCol = Math.max(startCell.col, endCell.col);
     return row >= minRow && row <= maxRow && col >= minCol && col <= maxCol;
   };
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Shift") {
+        setIsShiftPressed(true); // Mark Shift as pressed
+      }
+    };
+
+    const handleKeyUp = (event) => {
+      if (event.key === "Shift") {
+        setIsShiftPressed(false); // Mark Shift as released
+      }
+    };
+
+    // Attach event listeners
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    // Cleanup event listeners
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+  const undo = () => {
+    if (history.length === 0) return; // No history to undo
+
+    const lastState = history[history.length - 1];
+    const newRedoStack = [data, ...redoStack];
+    if (newRedoStack.length > MAX_HISTORY_SIZE) {
+      newRedoStack.pop(); // Remove the oldest redo state if exceeding max size
+    }
+
+    setRedoStack(newRedoStack);
+    setHistory((prev) => prev.slice(0, -1)); // Remove the last state from history
+    setData(lastState);
+    // rerender()
+  };
+
+  // Redo the last undone action
+  const redo = () => {
+    if (redoStack.length === 0) return; // No redo actions available
+
+    const nextState = redoStack[0];
+    const newHistory = [...history, data];
+    if (newHistory.length > MAX_HISTORY_SIZE) {
+      newHistory.shift(); // Remove the oldest state if exceeding max size
+    }
+    setHistory(newHistory);
+    setRedoStack((prev) => prev.slice(1)); // Remove the redone state from redo stack
+    setData(nextState);
+  };
+  const saveToHistory = () => {
+    setHistory((prevHistory) => {
+      const newHistory = [...prevHistory, JSON.parse(JSON.stringify(data))];
+      if (newHistory.length > MAX_HISTORY_SIZE) newHistory.shift(); // Limit history size
+      return newHistory;
+    });
+    setRedoStack([]); // Clear redo stack on new operation
+  };
+  const copyToClipboard = (withheader) => {
+    if (!startCell || !endCell) return; // Ensure start and end cells are selected
+
+    // Calculate the range of cells from startCell to endCell
+    const rows = Math.min(startCell.row, endCell.row);
+    const cols = Math.min(startCell.col, endCell.col);
+
+    const rowCount = Math.abs(startCell.row - endCell.row) + 1;
+    const colCount = Math.abs(startCell.col - endCell.col) + 1;
+
+    let all_cols = table.getAllColumns();
+    let selectedData = "";
+    if (withheader) {
+      for (let jj = 0; jj < colCount; jj++) {
+        let col_d = cols + jj;
+        let targetColId_d = all_cols.length > col_d ? all_cols[col_d].id : "";
+        let colHeader: any = all_cols[col_d].columnDef.header;
+        colHeader = colHeader && colHeader != "" ? colHeader : targetColId_d;
+        if (colHeader)
+          selectedData += colHeader + (jj === colCount - 1 ? "" : "\t");
+      }
+    }
+    if (selectedData != "") selectedData += "\n";
+
+    for (let i = 0; i < rowCount; i++) {
+      for (let j = 0; j < colCount; j++) {
+        const row = rows + i;
+        const col = cols + j;
+        let targetColId = all_cols.length > col ? all_cols[col].id : "";
+
+        if (data[row] && targetColId != "") {
+          selectedData +=
+            data[row][targetColId] + (j === colCount - 1 ? "" : "\t");
+        }
+      }
+      selectedData += "\n";
+    }
+    // alert(selectedData);
+    // Copy the selected data to clipboard
+    navigator.clipboard
+      .writeText(selectedData)
+      .then(() => {
+        // alert("Copied to clipboard!");
+        succeed(t("data_copied", "Data copied!."));
+      })
+      .catch((error) => {
+        console.error("Failed to copy: ", error);
+      });
+  };
+  const getTopLeftCell = () => {
+    if (!startCell || !endCell) return startCell; // Use startCell if endCell is null
+    const topRow = Math.min(startCell.row, endCell.row);
+    const leftCol = Math.min(startCell.col, endCell.col);
+    return { row: topRow, col: leftCol };
+  };
+
+  const handlePaste = (event: ClipboardEvent) => {
+    event.preventDefault();
+    const clipboardText = event.clipboardData?.getData("text/plain");
+    if (!clipboardText) return;
+
+    const rows = clipboardText
+      .split("\n")
+      .filter((row) => row.trim() !== "") // Ignore empty rows
+      .map((row) => row.split("\t")); // Split by tabs
+
+    const topLeftCell = getTopLeftCell();
+    let all_cols = table.getAllColumns();
+
+    if (!topLeftCell) return;
+    saveToHistory();
+    const newData = [...data];
+    const startRow = topLeftCell.row;
+    const startCol = topLeftCell.col;
+
+    rows.forEach((rowData, rowIndex) => {
+      rowData.forEach((cellData, colIndex) => {
+        const targetRow = startRow + rowIndex;
+        const targetCol = startCol + colIndex;
+        let targetColId =
+          all_cols.length > targetCol ? all_cols[targetCol].id : "";
+
+        if (targetRow < newData.length && targetColId != "") {
+          newData[targetRow][targetColId] = cellData;
+        }
+      });
+    });
+
+    setData(newData);
+  };
+
+  useEffect(() => {
+    window.addEventListener("paste", handlePaste);
+    return () => {
+      window.removeEventListener("paste", handlePaste);
+    };
+  }, [data, startCell, endCell]);
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && event.key === "z") {
+        event.preventDefault();
+        undo();
+      } else if (event.ctrlKey && event.key === "y") {
+        event.preventDefault();
+        redo();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [history, redoStack, data]);
+  const selectAll = () => {
+    setStartCell({ row: 0, col: 1 });
+    setEndCell({ row: table.getRowCount(), col: table.getAllColumns().length });
+  };
+  const deSelectAny = () => {
+    setStartCell(null);
+    setEndCell(null);
+  };
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && event.key === "c") {
+        event.preventDefault();
+        copyToClipboard(false);
+      } else if (event.ctrlKey && event.key === "a") {
+        event.preventDefault();
+        selectAll();
+      }
+    };
+    const touchMoveHandler = (event) => {
+      event.preventDefault();
+    };
+
+    document.addEventListener("touchmove", touchMoveHandler, {
+      passive: false,
+    });
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("touchmove", touchMoveHandler);
+    };
+  }, [data, startCell, endCell]);
   const table = useReactTable({
     data,
     columns,
@@ -341,12 +694,11 @@ export function AppTable() {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     autoResetPageIndex,
-    // Provide our updateData function to our table meta
     meta: {
       updateData: (rowIndex, columnId, value) => {
-        // Skip page index reset until after next rerender
         skipAutoResetPageIndex();
         setEditingCell(null);
+        saveToHistory();
         setData((old) =>
           old.map((row, index) => {
             if (index === rowIndex) {
@@ -368,84 +720,95 @@ export function AppTable() {
         setEditingCell(null);
         setOnEdit(false);
       },
+      deleteRow: (rowIndex) => {
+        saveToHistory();
+        let id = data[rowIndex]['id'];
+        const updatedItems = [...data]; // Make a copy of the array
+        
+        updatedItems.splice(rowIndex, 1); // Remove item at the index
+        setData(updatedItems); // Update state with the modified array
+        const deletedIds_n = [...deletedIds];
+        deletedIds_n.push(id);
+        setDeletedIds(deletedIds_n);
+      },
     },
   });
-  const copyToClipboard = () => {
-    if (!startCell || !endCell) return; // Ensure start and end cells are selected
 
-    // Calculate the range of cells from startCell to endCell
-    const rows = Math.min(startCell.row, endCell.row);
-    const cols = Math.min(startCell.col, endCell.col);
-    const rowCount = Math.abs(startCell.row - endCell.row) + 1;
-    const colCount = Math.abs(startCell.col - endCell.col) + 1;
-
-    let selectedData = "";
-    for (let jj = 0; jj < colCount; jj++) {
-      let col_d = cols + jj;
-      let colHeader: any = defaultColumns[col_d]["header"];
-      selectedData += colHeader + (jj === colCount - 1 ? "" : "\t");
-    }
-    selectedData += "\n";
-    for (let i = 0; i < rowCount; i++) {
-      for (let j = 0; j < colCount; j++) {
-        const row = rows + i;
-        const col = cols + j;
-        if (data[row]) {
-          let colDef: any = defaultColumns[col]["accessorKey"];
-          selectedData += data[row][colDef] + (j === colCount - 1 ? "" : "\t");
-        }
-      }
-      selectedData += "\n";
-    }
-    // alert(selectedData);
-    // Copy the selected data to clipboard
-    navigator.clipboard
-      .writeText(selectedData)
-      .then(() => {
-        // alert("Copied to clipboard!");
-      })
-      .catch((error) => {
-        console.error("Failed to copy: ", error);
-      });
-  };
-  useEffect(() => {
-    const touchMoveHandler = (event) => {
-      event.preventDefault();
-    };
-
-    document.addEventListener("touchmove", touchMoveHandler, {
-      passive: false,
-    });
-
-    return () => {
-      document.removeEventListener("touchmove", touchMoveHandler);
-    };
-  }, []);
   return (
     <>
-      <Button onClick={copyToClipboard} mb="md">
-        Copy Selected Range
-      </Button>
+      <Group justify="flex-start" mb="md" gap="2px">
+        <ActionIcon
+          variant="light"
+          onClick={undo}
+          title={t("undo", "Undo")}
+          disabled={history.length === 0}
+        >
+          <IconArrowBackUp stroke={1.5} size="1rem" />
+        </ActionIcon>
+        <ActionIcon
+          variant="light"
+          onClick={redo}
+          title={t("redo", "Redo")}
+          disabled={redoStack.length === 0}
+        >
+          <IconArrowForwardUp stroke={1.5} size="1rem" />
+        </ActionIcon>
+        <ActionIcon
+          variant="light"
+          onClick={() => selectAll()}
+          title={t("select_all", "Select All")}
+          disabled={!data || !data.length}
+        >
+          <IconSelectAll stroke={1.5} size="1rem" />
+        </ActionIcon>
+        <ActionIcon
+          variant="light"
+          c="red"
+          onClick={() => deSelectAny()}
+          title={t("deselect", "DeSelect")}
+          disabled={!getTopLeftCell()}
+        >
+          <IconDeselect stroke={1.5} size="1rem" />
+        </ActionIcon>
+        <ActionIcon
+          variant="light"
+          onClick={() => copyToClipboard(false)}
+          title={t("copy", "Copy")}
+          disabled={!getTopLeftCell()}
+        >
+          <IconCopy stroke={1.5} size="1rem" />
+        </ActionIcon>
+        <ActionIcon
+          variant="light"
+          onClick={() => copyToClipboard(true)}
+          title={t("copy_with_header", "Copy With Header")}
+          disabled={!getTopLeftCell()}
+        >
+          <IconCopyPlus stroke={1.5} size="1rem" />
+        </ActionIcon>
+      </Group>
+
       <Box pb="xl">
-        <ScrollArea  maw={"100%"} mx="auto" type="auto">
-            
+        <ScrollArea maw={"100%"} mx="auto" type="auto">
           <table
             {...{
               style: {
                 width: table.getCenterTotalSize(),
               },
-            }} 
+            }}
           >
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
+                  {headerGroup.headers.map((header, header_idx) => (
                     <th
                       {...{
                         key: header.id,
                         colSpan: header.colSpan,
+                        className: `${classesG.actionSides}`,
                         style: {
-                          width: header.getSize(),
+                          width: header_idx == 0 ? "30px" : header.getSize(),
+                          maxWidth: header_idx == 0 ? "30px" : "auto",
                         },
                       }}
                     >
@@ -493,14 +856,21 @@ export function AppTable() {
                     <td
                       {...{
                         key: cell.id,
-                        "data-row": rowIndex, 
+                        "data-row": rowIndex,
                         "data-col": colIndex,
+                        className: `${
+                          cell.column.id == "action" ? classesG.actionSides : ""
+                        }`,
                         style: {
                           position: "relative",
-                          width: cell.column.getSize(),
-                          backgroundColor: isHighlighted(rowIndex, colIndex)
-                            ? "#0650eb1a"
-                            : "transparent",
+                          width: colIndex == 0 ? "30px" : cell.column.getSize(),
+                          maxWidth: colIndex == 0 ? "30px" : "auto",
+                          backgroundColor:
+                            cell.column.id == "action"
+                              ? ""
+                              : isHighlighted(rowIndex, colIndex)
+                              ? "#0650eb1a"
+                              : "transparent",
                           userSelect: isHighlighted(rowIndex, colIndex)
                             ? "none"
                             : "inherit",
@@ -509,18 +879,36 @@ export function AppTable() {
                             : "1.5px solid lightgray",
                         },
                         onDoubleClick: (event) => {
+                          if (cell.column.id == "action") {
+                            return;
+                          }
                           setEditingCell([rowIndex, colIndex, cell.column.id]);
                         },
-                        onMouseDown: (event) =>
-                          handleMouseDown(event, rowIndex, colIndex),
+                        onMouseDown: (event) => {
+                          if (cell.column.id == "action") {
+                            return;
+                          }
+                          handleMouseDown(event, rowIndex, colIndex);
+                        },
                         onMouseMove: (event) => {
+                          if (cell.column.id == "action") {
+                            return;
+                          }
                           handleMouseMove(event, rowIndex, colIndex);
                         },
                         onTouchStart: (event) => {
+                          if (cell.column.id == "action") {
+                            return;
+                          }
                           event.preventDefault();
                           handleMouseDown(event, rowIndex, colIndex);
                         },
-                        onTouchMove: handleTouchMove,
+                        onTouchMove: (event) => {
+                          if (cell.column.id == "action") {
+                            return;
+                          }
+                          handleTouchMove(event);
+                        },
                       }}
                     >
                       {flexRender(
