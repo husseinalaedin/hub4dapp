@@ -49,6 +49,7 @@ import { HashTagsInput } from "../../../global/global-comp/Hashtags";
 import { useResizeObserver } from "@mantine/hooks";
 import { useAppHeaderNdSide } from "../../../hooks/useAppHeaderNdSide";
 import { Wtsb } from "../../../global/global-comp/Wtsb";
+import { MemoEditorApp } from "../../../global/AppEditor";
 const MAX_HISTORY_SIZE = 40;
 type Deal = {
   dealtype: string;
@@ -373,6 +374,71 @@ const ActionMenuCell = ({
     </Center>
   );
 };
+const ReadOnlyCell = ({ getValue, row: { index }, column: { id }, table }) => {
+  const { t } = useTranslation("common", { keyPrefix: "table" });
+  const inputRef = useRef<any>(null);
+  const { classes: classesG } = useGlobalStyl();
+  const editingCell = table.options.meta?.editingCell;
+  const onEdit =
+    editingCell && editingCell[0] === index && editingCell[2] === id;
+
+  const initialValue = getValue();
+  const [beforEditingValue, setBeforEditingValue] =
+    React.useState(initialValue);
+  const [value, setValue] = React.useState(initialValue);
+  const HandleOnEdit = (val) => {
+    table.options.meta?.onEdit(val);
+  };
+  useEffect(() => {
+    setBeforEditingValue(value);
+    if (onEdit && inputRef.current && inputRef.current.focus) {
+      inputRef.current.focus();
+      resizeInput();
+    }
+  }, [onEdit]);
+  const onSave = () => {
+    HandleOnEdit(false);
+    table.options.meta?.updateData(index, id, value, beforEditingValue);
+  };
+  const onCancel = () => {
+    setValue(beforEditingValue);
+    table.options.meta?.cancelEditing();
+  };
+  React.useEffect(() => {
+    setValue(getValue());
+  }, [initialValue]);
+  const resizeInput = () => {
+    if (inputRef.current) {
+      inputRef.current.style.width = "auto";
+      inputRef.current.style.width = `${inputRef.current.scrollWidth + 10}px`;
+    }
+  };
+  useEffect(() => {
+    resizeInput();
+  }, [value]);
+
+  return (
+    <>
+      {!onEdit && (
+        <Box
+          pl="2px"
+          pr="2px"
+          style={{
+            display: "block",
+            alignItems: "center",
+            fontFamily: "inherit",
+            fontSize: "inherit",
+            fontWeight: "inherit",
+            pointerEvents: "none",
+          }}
+        >
+          {value}
+        </Box>
+      )}
+      {onEdit && <></>}
+    </>
+  );
+};
 const defaultColumns: ColumnDef<Deal>[] = [
   {
     accessorKey: "action",
@@ -404,6 +470,7 @@ const defaultColumns: ColumnDef<Deal>[] = [
   {
     accessorKey: "description",
     header: "Description",
+    cell: ReadOnlyCell,
   },
 ];
 declare module "@tanstack/react-table" {
@@ -535,8 +602,23 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
 const renderSubComponent = ({ row }: { row: Row<Deal> }) => {
   return (
     <Box>
-      {/* {row.original.description} */}
-      {"okoko"}
+      <Group gap={"2px"}>
+        <ActionIcon variant="light" onClick={() => {}}>
+          <IconCheck stroke={1.5} size="1.2rem" />
+        </ActionIcon>
+        <ActionIcon c="red" variant="subtle" onClick={() => {}}>
+          <IconX stroke={1.5} size="1.2rem" />
+        </ActionIcon>
+      </Group>
+      <MemoEditorApp
+        // ref={bodyRef}
+        content={
+          row.original.description && row.original.description != ""
+            ? row.original.description
+            : ""
+        }
+        edit={true}
+      />
     </Box>
   );
 };
@@ -572,12 +654,16 @@ export function AppTable() {
   const [editingCell, setEditingCell] = useState<
     [number, number, string] | null
   >(null);
-  const cellInEdit = (rowIndex, colIndex) => {
+  const cellInEdit = (rowIndex, colIndex, id) => {
     return (
-      editingCell &&
-      editingCell[0] == rowIndex &&
-      editingCell &&
-      editingCell[1] == colIndex
+      (editingCell &&
+        editingCell[0] == rowIndex &&
+        editingCell[1] == colIndex &&
+        colIndex > 0) ||
+      (editingCell &&
+        editingCell[0] == rowIndex &&
+        editingCell[2] == id &&
+        id != "")
     );
   };
   const [isShiftPressed, setIsShiftPressed] = useState(false);
@@ -897,9 +983,9 @@ export function AppTable() {
         deletedIds_n.push(id);
         setDeletedIds(deletedIds_n);
       },
-      getRowCanExpand:(row)=>{
-        return true
-      }
+      getRowCanExpand: (row) => {
+        return true;
+      },
     },
   });
 
@@ -1061,7 +1147,8 @@ export function AppTable() {
                               ? classesG.actionSides
                               : ""
                           } ${
-                            !cellInEdit(rowIndex, colIndex) && density
+                            !cellInEdit(rowIndex, colIndex, cell.column.id) &&
+                            density
                               ? classesG.excelCellcollapsed
                               : ""
                           } `,
@@ -1127,7 +1214,7 @@ export function AppTable() {
                       </td>
                     ))}
                   </tr>
-                  {row.getIsExpanded() && (
+                  {cellInEdit(rowIndex, -1, "description") && (
                     <tr>
                       {/* 2nd row is a custom 1 cell row */}
                       <td colSpan={row.getVisibleCells().length}>
