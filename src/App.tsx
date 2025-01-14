@@ -17,10 +17,10 @@ import React from "react";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import { I18nextProvider } from "react-i18next";
- 
+
 import { AppRoutes } from "./global/AppRoutes";
 import i18n from "./locales/I18next";
-import { HeaderProvider } from "./hooks/useAppHeader";
+import { HeaderNdSideProvider } from "./hooks/useAppHeaderNdSide";
 import { BrowserRouter } from "react-router";
 
 export default function AppMain() {
@@ -32,11 +32,11 @@ export default function AppMain() {
             <AuthProvider>
               <AppGlobalStylProvider>
                 <ModalsProvider>
-                  <HeaderProvider>
+                  <HeaderNdSideProvider>
                     {/* <BrowserRouter> */}
-                      <AppRoutes />
+                    <AppRoutes />
                     {/* </BrowserRouter> */}
-                  </HeaderProvider>
+                  </HeaderNdSideProvider>
                 </ModalsProvider>
               </AppGlobalStylProvider>
             </AuthProvider>

@@ -32,13 +32,13 @@ import { useGlobalStyl } from "../../../hooks/useTheme";
 import { AppNotifications } from "../../../hooks/useAppTheme";
 import { notifications, Notifications } from "@mantine/notifications";
 import { DemoDrawer } from "../../../global/testDemo";
-import { useAppHeader } from "../../../hooks/useAppHeader";
+import { useAppHeaderNdSide } from "../../../hooks/useAppHeaderNdSide";
 
 export const AppHeader = (prop: any) => {
   let child = prop?.children;
   let title = prop?.title;
   let titleClicked = prop?.titleClicked;
-  const { setHeaderComponent }: any = useAppHeader();
+  const { setHeaderComponent }: any = useAppHeaderNdSide();
 
   const Header = () => {
     return <>{child}</>;

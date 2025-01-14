@@ -268,6 +268,15 @@ export const AppGlobalStylProvider = ({ children }: any) => {
           border: "2px solid blue",
         },
       },
+      excelCellcollapsed: {
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+      },
+      //     white-space: nowrap;
+      // overflow: hidden;
+      // text-overflow: ellipsis;
+
       actionSides: {
         backgroundColor: `${
           colorScheme === "dark"

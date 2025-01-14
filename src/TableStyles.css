@@ -28,16 +28,19 @@ td,
 
 th,
 .th {
-  border: 1px solid lightgray; /* Adds border to table header */
+  border: 1.5px solid lightgray; /* Adds border to table header */
   position: relative;
   font-weight: bold;
   text-align: center;
   background-color: #f8f9fa; /* Optional: Light background for the header */
+  word-wrap:break-word;
+  overflow: hidden;
 }
 
 td,
 .td {
   border: 1px solid lightgray; /* Ensures table cells have a consistent border */
+  word-wrap:break-word;
 }
 
 .resizer {

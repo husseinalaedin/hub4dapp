@@ -105,6 +105,7 @@ export const useAxiosGet = (url2, params) => {
                         if (err.response.data.error_code && err.response.data.error_code != '')
                             setErroCode(err.response.data.error_code)
                         errorMsg = err.response.data.message
+                        console.log("errorMsg:",errorMsg);
                     }
 
                     else {

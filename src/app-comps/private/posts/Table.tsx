@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import {
   useReactTable,
   ColumnResizeMode,
@@ -8,6 +8,7 @@ import {
   ColumnResizeDirection,
   RowData,
   getPaginationRowModel,
+  Row,
 } from "@tanstack/react-table";
 import {
   ActionIcon,
@@ -29,18 +30,25 @@ import { useTranslation } from "react-i18next";
 import {
   IconArrowBackUp,
   IconArrowForwardUp,
+  IconBaselineDensityMedium,
+  IconBaselineDensitySmall,
   IconCheck,
   IconCopy,
   IconCopyPlus,
   IconDeselect,
   IconDotsVertical,
+  IconMaximize,
   IconMenu,
+  IconMinimize,
   IconSelectAll,
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
 import { G, useMessage } from "../../../global/G";
 import { HashTagsInput } from "../../../global/global-comp/Hashtags";
+import { useResizeObserver } from "@mantine/hooks";
+import { useAppHeaderNdSide } from "../../../hooks/useAppHeaderNdSide";
+import { Wtsb } from "../../../global/global-comp/Wtsb";
 const MAX_HISTORY_SIZE = 40;
 type Deal = {
   dealtype: string;
@@ -108,6 +116,7 @@ const defaultData: Deal[] = [
   },
 ];
 const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
+  const { t } = useTranslation("common", { keyPrefix: "table" });
   const inputRef = useRef<any>(null);
   const { classes: classesG } = useGlobalStyl();
   const editingCell = table.options.meta?.editingCell;
@@ -122,21 +131,20 @@ const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
     table.options.meta?.onEdit(val);
   };
   useEffect(() => {
-    console.log(inputRef);
+    setBeforEditingValue(value);
     if (onEdit && inputRef.current && inputRef.current.focus) {
       inputRef.current.focus();
       resizeInput();
-      setBeforEditingValue(value);
     }
   }, [onEdit]);
   const onSave = () => {
     HandleOnEdit(false);
-    table.options.meta?.updateData(index, id, value);
+    table.options.meta?.updateData(index, id, value, beforEditingValue);
   };
-  const onCancel=()=>{
+  const onCancel = () => {
     setValue(beforEditingValue);
     table.options.meta?.cancelEditing();
-  }
+  };
   React.useEffect(() => {
     setValue(getValue());
   }, [initialValue]);
@@ -154,11 +162,10 @@ const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
     <>
       {!onEdit && (
         <Box
-          bg="red"
           pl="2px"
           pr="2px"
           style={{
-            display: "flex",
+            display: "block",
             alignItems: "center",
             fontFamily: "inherit",
             fontSize: "inherit",
@@ -170,28 +177,124 @@ const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
         </Box>
       )}
       {onEdit && (
-        <HashTagsInput
-          //   ref={inputRef}
-          h="100%"
-          defaultValue={initialValue}
-          value={value}
-          onChange={setValue}
-          onBlur={onSave}
-          readOnly={false}
-          onEscape={onCancel}
-          rightSection={
-            <>
-              <Group gap={"2px"}>
-                <ActionIcon variant="light" onClick={onSave}>
-                  <IconCheck stroke={1.5} size="1.2rem" />
-                </ActionIcon>
-                <ActionIcon c="red" variant="subtle" onClick={onCancel}>
-                  <IconX stroke={1.5} size="1.2rem" />
-                </ActionIcon>
-              </Group>
-            </>
-          }
-        />
+        <Group justify="space-between" gap={1} w="100%">
+          <Group gap={"2px"}>
+            <ActionIcon variant="light" onClick={onSave}>
+              <IconCheck stroke={1.5} size="1.2rem" />
+            </ActionIcon>
+            <ActionIcon c="red" variant="subtle" onClick={onCancel}>
+              <IconX stroke={1.5} size="1.2rem" />
+            </ActionIcon>
+          </Group>
+          <HashTagsInput
+            placeholder={t("enter_hashtags", "Please Enter the hashtag")}
+            //   ref={inputRef}
+            h="100%"
+            w="100%"
+            defaultValue={initialValue}
+            value={value}
+            onChange={setValue}
+            onBlur={() => {
+              if (beforEditingValue === value) onCancel();
+              // onSave()
+            }}
+            readOnly={false}
+            onEscape={onCancel}
+          />
+        </Group>
+      )}
+    </>
+  );
+};
+const TypeCell = ({ getValue, row: { index }, column: { id }, table }) => {
+  const { t } = useTranslation("common", { keyPrefix: "table" });
+  const inputRef = useRef<any>(null);
+  const { classes: classesG } = useGlobalStyl();
+  const editingCell = table.options.meta?.editingCell;
+  const onEdit =
+    editingCell && editingCell[0] === index && editingCell[2] === id;
+
+  const initialValue = getValue();
+  const [beforEditingValue, setBeforEditingValue] =
+    React.useState(initialValue);
+  const [value, setValue] = React.useState(initialValue);
+  const HandleOnEdit = (val) => {
+    table.options.meta?.onEdit(val);
+  };
+  useEffect(() => {
+    setBeforEditingValue(value);
+    if (onEdit && inputRef.current && inputRef.current.focus) {
+      inputRef.current.focus();
+      resizeInput();
+    }
+  }, [onEdit]);
+  const onSave = () => {
+    HandleOnEdit(false);
+    table.options.meta?.updateData(index, id, value, beforEditingValue);
+  };
+  const onCancel = () => {
+    setValue(beforEditingValue);
+    table.options.meta?.cancelEditing();
+  };
+  React.useEffect(() => {
+    setValue(getValue());
+  }, [initialValue]);
+  const resizeInput = () => {
+    if (inputRef.current) {
+      inputRef.current.style.width = "auto";
+      inputRef.current.style.width = `${inputRef.current.scrollWidth + 10}px`;
+    }
+  };
+  useEffect(() => {
+    resizeInput();
+  }, [value]);
+
+  return (
+    <>
+      {!onEdit && (
+        <Box
+          pl="2px"
+          pr="2px"
+          style={{
+            display: "block",
+            alignItems: "center",
+            fontFamily: "inherit",
+            fontSize: "inherit",
+            fontWeight: "inherit",
+            pointerEvents: "none",
+          }}
+        >
+          {value}
+        </Box>
+      )}
+      {onEdit && (
+        <Group justify="flex-start" gap={1}>
+          <Group gap={"2px"}>
+            <ActionIcon variant="light" onClick={onSave}>
+              <IconCheck stroke={1.5} size="1.2rem" />
+            </ActionIcon>
+            <ActionIcon c="red" variant="subtle" onClick={onCancel}>
+              <IconX stroke={1.5} size="1.2rem" />
+            </ActionIcon>
+          </Group>
+          <Wtsb
+            withinPortal={true}
+            defaultValue={initialValue}
+            value={value}
+            onChange={setValue}
+            onBlur={() => {
+              if (beforEditingValue === value) onCancel();
+              // onSave()
+            }}
+            onKeyDown={(event) => {
+              if (event.key == "Enter") onSave();
+              if (event.key == "Escape") {
+                setValue(beforEditingValue);
+                table.options.meta?.cancelEditing();
+              }
+            }}
+          />
+        </Group>
       )}
     </>
   );
@@ -224,10 +327,7 @@ const ActionMenuCell = ({
       setBeforEditingValue(value);
     }
   }, [onEdit]);
-  const onSave = () => {
-    HandleOnEdit(false);
-    table.options.meta?.updateData(index, id, value);
-  };
+
   React.useEffect(() => {
     setValue(getValue());
   }, [initialValue]);
@@ -282,6 +382,7 @@ const defaultColumns: ColumnDef<Deal>[] = [
   {
     accessorKey: "dealtype",
     header: "Type",
+    cell: TypeCell,
   },
   {
     accessorKey: "title",
@@ -307,12 +408,18 @@ const defaultColumns: ColumnDef<Deal>[] = [
 ];
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
-    updateData: (rowIndex: number, columnId: string, value: unknown) => void;
+    updateData: (
+      rowIndex: number,
+      columnId: string,
+      value: unknown,
+      beforEditingValue: unknown
+    ) => void;
     onEdit: (onEdit_: boolean) => void;
     editingCell: [number, number, string] | null;
     cellIsHighlighted: (rowIndex: number, columnIndex: number) => boolean;
     cancelEditing: () => void;
     deleteRow: (rowIndex: number) => void;
+    getRowCanExpand: (row: Row<TData>) => boolean;
   }
 }
 
@@ -339,7 +446,11 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
     }, [onEdit]);
     const onSave = () => {
       HandleOnEdit(false);
-      table.options.meta?.updateData(index, id, value);
+      table.options.meta?.updateData(index, id, value, beforEditingValue);
+    };
+    const onCancel = () => {
+      setValue(beforEditingValue);
+      table.options.meta?.cancelEditing();
     };
     React.useEffect(() => {
       setValue(initialValue);
@@ -362,7 +473,7 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
             pl="2px"
             pr="2px"
             style={{
-              display: "flex",
+              display: "block",
               alignItems: "center",
               fontFamily: "inherit",
               fontSize: "inherit",
@@ -374,19 +485,21 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
           </Box>
         )}
         {onEdit && (
-          <input
+          <TextInput
             className={classesG.inputExcel}
             ref={inputRef}
             onKeyDown={(event) => {
               if (event.key == "Enter") onSave();
               if (event.key == "Escape") {
-                setValue(beforEditingValue);
-                table.options.meta?.cancelEditing();
+                onCancel();
               }
             }}
             value={value as string}
             onChange={(e) => setValue(e.target.value)}
-            onBlur={onSave}
+            onBlur={() => {
+              if (beforEditingValue === value) onCancel();
+              // onSave()
+            }}
             style={{
               fontFamily: "inherit",
               fontSize: "inherit",
@@ -397,18 +510,36 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
               position: "absolute",
               top: 0,
               left: 0,
-              bottom: 0,
+              // bottom: 0,
               width: "auto",
               minWidth: "100px",
               zIndex: 4000,
             }}
+            rightSectionWidth={60}
+            rightSection={
+              <Group gap={"2px"}>
+                <ActionIcon variant="light" onClick={onSave}>
+                  <IconCheck stroke={1.5} size="1.2rem" />
+                </ActionIcon>
+                <ActionIcon c="red" variant="subtle" onClick={onCancel}>
+                  <IconX stroke={1.5} size="1.2rem" />
+                </ActionIcon>
+              </Group>
+            }
           />
         )}
       </>
     );
   },
 };
-
+const renderSubComponent = ({ row }: { row: Row<Deal> }) => {
+  return (
+    <Box>
+      {/* {row.original.description} */}
+      {"okoko"}
+    </Box>
+  );
+};
 function useSkipper() {
   const shouldSkipRef = React.useRef(true);
   const shouldSkip = shouldSkipRef.current;
@@ -426,18 +557,29 @@ function useSkipper() {
 }
 export function AppTable() {
   const { classes: classesG } = useGlobalStyl();
+  const { desktopFocus, setDesktopfocus }: any = useAppHeaderNdSide();
   const { succeed } = useMessage();
   const { t } = useTranslation("common", { keyPrefix: "table" });
   const [data, setData] = useState<any>(() => [...defaultData]);
   const [history, setHistory] = useState<any>([]);
   const [redoStack, setRedoStack] = useState<any>([]);
   const [deletedIds, setDeletedIds] = useState<any>([]);
+  const [editedIds, setEditedIds] = useState<any>([]);
   const [startCell, setStartCell] = useState<any>(null); // Starting cell coordinates
   const [endCell, setEndCell] = useState<any>(null); // Ending cell coordinates
   const [onEdit, setOnEdit] = useState(false);
+  const [density, setDensity] = useState<boolean>(true);
   const [editingCell, setEditingCell] = useState<
     [number, number, string] | null
   >(null);
+  const cellInEdit = (rowIndex, colIndex) => {
+    return (
+      editingCell &&
+      editingCell[0] == rowIndex &&
+      editingCell &&
+      editingCell[1] == colIndex
+    );
+  };
   const [isShiftPressed, setIsShiftPressed] = useState(false);
 
   const handleMouseDown = (event, row, col) => {
@@ -708,11 +850,21 @@ export function AppTable() {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     autoResetPageIndex,
+
     meta: {
-      updateData: (rowIndex, columnId, value) => {
-        skipAutoResetPageIndex();
+      updateData: (rowIndex, columnId, value, beforEditingValue) => {
         setEditingCell(null);
+        if (value === beforEditingValue) return;
+        skipAutoResetPageIndex();
+
         saveToHistory();
+
+        let id = data[rowIndex]["id"];
+
+        const editedIds_n = [...editedIds];
+        editedIds_n.push(id);
+        setEditedIds(editedIds_n);
+
         setData((old) =>
           old.map((row, index) => {
             if (index === rowIndex) {
@@ -736,21 +888,37 @@ export function AppTable() {
       },
       deleteRow: (rowIndex) => {
         saveToHistory();
-        let id = data[rowIndex]['id'];
+        let id = data[rowIndex]["id"];
         const updatedItems = [...data]; // Make a copy of the array
-        
+
         updatedItems.splice(rowIndex, 1); // Remove item at the index
         setData(updatedItems); // Update state with the modified array
         const deletedIds_n = [...deletedIds];
         deletedIds_n.push(id);
         setDeletedIds(deletedIds_n);
       },
+      getRowCanExpand:(row)=>{
+        return true
+      }
     },
   });
 
   return (
     <>
       <Group justify="flex-start" mb="md" gap="2px">
+        <ActionIcon
+          variant="filled"
+          onClick={() => {
+            setDesktopfocus((prev) => !prev);
+          }}
+          title={
+            desktopFocus ? t("minimize", "Minimize") : t("maximize", "Maximize")
+          }
+        >
+          {!desktopFocus && <IconMaximize stroke={1.5} size="1rem" />}
+          {desktopFocus && <IconMinimize stroke={1.5} size="1rem" />}
+        </ActionIcon>
+
         <ActionIcon
           variant="light"
           onClick={undo}
@@ -800,6 +968,20 @@ export function AppTable() {
         >
           <IconCopyPlus stroke={1.5} size="1rem" />
         </ActionIcon>
+        <ActionIcon
+          variant="light"
+          onClick={() => {
+            setDensity((prev) => !prev);
+          }}
+          title={
+            density
+              ? t("low_density", "Low Density")
+              : t("high_density", "High Density")
+          }
+        >
+          {!density && <IconBaselineDensitySmall stroke={1.5} size="1rem" />}
+          {density && <IconBaselineDensityMedium stroke={1.5} size="1rem" />}
+        </ActionIcon>
       </Group>
 
       <Box pb="xl">
@@ -823,7 +1005,7 @@ export function AppTable() {
                         style: {
                           width: header_idx == 0 ? "30px" : header.getSize(),
                           maxWidth: header_idx == 0 ? "30px" : "auto",
-                          height:"30px"
+                          height: "30px",
                         },
                       }}
                     >
@@ -866,73 +1048,94 @@ export function AppTable() {
             </thead>
             <tbody>
               {table.getRowModel().rows.map((row, rowIndex) => (
-                <tr key={row.id}>
-                  {row.getVisibleCells().map((cell, colIndex) => (
-                    <td
-                      {...{
-                        key: cell.id,
-                        "data-row": rowIndex,
-                        "data-col": colIndex,
-                        className: `${
-                          cell.column.id == "action" ? classesG.actionSides : ""
-                        }`,
-                        style: {
-                          position: "relative",
-                          width: colIndex == 0 ? "30px" : cell.column.getSize(),
-                          maxWidth: colIndex == 0 ? "30px" : "auto",
-                          backgroundColor:
+                <Fragment key={row.id}>
+                  <tr>
+                    {row.getVisibleCells().map((cell, colIndex) => (
+                      <td
+                        {...{
+                          key: cell.id,
+                          "data-row": rowIndex,
+                          "data-col": colIndex,
+                          className: `${
                             cell.column.id == "action"
-                              ? ""
-                              : isHighlighted(rowIndex, colIndex)
-                              ? "#0650eb1a"
-                              : "transparent",
-                          userSelect: isHighlighted(rowIndex, colIndex)
-                            ? "none"
-                            : "inherit",
-                          border: isHighlighted(rowIndex, colIndex)
-                            ? "1.5px solid #d3d3d366"
-                            : "1.5px solid lightgray",
-                        },
-                        onDoubleClick: (event) => {
-                          if (cell.column.id == "action") {
-                            return;
-                          }
-                          setEditingCell([rowIndex, colIndex, cell.column.id]);
-                        },
-                        onMouseDown: (event) => {
-                          if (cell.column.id == "action") {
-                            return;
-                          }
-                          handleMouseDown(event, rowIndex, colIndex);
-                        },
-                        onMouseMove: (event) => {
-                          if (cell.column.id == "action") {
-                            return;
-                          }
-                          handleMouseMove(event, rowIndex, colIndex);
-                        },
-                        onTouchStart: (event) => {
-                          if (cell.column.id == "action") {
-                            return;
-                          }
-                          event.preventDefault();
-                          handleMouseDown(event, rowIndex, colIndex);
-                        },
-                        onTouchMove: (event) => {
-                          if (cell.column.id == "action") {
-                            return;
-                          }
-                          handleTouchMove(event);
-                        },
-                      }}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  ))}
-                </tr>
+                              ? classesG.actionSides
+                              : ""
+                          } ${
+                            !cellInEdit(rowIndex, colIndex) && density
+                              ? classesG.excelCellcollapsed
+                              : ""
+                          } `,
+                          style: {
+                            position: "relative",
+                            width:
+                              colIndex == 0 ? "30px" : cell.column.getSize(),
+                            maxWidth: colIndex == 0 ? "30px" : "auto",
+                            backgroundColor:
+                              cell.column.id == "action"
+                                ? ""
+                                : isHighlighted(rowIndex, colIndex)
+                                ? "#0650eb1a"
+                                : "transparent",
+                            userSelect: isHighlighted(rowIndex, colIndex)
+                              ? "none"
+                              : "inherit",
+                            border: isHighlighted(rowIndex, colIndex)
+                              ? "1.5px solid #d3d3d366"
+                              : "1.5px solid lightgray",
+                          },
+                          onDoubleClick: (event) => {
+                            if (cell.column.id == "action") {
+                              return;
+                            }
+                            setEditingCell([
+                              rowIndex,
+                              colIndex,
+                              cell.column.id,
+                            ]);
+                          },
+                          onMouseDown: (event) => {
+                            if (cell.column.id == "action") {
+                              return;
+                            }
+                            handleMouseDown(event, rowIndex, colIndex);
+                          },
+                          onMouseMove: (event) => {
+                            if (cell.column.id == "action") {
+                              return;
+                            }
+                            handleMouseMove(event, rowIndex, colIndex);
+                          },
+                          onTouchStart: (event) => {
+                            if (cell.column.id == "action") {
+                              return;
+                            }
+                            event.preventDefault();
+                            handleMouseDown(event, rowIndex, colIndex);
+                          },
+                          onTouchMove: (event) => {
+                            if (cell.column.id == "action") {
+                              return;
+                            }
+                            handleTouchMove(event);
+                          },
+                        }}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                  {row.getIsExpanded() && (
+                    <tr>
+                      {/* 2nd row is a custom 1 cell row */}
+                      <td colSpan={row.getVisibleCells().length}>
+                        {renderSubComponent({ row })}
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               ))}
             </tbody>
           </table>

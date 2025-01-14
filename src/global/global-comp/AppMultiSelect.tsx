@@ -205,6 +205,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       withinPortal={withinPortal}
       onOptionSubmit={handleValueSelect}
       readOnly={readOnly}
+      
     >
       <Combobox.DropdownTarget>
         <PillsInput
@@ -223,12 +224,14 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
           label={label}
           style={style}
           rightSection={rightSection}
+          w="100%"
         >
           <Pill.Group>
             {values}
 
             <Combobox.EventsTarget>
               <PillsInput.Field
+                
                 {...others}
                 ref={ref}
                 required={required}

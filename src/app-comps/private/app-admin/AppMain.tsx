@@ -47,7 +47,7 @@ import {
 } from "../../../store/features/ActiveNav";
 import { useGlobalStyl } from "../../../hooks/useTheme";
 import { Analytic } from "../dashboard/Analytic";
-import { useAppHeader } from "../../../hooks/useAppHeader";
+import { useAppHeaderNdSide } from "../../../hooks/useAppHeaderNdSide";
 
 const scaleY = {
   in: { opacity: 1, transform: "scaleY(1)" },
@@ -247,18 +247,19 @@ export const AppMain0 = () => {
 };
 export const AppMain = () => {
   const [opened, { toggle }] = useDisclosure();
-  const { HeaderComponent }: any = useAppHeader();
+  const { HeaderComponent }: any = useAppHeaderNdSide();
   const small = useSelector(selectSmall);
   const medium = useSelector(selectMedium);
   const padng = small ? "sm" : medium ? "md" : "lg";
   const { classes: classesG } = useGlobalStyl();
+  const { desktopFocus } :any= useAppHeaderNdSide();
   return (
     <AppShell
       header={{ height: small ? 60 : 66 }}
       navbar={{
         width: 300,
         breakpoint: "sm",
-        collapsed: { mobile: !opened },
+        collapsed: { mobile: !opened, desktop: desktopFocus },
       }}
       padding={padng}
     >
@@ -266,7 +267,7 @@ export const AppMain = () => {
         <Box style={{ display: "flex" }}>
           <Group
             justify="space-between"
-            style={{ flex: small ? (opened? "1":"0 0 auto") : "0 0 auto" }}
+            style={{ flex: small ? (opened ? "1" : "0 0 auto") : "0 0 auto" }}
           >
             <Burger
               opened={opened}
@@ -323,7 +324,6 @@ export const AppMain = () => {
         <Box pos="relative">
           <Outlet />
         </Box>
-        
       </AppShell.Main>
     </AppShell>
   );
