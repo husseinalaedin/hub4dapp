@@ -178,13 +178,13 @@ const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
         </Box>
       )}
       {onEdit && (
-        <Group justify="space-between" gap={1} w="100%">
-          <Group gap={"2px"}>
-            <ActionIcon variant="light" onClick={onSave}>
-              <IconCheck stroke={1.5} size="1.2rem" />
-            </ActionIcon>
-            <ActionIcon c="red" variant="subtle" onClick={onCancel}>
+        <Group justify="flex-end" gap={1} w="100%" p="2px">
+          <Group gap={"2px"} justify="flex-end" p="2px">
+            <ActionIcon c="red" variant="light" onClick={onCancel}>
               <IconX stroke={1.5} size="1.2rem" />
+            </ActionIcon>
+            <ActionIcon variant="filled" onClick={onSave}>
+              <IconCheck stroke={1.5} size="1.2rem" />
             </ActionIcon>
           </Group>
           <HashTagsInput
@@ -269,13 +269,13 @@ const TypeCell = ({ getValue, row: { index }, column: { id }, table }) => {
         </Box>
       )}
       {onEdit && (
-        <Group justify="flex-start" gap={1}>
-          <Group gap={"2px"}>
-            <ActionIcon variant="light" onClick={onSave}>
-              <IconCheck stroke={1.5} size="1.2rem" />
-            </ActionIcon>
-            <ActionIcon c="red" variant="subtle" onClick={onCancel}>
+        <Group justify="flex-end" gap={1} p="2px">
+          <Group gap={"2px"} justify="flex-end" p="2px">
+            <ActionIcon c="red" variant="light" onClick={onCancel}>
               <IconX stroke={1.5} size="1.2rem" />
+            </ActionIcon>
+            <ActionIcon variant="filled" onClick={onSave}>
+              <IconCheck stroke={1.5} size="1.2rem" />
             </ActionIcon>
           </Group>
           <Wtsb
@@ -435,7 +435,12 @@ const ReadOnlyCell = ({ getValue, row: { index }, column: { id }, table }) => {
           {value}
         </Box>
       )}
-      {onEdit && <></>}
+      {onEdit && (
+        <Group gap={1}>
+          {t("editing", "editing")}
+          <Box>...</Box>
+        </Group>
+      )}
     </>
   );
 };
@@ -585,12 +590,13 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
             rightSectionWidth={60}
             rightSection={
               <Group gap={"2px"}>
-                <ActionIcon variant="light" onClick={onSave}>
-                  <IconCheck stroke={1.5} size="1.2rem" />
-                </ActionIcon>
-                <ActionIcon c="red" variant="subtle" onClick={onCancel}>
+                <ActionIcon c="red" variant="light" onClick={onCancel}>
                   <IconX stroke={1.5} size="1.2rem" />
                 </ActionIcon>
+                <ActionIcon variant="filled" onClick={onSave}>
+                  <IconCheck stroke={1.5} size="1.2rem" />
+                </ActionIcon>
+                
               </Group>
             }
           />
@@ -599,26 +605,49 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
     );
   },
 };
-const renderSubComponent = ({ row }: { row: Row<Deal> }) => {
+const EditDescription = ({ row, rowIndex, table }) => {
+  const { t } = useTranslation("common", { keyPrefix: "table" });
+  const initialValue = row.original.description;
+  // const [value, setValue] = React.useState(initialValue);
+  const HandleOnEdit = (val) => {
+    table.options.meta?.onEdit(val);
+  };
+  const bodyRef = useRef<any>(null);
+  const onSave = () => {
+    HandleOnEdit(false);
+    let body = bodyRef?.current?.editorObject?.currentContent;
+    table.options.meta?.updateData(
+      rowIndex,
+      "description",
+      body,
+      row.original.description
+    );
+  };
+  const onCancel = () => {
+    table.options.meta?.cancelEditing();
+  };
   return (
     <Box>
-      <Group gap={"2px"}>
-        <ActionIcon variant="light" onClick={() => {}}>
-          <IconCheck stroke={1.5} size="1.2rem" />
-        </ActionIcon>
-        <ActionIcon c="red" variant="subtle" onClick={() => {}}>
-          <IconX stroke={1.5} size="1.2rem" />
-        </ActionIcon>
+      <Group gap={"2px"} justify="flex-end" p="2px">
+        <Button
+          size="compact-lg"
+          c="red"
+          variant="light"
+          onClick={onCancel}
+          leftSection={<IconX stroke={1.5} size="1.2rem" />}
+        >
+          {t("cancel", "Cancel")}
+        </Button>
+        <Button
+          size="compact-lg"
+          variant="filled"
+          onClick={onSave}
+          leftSection={<IconCheck stroke={1.5} size="1.2rem" />}
+        >
+          {t("confirm", "Confirm")}
+        </Button>
       </Group>
-      <MemoEditorApp
-        // ref={bodyRef}
-        content={
-          row.original.description && row.original.description != ""
-            ? row.original.description
-            : ""
-        }
-        edit={true}
-      />
+      <MemoEditorApp ref={bodyRef} content={initialValue} edit={true} />
     </Box>
   );
 };
@@ -702,11 +731,28 @@ export function AppTable() {
       }
     }
   };
+  const activeCellByTyping = (event) => {
+    const isPrintableKey =
+      (event.key.length === 1 && // Ensure it's a single character
+        !event.ctrlKey && // Exclude Ctrl key combinations
+        !event.metaKey && // Exclude Meta/Command key combinations
+        !event.altKey) ||
+      event.key === "Backspace"; // Include Backspace;
+    if (!isPrintableKey || (editingCell && editingCell[0] >= 0) || !startCell)
+      return;
 
+    let all_cols = table.getAllColumns();
+    let targetCol = startCell.col;
+    let targetColId = all_cols.length > targetCol ? all_cols[targetCol].id : "";
+    event.preventDefault();
+    setEditingCell([startCell.row, startCell.col, targetColId]);
+  };
   const [columns] = React.useState<typeof defaultColumns>(() => [
     ...defaultColumns,
   ]);
-
+useEffect(()=>{
+console.log(editingCell);
+},[editingCell])
   const [columnResizeMode, setColumnResizeMode] =
     React.useState<ColumnResizeMode>("onChange");
 
@@ -722,6 +768,9 @@ export function AppTable() {
     const minCol = Math.min(startCell.col, endCell.col);
     const maxCol = Math.max(startCell.col, endCell.col);
     return row >= minRow && row <= maxRow && col >= minCol && col <= maxCol;
+  };
+  const rowInEditMode = (rowIndex) => {
+    return editingCell && editingCell[0] == rowIndex;
   };
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -1077,6 +1126,8 @@ export function AppTable() {
               style: {
                 width: table.getCenterTotalSize(),
               },
+              tabIndex: 0,
+              onKeyDown: (event) => activeCellByTyping(event),
             }}
           >
             <thead>
@@ -1135,7 +1186,13 @@ export function AppTable() {
             <tbody>
               {table.getRowModel().rows.map((row, rowIndex) => (
                 <Fragment key={row.id}>
-                  <tr>
+                  <tr
+                    {...{
+                      className: `${
+                        rowInEditMode(rowIndex) ? classesG.excelRowEditMode : ""
+                      }`,
+                    }}
+                  >
                     {row.getVisibleCells().map((cell, colIndex) => (
                       <td
                         {...{
@@ -1218,7 +1275,11 @@ export function AppTable() {
                     <tr>
                       {/* 2nd row is a custom 1 cell row */}
                       <td colSpan={row.getVisibleCells().length}>
-                        {renderSubComponent({ row })}
+                        <EditDescription
+                          row={row}
+                          rowIndex={rowIndex}
+                          table={table}
+                        />
                       </td>
                     </tr>
                   )}

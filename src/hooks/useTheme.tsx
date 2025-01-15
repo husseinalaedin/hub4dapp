@@ -273,6 +273,13 @@ export const AppGlobalStylProvider = ({ children }: any) => {
         overflow: "hidden",
         textOverflow: "ellipsis",
       },
+      excelRowEditMode: {
+        backgroundColor: `${
+          colorScheme === "dark"
+            ? darken(theme.colors.teal[9], 1)
+            : lighten(theme.colors.green[7], 0.9)
+        }  !important`,
+      },
       //     white-space: nowrap;
       // overflow: hidden;
       // text-overflow: ellipsis;
