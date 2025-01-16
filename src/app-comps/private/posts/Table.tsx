@@ -1,4 +1,11 @@
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  Fragment,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   useReactTable,
   ColumnResizeMode,
@@ -23,6 +30,7 @@ import {
   Table,
   Textarea,
   TextInput,
+  Tooltip,
 } from "@mantine/core";
 import { getFilteredRowModel } from "@tanstack/react-table";
 import { useGlobalStyl } from "../../../hooks/useTheme";
@@ -37,16 +45,18 @@ import {
   IconCopyPlus,
   IconDeselect,
   IconDotsVertical,
+  IconInfoCircle,
   IconMaximize,
   IconMenu,
   IconMinimize,
+  IconQuestionMark,
   IconSelectAll,
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
 import { G, useMessage } from "../../../global/G";
 import { HashTagsInput } from "../../../global/global-comp/Hashtags";
-import { useResizeObserver } from "@mantine/hooks";
+import { useClickOutside, useResizeObserver } from "@mantine/hooks";
 import { useAppHeaderNdSide } from "../../../hooks/useAppHeaderNdSide";
 import { Wtsb } from "../../../global/global-comp/Wtsb";
 import { MemoEditorApp } from "../../../global/AppEditor";
@@ -140,7 +150,13 @@ const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
   }, [onEdit]);
   const onSave = () => {
     HandleOnEdit(false);
-    table.options.meta?.updateData(index, id, value, beforEditingValue);
+console.log(value,'hashhh')
+    if (value && value.split) {
+      let values_ = value.split(",");
+      // for (let i = 0; i < values_.length; i++) {
+        table.options.meta?.updateData(index, id, values_, '');
+      // }
+    } else table.options.meta?.updateData(index, id, value, beforEditingValue);
   };
   const onCancel = () => {
     setValue(beforEditingValue);
@@ -174,12 +190,23 @@ const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
             pointerEvents: "none",
           }}
         >
-          {value && value.length > 0 ? value.join(",") : ""}
+          {value && value.join && value.length > 0 ? value.join(",") : [value]}
         </Box>
       )}
       {onEdit && (
         <Group justify="flex-end" gap={1} w="100%" p="2px">
           <Group gap={"2px"} justify="flex-end" p="2px">
+            <Tooltip
+              label={t(
+                "hashtag_info_message",
+                "Please enter the hashtag and press Enter"
+              )}
+            >
+              <ActionIcon c="orange" variant="light" style={{ cursor: "help" }}>
+                <IconQuestionMark stroke={1.5} size="1.2rem" />
+              </ActionIcon>
+            </Tooltip>
+
             <ActionIcon c="red" variant="light" onClick={onCancel}>
               <IconX stroke={1.5} size="1.2rem" />
             </ActionIcon>
@@ -188,12 +215,14 @@ const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
             </ActionIcon>
           </Group>
           <HashTagsInput
-            placeholder={t("enter_hashtags", "Please Enter the hashtag")}
+            placeholder={t("enter_hashtags", "Please Enter#")}
             //   ref={inputRef}
             h="100%"
             w="100%"
-            defaultValue={initialValue}
-            value={value}
+            defaultValue={
+              Array.isArray(initialValue) ? initialValue : [initialValue]
+            }
+            value={Array.isArray(value) ? value : [value]}
             onChange={setValue}
             onBlur={() => {
               if (beforEditingValue === value) onCancel();
@@ -306,56 +335,46 @@ const ActionMenuCell = ({
   column: { id },
   table,
 }) => {
+  const ref = useRef<HTMLDivElement | null>(null); // Explicitly type the ref
+  const [opened, setOpened] = useState(false);
   const { t } = useTranslation("common", { keyPrefix: "table" });
   const inputRef = useRef<any>(null);
   const { classes: classesG } = useGlobalStyl();
-  const editingCell = table.options.meta?.editingCell;
-  const onEdit =
-    editingCell && editingCell[0] === index && editingCell[2] === id;
+  const forceCloseTm = table.options.meta?.forceCloseTm;
+  useEffect(() => {
+    if (!forceCloseTm || forceCloseTm == "") return;
+    // setOpened(false);
+  }, [forceCloseTm]);
+  const handler = (event: any) => {
+    try {
+      if (ref.current && ref.current.contains(event.target)) {
+        event.stopPropagation();
+        return;
+      }
+    } catch (error) {}
 
-  const initialValue = getValue();
-  const [beforEditingValue, setBeforEditingValue] =
-    React.useState(initialValue);
-  const [value, setValue] = React.useState(initialValue);
-  const HandleOnEdit = (val) => {
-    table.options.meta?.onEdit(val);
+    setOpened(false);
   };
   useEffect(() => {
-    console.log(inputRef);
-    if (onEdit && inputRef.current && inputRef.current.focus) {
-      inputRef.current.focus();
-      resizeInput();
-      setBeforEditingValue(value);
-    }
-  }, [onEdit]);
-
-  React.useEffect(() => {
-    setValue(getValue());
-  }, [initialValue]);
-  const resizeInput = () => {
-    if (inputRef.current) {
-      inputRef.current.style.width = "auto";
-      inputRef.current.style.width = `${inputRef.current.scrollWidth + 10}px`;
-    }
-  };
-  useEffect(() => {
-    resizeInput();
-  }, [value]);
-
+    window.addEventListener("mousedown", handler);
+    return () => window.removeEventListener("mousedown", handler);
+  }, []);
   return (
     <Center>
-      <Menu shadow="md" width={200} position="bottom-start">
+      <Menu shadow="md" width={200} position="bottom-start" opened={opened}>
         <Menu.Target>
           <ActionIcon
             variant="subtle"
-            //   onClick={undo}
+            onClick={() => {
+              setOpened((prev) => !prev);
+            }}
             title={t("action_menu", "Action Menu")}
           >
             <IconDotsVertical stroke={1.5} size="1.2rem" />
           </ActionIcon>
         </Menu.Target>
 
-        <Menu.Dropdown>
+        <Menu.Dropdown ref={ref}>
           <Menu.Item
             c="red"
             leftSection={
@@ -365,6 +384,7 @@ const ActionMenuCell = ({
             }
             onClick={() => {
               table.options.meta?.deleteRow(index);
+              setOpened(false);
             }}
           >
             {t("delete", "Delete Record")}
@@ -492,6 +512,7 @@ declare module "@tanstack/react-table" {
     cancelEditing: () => void;
     deleteRow: (rowIndex: number) => void;
     getRowCanExpand: (row: Row<TData>) => boolean;
+    forceCloseTm: string;
   }
 }
 
@@ -596,7 +617,6 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
                 <ActionIcon variant="filled" onClick={onSave}>
                   <IconCheck stroke={1.5} size="1.2rem" />
                 </ActionIcon>
-                
               </Group>
             }
           />
@@ -667,6 +687,10 @@ function useSkipper() {
   return [shouldSkip, skip] as const;
 }
 export function AppTable() {
+  const [forceCloseTm, setForceCloseTm] = useState("");
+  const [lastTap, setLastTap] = useState(0);
+  const doubleTapDelay = 300; // Maximum delay between taps in milliseconds
+
   const { classes: classesG } = useGlobalStyl();
   const { desktopFocus, setDesktopfocus }: any = useAppHeaderNdSide();
   const { succeed } = useMessage();
@@ -698,6 +722,7 @@ export function AppTable() {
   const [isShiftPressed, setIsShiftPressed] = useState(false);
 
   const handleMouseDown = (event, row, col) => {
+    setForceCloseTm(new Date().getTime().toString());
     if (isShiftPressed) {
       setEndCell({ row, col });
       return;
@@ -731,7 +756,49 @@ export function AppTable() {
       }
     }
   };
+  const tableKeyDown = (event) => {
+    moveCell(event);
+    activeCellByTyping(event);
+  };
+  const moveCell = (event) => {
+    let row_ = 0;
+    let col_ = 0;
+    switch (event.key) {
+      case "ArrowUp":
+        row_ = -1; // Move up
+        break;
+      case "ArrowDown":
+        row_ = 1; // Move down
+        break;
+      case "ArrowLeft":
+        col_ = -1; // Move left
+        break;
+      case "ArrowRight":
+        col_ = 1; // Move right
+        break;
+      default:
+        return;
+    }
+
+    if ((editingCell && editingCell[0] >= 0) || !startCell) return;
+    let all_cols = table.getAllColumns();
+    let all_rows_count = table.getRowCount();
+    let newCol = startCell.col + col_;
+    let newRow = startCell.row + row_;
+
+    newRow = newRow >= all_rows_count ? all_rows_count - 1 : newRow;
+    newCol = newCol >= all_cols.length ? all_cols.length - 1 : newCol;
+
+    newCol = newCol <= 1 ? 1 : newCol;
+    newRow = newRow < 0 ? 0 : newRow;
+    if (newCol == startCell.col && newRow == startCell.row) return;
+
+    event.preventDefault();
+    setStartCell({ row: newRow, col: newCol });
+    setEndCell({ row: newRow, col: newCol });
+  };
   const activeCellByTyping = (event) => {
+    if (!editingCell) return;
     const isPrintableKey =
       (event.key.length === 1 && // Ensure it's a single character
         !event.ctrlKey && // Exclude Ctrl key combinations
@@ -750,9 +817,9 @@ export function AppTable() {
   const [columns] = React.useState<typeof defaultColumns>(() => [
     ...defaultColumns,
   ]);
-useEffect(()=>{
-console.log(editingCell);
-},[editingCell])
+  useEffect(() => {
+    console.log(editingCell);
+  }, [editingCell]);
   const [columnResizeMode, setColumnResizeMode] =
     React.useState<ColumnResizeMode>("onChange");
 
@@ -775,13 +842,13 @@ console.log(editingCell);
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Shift") {
-        setIsShiftPressed(true); // Mark Shift as pressed
+        setIsShiftPressed(true);
       }
     };
 
     const handleKeyUp = (event) => {
       if (event.key === "Shift") {
-        setIsShiftPressed(false); // Mark Shift as released
+        setIsShiftPressed(false);
       }
     };
 
@@ -888,6 +955,7 @@ console.log(editingCell);
   };
 
   const handlePaste = (event: ClipboardEvent) => {
+    if (editingCell) return;
     event.preventDefault();
     const clipboardText = event.clipboardData?.getData("text/plain");
     if (!clipboardText) return;
@@ -905,21 +973,26 @@ console.log(editingCell);
     const newData = [...data];
     const startRow = topLeftCell.row;
     const startCol = topLeftCell.col;
+    try {
+      rows.forEach((rowData, rowIndex) => {
+        rowData.forEach((cellData, colIndex) => {
+          const targetRow = startRow + rowIndex;
+          const targetCol = startCol + colIndex;
+          let targetColId =
+            all_cols.length > targetCol ? all_cols[targetCol].id : "";
 
-    rows.forEach((rowData, rowIndex) => {
-      rowData.forEach((cellData, colIndex) => {
-        const targetRow = startRow + rowIndex;
-        const targetCol = startCol + colIndex;
-        let targetColId =
-          all_cols.length > targetCol ? all_cols[targetCol].id : "";
-
-        if (targetRow < newData.length && targetColId != "") {
-          newData[targetRow][targetColId] = cellData;
-        }
+          if (targetRow < newData.length && targetColId != "") {
+            if (targetColId === "hashtags") {
+              let cellData_arr =
+                cellData && cellData.split ? cellData.split(",") : [];
+              newData[targetRow][targetColId] = cellData_arr;
+            } else newData[targetRow][targetColId] = cellData;
+          }
+        });
       });
-    });
 
-    setData(newData);
+      setData(newData);
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -927,7 +1000,7 @@ console.log(editingCell);
     return () => {
       window.removeEventListener("paste", handlePaste);
     };
-  }, [data, startCell, endCell]);
+  }, [data, startCell, endCell, editingCell]);
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.ctrlKey && event.key === "z") {
@@ -946,7 +1019,10 @@ console.log(editingCell);
   }, [history, redoStack, data]);
   const selectAll = () => {
     setStartCell({ row: 0, col: 1 });
-    setEndCell({ row: table.getRowCount(), col: table.getAllColumns().length });
+    setEndCell({
+      row: table.getRowCount() - 1,
+      col: table.getAllColumns().length - 1,
+    });
   };
   const deSelectAny = () => {
     setStartCell(null);
@@ -954,10 +1030,10 @@ console.log(editingCell);
   };
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.ctrlKey && event.key === "c") {
+      if (!editingCell && event.ctrlKey && event.key === "c") {
         event.preventDefault();
         copyToClipboard(false);
-      } else if (event.ctrlKey && event.key === "a") {
+      } else if (!editingCell && event.ctrlKey && event.key === "a") {
         event.preventDefault();
         selectAll();
       }
@@ -974,7 +1050,10 @@ console.log(editingCell);
       window.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("touchmove", touchMoveHandler);
     };
-  }, [data, startCell, endCell]);
+  }, [data, startCell, endCell, editingCell]);
+  useEffect(() => {
+    console.log(editingCell, "changed");
+  }, [editingCell]);
   const table = useReactTable({
     data,
     columns,
@@ -989,6 +1068,7 @@ console.log(editingCell);
     meta: {
       updateData: (rowIndex, columnId, value, beforEditingValue) => {
         setEditingCell(null);
+        console.log("cancel editing after updating....");
         if (value === beforEditingValue) return;
         skipAutoResetPageIndex();
 
@@ -1019,6 +1099,7 @@ console.log(editingCell);
       },
       cancelEditing: () => {
         setEditingCell(null);
+        console.log("cancel editing after by canceling..");
         setOnEdit(false);
       },
       deleteRow: (rowIndex) => {
@@ -1035,6 +1116,7 @@ console.log(editingCell);
       getRowCanExpand: (row) => {
         return true;
       },
+      forceCloseTm: forceCloseTm,
     },
   });
 
@@ -1127,7 +1209,7 @@ console.log(editingCell);
                 width: table.getCenterTotalSize(),
               },
               tabIndex: 0,
-              onKeyDown: (event) => activeCellByTyping(event),
+              onKeyDown: (event) => tableKeyDown(event),
             }}
           >
             <thead>
@@ -1238,6 +1320,7 @@ console.log(editingCell);
                             ]);
                           },
                           onMouseDown: (event) => {
+                            setForceCloseTm(new Date().getTime().toString());
                             if (cell.column.id == "action") {
                               return;
                             }
@@ -1253,8 +1336,22 @@ console.log(editingCell);
                             if (cell.column.id == "action") {
                               return;
                             }
-                            event.preventDefault();
+                            const now = Date.now();
+                            if (now - lastTap <= doubleTapDelay) {
+                              //handleDoubleClick(); // Trigger double-tap action
+                              if (cell.column.id == "action") {
+                                return;
+                              }
+                              setEditingCell([
+                                rowIndex,
+                                colIndex,
+                                cell.column.id,
+                              ]);
+                            }
+                            setLastTap(now);
+
                             handleMouseDown(event, rowIndex, colIndex);
+                            // event.preventDefault();
                           },
                           onTouchMove: (event) => {
                             if (cell.column.id == "action") {

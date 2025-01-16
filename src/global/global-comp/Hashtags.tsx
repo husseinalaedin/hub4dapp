@@ -336,6 +336,7 @@ export const HashTagsInput = forwardRef<any, any>(
     }, [errorMessageHashGet, succeededHashGet]);
     return (
       <AppMultiSelect
+        charsNotAllowed={['#']}
         ref={ref}
         readOnly={readOnly}
         {...others}
