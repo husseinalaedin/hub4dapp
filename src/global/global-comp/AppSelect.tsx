@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CloseButton,
   Combobox,
   InputBase,
   MantineSize,
   MantineStyleProps,
-  ScrollArea, 
+  ScrollArea,
   useCombobox,
 } from "@mantine/core";
 import { useGlobalStyl } from "../../hooks/useTheme";
@@ -32,6 +32,7 @@ interface AppSelectProps
   leftSection?: React.ReactNode;
   description?: React.ReactNode;
   required?: boolean;
+  forceClick?: string;
 }
 export function AppSelect({
   value,
@@ -56,6 +57,7 @@ export function AppSelect({
   leftSection,
   description,
   required,
+  forceClick,
   ...others
 }: AppSelectProps) {
   const { classes: classesG } = useGlobalStyl();
@@ -66,6 +68,25 @@ export function AppSelect({
   withAsterisk = !!withAsterisk;
   withinPortal = !!withinPortal;
   limit = limit && limit > 0 ? limit : 1000000;
+  const inputRef = useRef<any>(null);
+  useEffect(() => {
+    if (!forceClick || forceClick == "") return;
+    try {
+      const triggerClick = () => {
+        if (inputRef && inputRef.current) {
+          const clickEvent = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+          });
+
+          inputRef.current.dispatchEvent(clickEvent);
+          inputRef.current.focus();
+        }
+      };
+      triggerClick();
+    } catch (error) {}
+  }, [forceClick]);
+
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
@@ -124,6 +145,7 @@ export function AppSelect({
     srch = srchv && srchv !== "" ? srchv.toString() : "";
     setSearch(srch);
   };
+
   return (
     <Combobox
       store={combobox}
@@ -135,9 +157,11 @@ export function AppSelect({
         combobox.closeDropdown();
       }}
       readOnly={readOnly}
+      offset={2}
     >
       <Combobox.Target>
         <InputBase
+          ref={inputRef}
           leftSection={leftSection}
           withAsterisk={withAsterisk}
           disabled={disabled}

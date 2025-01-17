@@ -262,11 +262,23 @@ export const AppGlobalStylProvider = ({ children }: any) => {
         lineHeight: "18px !important",
       },
       inputExcel: {
-        border: "2px solid #ccc",
+        border: `2px solid ${
+          colorScheme === "dark" ? theme.colors.teal[5] : theme.colors.indigo[9]
+        }  !important`,
         outline: "none", // Removes default browser focus
         "&:focus": {
           border: "2px solid blue",
         },
+      },
+      typeInputExcel: {
+        backgroundColor: `${
+          colorScheme === "dark"
+            ? darken(theme.colors.green[9], 0.9)
+            : lighten(theme.colors.green[1], 0.9)
+        }  !important`,
+        border: `2px solid ${
+          colorScheme === "dark" ? theme.colors.teal[5] : theme.colors.indigo[9]
+        }  !important`,
       },
       excelCellcollapsed: {
         whiteSpace: "nowrap",

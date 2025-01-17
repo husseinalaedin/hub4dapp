@@ -95,6 +95,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
     limit = limit && limit > 0 ? limit : 1000000;
     // value = !!value ? value : [];
     const [charNotAllowed, setCharNotAllowed] = useState("");
+    const [enterClicked, setEnterClicked] = useState("");
     const [defaulted, setDefaulted] = useState(false);
     const combobox = useCombobox({
       onDropdownClose: () => combobox.resetSelectedOption(),
@@ -131,15 +132,16 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       //    ? value
       //    : [...value, val];
       //  setValue(newArr);
+      setSearch("");
       setValue((current) => {
         if (!current) return [val];
         return current.includes(val)
           ? current.filter((v) => v !== val)
           : [...current, val];
       });
-      setSearch("");
     };
     const handleValueByEnter = async () => {
+      console.log("enter123");
       if (!searchValue || searchValue == "") return;
       let item: any = current_object(searchValue);
       if (!(!item || !item.value)) {
@@ -221,12 +223,17 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       }
       return val;
     };
+    useEffect(() => {
+      if (enterClicked == "" || searchValue=='') return;
+       handleValueByEnter();
+    }, [enterClicked]);
     return (
       <Combobox
         store={combobox}
         withinPortal={withinPortal}
         onOptionSubmit={handleValueSelect}
         readOnly={readOnly}
+        offset={2}
       >
         <Combobox.DropdownTarget>
           <PillsInput
@@ -287,10 +294,11 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
                         handleValueRemove(_value[_value.length - 1]);
                     }
                     if (event.key === "Enter" && lnt > 0) {
+                      setEnterClicked(new Date().getTime().toString())
                       event.preventDefault();
-                      handleValueByEnter();
+                     
                     }
-                    if (event.key === "Escape" && lnt > 0) {
+                    if (event.key === "Escape") {
                       event.preventDefault();
                       onEscape(event);
                     }

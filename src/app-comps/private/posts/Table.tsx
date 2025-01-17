@@ -16,6 +16,7 @@ import {
   RowData,
   getPaginationRowModel,
   Row,
+  PaginationState,
 } from "@tanstack/react-table";
 import {
   ActionIcon,
@@ -150,11 +151,11 @@ const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
   }, [onEdit]);
   const onSave = () => {
     HandleOnEdit(false);
-console.log(value,'hashhh')
+    console.log(value, "hashhh");
     if (value && value.split) {
       let values_ = value.split(",");
       // for (let i = 0; i < values_.length; i++) {
-        table.options.meta?.updateData(index, id, values_, '');
+      table.options.meta?.updateData(index, id, values_, "");
       // }
     } else table.options.meta?.updateData(index, id, value, beforEditingValue);
   };
@@ -193,20 +194,60 @@ console.log(value,'hashhh')
           {value && value.join && value.length > 0 ? value.join(",") : [value]}
         </Box>
       )}
+      {/* <Tooltip
+        label={t(
+          "hashtag_info_message",
+          "Please enter the hashtag and press Enter"
+        )}
+      >
+        <ActionIcon c="orange" variant="light" style={{ cursor: "help" }}>
+          <IconQuestionMark stroke={1.5} size="1.2rem" />
+        </ActionIcon>
+      </Tooltip> */}
       {onEdit && (
-        <Group justify="flex-end" gap={1} w="100%" p="2px">
-          <Group gap={"2px"} justify="flex-end" p="2px">
-            <Tooltip
-              label={t(
-                "hashtag_info_message",
-                "Please enter the hashtag and press Enter"
-              )}
-            >
-              <ActionIcon c="orange" variant="light" style={{ cursor: "help" }}>
-                <IconQuestionMark stroke={1.5} size="1.2rem" />
-              </ActionIcon>
-            </Tooltip>
+        <Group
+          className={classesG.typeInputExcel}
+          justify="space-between"
+          gap={1}
+          p="2px"
+          style={{
+            fontFamily: "inherit",
+            fontSize: "inherit",
+            fontWeight: "inherit",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            border: "1px solid red;",
+            position: "absolute",
+            top: -2,
+            left: -2,
+            // bottom: 0,
+            width: "320px",
+            minWidth: "325px",
+            zIndex: 4000,
+          }}
+        >
+          <Box w="250px">
+            <HashTagsInput
+              withinPortal={30000}
+              placeholder={t("enter_hashtags", "Please Enter#")}
+              ref={inputRef}
+              // h="100%"
+              w="100%"
+              defaultValue={
+                Array.isArray(initialValue) ? initialValue : [initialValue]
+              }
+              value={Array.isArray(value) ? value : [value]}
+              onChange={setValue}
+              onBlur={() => {
+                if (beforEditingValue === value) onCancel();
+                // onSave()
+              }}
+              readOnly={false}
+              onEscape={onCancel}
+            />
+          </Box>
 
+          <Group gap={"3px"} justify="space-between" p="2px">
             <ActionIcon c="red" variant="light" onClick={onCancel}>
               <IconX stroke={1.5} size="1.2rem" />
             </ActionIcon>
@@ -214,29 +255,14 @@ console.log(value,'hashhh')
               <IconCheck stroke={1.5} size="1.2rem" />
             </ActionIcon>
           </Group>
-          <HashTagsInput
-            placeholder={t("enter_hashtags", "Please Enter#")}
-            //   ref={inputRef}
-            h="100%"
-            w="100%"
-            defaultValue={
-              Array.isArray(initialValue) ? initialValue : [initialValue]
-            }
-            value={Array.isArray(value) ? value : [value]}
-            onChange={setValue}
-            onBlur={() => {
-              if (beforEditingValue === value) onCancel();
-              // onSave()
-            }}
-            readOnly={false}
-            onEscape={onCancel}
-          />
         </Group>
       )}
     </>
   );
 };
 const TypeCell = ({ getValue, row: { index }, column: { id }, table }) => {
+  const [forceClick, setForceClick] = useState("");
+
   const { t } = useTranslation("common", { keyPrefix: "table" });
   const inputRef = useRef<any>(null);
   const { classes: classesG } = useGlobalStyl();
@@ -256,6 +282,9 @@ const TypeCell = ({ getValue, row: { index }, column: { id }, table }) => {
     if (onEdit && inputRef.current && inputRef.current.focus) {
       inputRef.current.focus();
       resizeInput();
+    }
+    if (onEdit) {
+      setForceClick(new Date().getTime().toString());
     }
   }, [onEdit]);
   const onSave = () => {
@@ -298,16 +327,29 @@ const TypeCell = ({ getValue, row: { index }, column: { id }, table }) => {
         </Box>
       )}
       {onEdit && (
-        <Group justify="flex-end" gap={1} p="2px">
-          <Group gap={"2px"} justify="flex-end" p="2px">
-            <ActionIcon c="red" variant="light" onClick={onCancel}>
-              <IconX stroke={1.5} size="1.2rem" />
-            </ActionIcon>
-            <ActionIcon variant="filled" onClick={onSave}>
-              <IconCheck stroke={1.5} size="1.2rem" />
-            </ActionIcon>
-          </Group>
+        <Group
+          className={classesG.typeInputExcel}
+          justify="space-between"
+          gap={1}
+          p="2px"
+          style={{
+            fontFamily: "inherit",
+            fontSize: "inherit",
+            fontWeight: "inherit",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            border: "1px solid red;",
+            position: "absolute",
+            top: -2,
+            left: -2,
+            // bottom: 0,
+            width: "320px",
+            minWidth: "320px",
+            zIndex: 4000,
+          }}
+        >
           <Wtsb
+            forceClick={forceClick}
             withinPortal={true}
             defaultValue={initialValue}
             value={value}
@@ -324,6 +366,14 @@ const TypeCell = ({ getValue, row: { index }, column: { id }, table }) => {
               }
             }}
           />
+          <Group gap={"3px"} justify="space-between" p="2px">
+            <ActionIcon c="red" variant="light" onClick={onCancel}>
+              <IconX stroke={1.5} size="1.2rem" />
+            </ActionIcon>
+            <ActionIcon variant="filled" onClick={onSave}>
+              <IconCheck stroke={1.5} size="1.2rem" />
+            </ActionIcon>
+          </Group>
         </Group>
       )}
     </>
@@ -507,7 +557,7 @@ declare module "@tanstack/react-table" {
       beforEditingValue: unknown
     ) => void;
     onEdit: (onEdit_: boolean) => void;
-    editingCell: [number, number, string] | null;
+    editingCell: [number, number, string, string] | null;
     cellIsHighlighted: (rowIndex: number, columnIndex: number) => boolean;
     cancelEditing: () => void;
     deleteRow: (rowIndex: number) => void;
@@ -535,6 +585,9 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
         inputRef.current.focus();
         resizeInput();
         setBeforEditingValue(value);
+        if (editingCell[3] == "Backspace") {
+          setValue("");
+        }
       }
     }, [onEdit]);
     const onSave = () => {
@@ -601,12 +654,12 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
               overflow: "hidden",
               border: "1px solid red;",
               position: "absolute",
-              top: 0,
-              left: 0,
+              top: -2,
+              left: -2,
               // bottom: 0,
               width: "auto",
               minWidth: "100px",
-              zIndex: 4000,
+              zIndex: 400000000000000,
             }}
             rightSectionWidth={60}
             rightSection={
@@ -687,6 +740,7 @@ function useSkipper() {
   return [shouldSkip, skip] as const;
 }
 export function AppTable() {
+  const elementRef: any = useRef(null);
   const [forceCloseTm, setForceCloseTm] = useState("");
   const [lastTap, setLastTap] = useState(0);
   const doubleTapDelay = 300; // Maximum delay between taps in milliseconds
@@ -695,7 +749,24 @@ export function AppTable() {
   const { desktopFocus, setDesktopfocus }: any = useAppHeaderNdSide();
   const { succeed } = useMessage();
   const { t } = useTranslation("common", { keyPrefix: "table" });
-  const [data, setData] = useState<any>(() => [...defaultData]);
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 1000,
+  });
+
+  const defaults = () => {
+    let dta: any = [];
+    let dta_s = JSON.stringify(defaultData);
+    for (let i = 0; i < 25; i++) {
+      let df = JSON.parse(dta_s);
+      for (let i = 0; i < df.length; i++) {
+        dta.push(df[i]);
+      }
+    }
+    console.log(dta, "DATA");
+    return dta;
+  };
+  const [data, setData] = useState<any>(() => [...defaults()]);
   const [history, setHistory] = useState<any>([]);
   const [redoStack, setRedoStack] = useState<any>([]);
   const [deletedIds, setDeletedIds] = useState<any>([]);
@@ -705,7 +776,7 @@ export function AppTable() {
   const [onEdit, setOnEdit] = useState(false);
   const [density, setDensity] = useState<boolean>(true);
   const [editingCell, setEditingCell] = useState<
-    [number, number, string] | null
+    [number, number, string, string] | null
   >(null);
   const cellInEdit = (rowIndex, colIndex, id) => {
     return (
@@ -763,22 +834,29 @@ export function AppTable() {
   const moveCell = (event) => {
     let row_ = 0;
     let col_ = 0;
-    switch (event.key) {
-      case "ArrowUp":
-        row_ = -1; // Move up
-        break;
-      case "ArrowDown":
-        row_ = 1; // Move down
-        break;
-      case "ArrowLeft":
-        col_ = -1; // Move left
-        break;
-      case "ArrowRight":
-        col_ = 1; // Move right
-        break;
-      default:
-        return;
+    if (event.key === "Tab") {
+      col_ = 1;
+      if (event.shiftKey) {
+        col_ = -1;
+      }
     }
+    if (col_ == 0)
+      switch (event.key) {
+        case "ArrowUp":
+          row_ = -1; // Move up
+          break;
+        case "ArrowDown":
+          row_ = 1; // Move down
+          break;
+        case "ArrowLeft":
+          col_ = -1; // Move left
+          break;
+        case "ArrowRight":
+          col_ = 1; // Move right
+          break;
+        default:
+          return;
+      }
 
     if ((editingCell && editingCell[0] >= 0) || !startCell) return;
     let all_cols = table.getAllColumns();
@@ -798,13 +876,15 @@ export function AppTable() {
     setEndCell({ row: newRow, col: newCol });
   };
   const activeCellByTyping = (event) => {
-    if (!editingCell) return;
+    if (editingCell) return;
     const isPrintableKey =
       (event.key.length === 1 && // Ensure it's a single character
         !event.ctrlKey && // Exclude Ctrl key combinations
         !event.metaKey && // Exclude Meta/Command key combinations
         !event.altKey) ||
-      event.key === "Backspace"; // Include Backspace;
+      event.key == "Enter" ||
+      event.key == "Backspace";
+    // Include Backspace;
     if (!isPrintableKey || (editingCell && editingCell[0] >= 0) || !startCell)
       return;
 
@@ -812,7 +892,7 @@ export function AppTable() {
     let targetCol = startCell.col;
     let targetColId = all_cols.length > targetCol ? all_cols[targetCol].id : "";
     event.preventDefault();
-    setEditingCell([startCell.row, startCell.col, targetColId]);
+    setEditingCell([startCell.row, startCell.col, targetColId, event.key]);
   };
   const [columns] = React.useState<typeof defaultColumns>(() => [
     ...defaultColumns,
@@ -1051,9 +1131,7 @@ export function AppTable() {
       document.removeEventListener("touchmove", touchMoveHandler);
     };
   }, [data, startCell, endCell, editingCell]);
-  useEffect(() => {
-    console.log(editingCell, "changed");
-  }, [editingCell]);
+
   const table = useReactTable({
     data,
     columns,
@@ -1067,19 +1145,16 @@ export function AppTable() {
 
     meta: {
       updateData: (rowIndex, columnId, value, beforEditingValue) => {
-        setEditingCell(null);
-        console.log("cancel editing after updating....");
-        if (value === beforEditingValue) return;
         skipAutoResetPageIndex();
+        setEditingCell(null);
+
+        if (value === beforEditingValue) return;
 
         saveToHistory();
-
         let id = data[rowIndex]["id"];
-
         const editedIds_n = [...editedIds];
         editedIds_n.push(id);
         setEditedIds(editedIds_n);
-
         setData((old) =>
           old.map((row, index) => {
             if (index === rowIndex) {
@@ -1099,7 +1174,6 @@ export function AppTable() {
       },
       cancelEditing: () => {
         setEditingCell(null);
-        console.log("cancel editing after by canceling..");
         setOnEdit(false);
       },
       deleteRow: (rowIndex) => {
@@ -1118,7 +1192,21 @@ export function AppTable() {
       },
       forceCloseTm: forceCloseTm,
     },
+    state: {
+      pagination,
+    },
   });
+  useEffect(() => {
+    if (!editingCell) enforceTabIndex();
+  }, [editingCell]);
+  const enforceTabIndex = () => {
+    try {
+      const element = elementRef.current;
+      if (!element) return;
+      element.tabIndex = 0;
+      element.focus();
+    } catch (error) {}
+  };
 
   return (
     <>
@@ -1204,6 +1292,7 @@ export function AppTable() {
       <Box pb="xl">
         <ScrollArea maw={"100%"} mx="auto" type="auto">
           <table
+            ref={elementRef}
             {...{
               style: {
                 width: table.getCenterTotalSize(),
@@ -1317,6 +1406,7 @@ export function AppTable() {
                               rowIndex,
                               colIndex,
                               cell.column.id,
+                              "",
                             ]);
                           },
                           onMouseDown: (event) => {
@@ -1346,6 +1436,7 @@ export function AppTable() {
                                 rowIndex,
                                 colIndex,
                                 cell.column.id,
+                                "",
                               ]);
                             }
                             setLastTap(now);
