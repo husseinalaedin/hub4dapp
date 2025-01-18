@@ -20,15 +20,18 @@ import {
 } from "@tanstack/react-table";
 import {
   ActionIcon,
+  Alert,
   Box,
   Button,
   Center,
   Group,
   Input,
   Menu,
+  Popover,
   ScrollArea,
   Stack,
   Table,
+  Text,
   Textarea,
   TextInput,
   Tooltip,
@@ -56,11 +59,21 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { G, useMessage } from "../../../global/G";
-import { HashTagsInput } from "../../../global/global-comp/Hashtags";
-import { useClickOutside, useResizeObserver } from "@mantine/hooks";
+import {
+  HASHTAGS_SEP,
+  HashtagsAlert,
+  HashTagsInput,
+  SplitHashtags,
+} from "../../../global/global-comp/Hashtags";
+import {
+  useClickOutside,
+  useDisclosure,
+  useResizeObserver,
+} from "@mantine/hooks";
 import { useAppHeaderNdSide } from "../../../hooks/useAppHeaderNdSide";
 import { Wtsb } from "../../../global/global-comp/Wtsb";
 import { MemoEditorApp } from "../../../global/AppEditor";
+import { CurrenciesDropped } from "../../../global/global-comp/Currencies";
 const MAX_HISTORY_SIZE = 40;
 type Deal = {
   dealtype: string;
@@ -127,6 +140,15 @@ const defaultData: Deal[] = [
       "Fully Tested with HSO BATTERY 80%+, Grade B, Pack Boxes included.",
   },
 ];
+const HashTagHeader = ({ table }) => {
+ 
+  return (
+    <Group justify="center">
+      <Box>hashtags</Box>
+      <HashtagsAlert />
+    </Group>
+  );
+};
 const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
   const { t } = useTranslation("common", { keyPrefix: "table" });
   const inputRef = useRef<any>(null);
@@ -151,13 +173,13 @@ const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
   }, [onEdit]);
   const onSave = () => {
     HandleOnEdit(false);
-    console.log(value, "hashhh");
-    if (value && value.split) {
-      let values_ = value.split(",");
-      // for (let i = 0; i < values_.length; i++) {
-      table.options.meta?.updateData(index, id, values_, "");
-      // }
-    } else table.options.meta?.updateData(index, id, value, beforEditingValue);
+    table.options.meta?.updateData(index, id, value, beforEditingValue);
+    // if (value && value.split) {
+    //   let values_ = value.split(HASHTAGS_SEP);
+    //   // for (let i = 0; i < values_.length; i++) {
+    //   table.options.meta?.updateData(index, id, values_, "");
+    //   // }
+    // } else table.options.meta?.updateData(index, id, value, beforEditingValue);
   };
   const onCancel = () => {
     setValue(beforEditingValue);
@@ -206,7 +228,7 @@ const HashTagCell = ({ getValue, row: { index }, column: { id }, table }) => {
       </Tooltip> */}
       {onEdit && (
         <Group
-          className={classesG.typeInputExcel}
+          className={classesG.editingExcelCell}
           justify="space-between"
           gap={1}
           p="2px"
@@ -328,7 +350,7 @@ const TypeCell = ({ getValue, row: { index }, column: { id }, table }) => {
       )}
       {onEdit && (
         <Group
-          className={classesG.typeInputExcel}
+          className={classesG.editingExcelCell}
           justify="space-between"
           gap={1}
           p="2px"
@@ -514,6 +536,159 @@ const ReadOnlyCell = ({ getValue, row: { index }, column: { id }, table }) => {
     </>
   );
 };
+const PriceCell = ({ getValue, row: { index }, column: { id }, table }) => {
+  const inputRef = useRef<any>(null);
+  const contnrRef = useRef<any>(null);
+  const currRef = useRef<any>(null);
+  const { classes: classesG } = useGlobalStyl();
+  const editingCell = table.options.meta?.editingCell;
+  const onEdit =
+    editingCell && editingCell[0] === index && editingCell[2] === id;
+  const initialValue = getValue();
+  const [beforEditingValue, setBeforEditingValue] =
+    React.useState(initialValue);
+  const [value, setValue] = React.useState(
+    G.parseNumberAndString(initialValue).number
+  );
+  const [curr, setCurr] = React.useState(
+    G.parseNumberAndString(initialValue).text
+  );
+
+  const HandleOnEdit = (val) => {
+    table.options.meta?.onEdit(val);
+  };
+  useEffect(() => {
+    if (onEdit && inputRef.current && inputRef.current.focus) {
+      inputRef.current.focus();
+      resizeInput();
+      setBeforEditingValue(value + curr);
+      if (editingCell[3] == "Backspace") {
+        // setValue("");
+      }
+    }
+  }, [onEdit]);
+  const onSave = () => {
+    HandleOnEdit(false);
+    table.options.meta?.updateData(index, id, value + curr, beforEditingValue);
+  };
+  const onCancel = () => {
+    updateMixedValues(beforEditingValue);
+    table.options.meta?.cancelEditing();
+  };
+  React.useEffect(() => {
+    updateMixedValues(initialValue);
+  }, [initialValue]);
+  const updateMixedValues = (iput) => {
+    let vl = G.parseNumberAndString(iput);
+    setValue(vl.number);
+    setCurr(vl.text);
+  };
+  const resizeInput = () => {
+    if (contnrRef.current && inputRef.current) {
+      inputRef.current.style.width = "auto";
+      inputRef.current.style.width = `${inputRef.current.scrollWidth}px`;
+
+      contnrRef.current.style.width = "auto";
+      contnrRef.current.style.width = `${inputRef.current.scrollWidth + 155}px`;
+    }
+  };
+  useEffect(() => {
+    resizeInput();
+  }, [value]);
+
+  return (
+    <>
+      {!onEdit && (
+        <Box
+          bg="transparent"
+          pl="2px"
+          pr="2px"
+          style={{
+            display: "block",
+            alignItems: "center",
+            fontFamily: "inherit",
+            fontSize: "inherit",
+            fontWeight: "inherit",
+            pointerEvents: "none",
+          }}
+        >
+          {(value + curr) as string}
+        </Box>
+      )}
+      {onEdit && (
+        <Group
+          gap={2}
+          style={{
+            fontFamily: "inherit",
+            fontSize: "inherit",
+            fontWeight: "inherit",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            border: "1px solid red;",
+            position: "absolute",
+            top: -2,
+            left: -2,
+            // bottom: 0,
+            width: "auto",
+            minWidth: "200px",
+            zIndex: 400000000000000,
+          }}
+          className={classesG.editingExcelCell}
+          ref={contnrRef}
+          justify="space-between"
+        >
+          <TextInput
+            classNames={{
+              input: classesG.width75,
+            }}
+            style={{ width: 75 }}
+            variant="unstyled"
+            ref={inputRef}
+            onKeyDown={(event) => {
+              if (event.key == "Enter") {
+                if (currRef.current) currRef.current.focus();
+                //onSave();
+              }
+              if (event.key == "Escape") {
+                onCancel();
+              }
+            }}
+            value={value as string}
+            onChange={(e) => setValue(e.target.value)}
+            onBlur={() => {
+              // if (beforEditingValue === value) onCancel();
+              // onSave()
+            }}
+          />
+          <Group justify="flex-end" w={135}>
+            <Group gap={"2px"} w={"100%"} justify="flex-end">
+              <CurrenciesDropped
+                defaultValue={curr}
+                ref={currRef}
+                onSubmit={(val) => {
+                  setCurr(val);
+                  onSave();
+                }}
+                onKeyDown={(event) => {
+                  if (event.key == "Escape") {
+                    onCancel();
+                  }
+                }}
+              />
+
+              <ActionIcon c="red" variant="light" onClick={onCancel}>
+                <IconX stroke={1.5} size="1.2rem" />
+              </ActionIcon>
+              <ActionIcon variant="filled" onClick={onSave}>
+                <IconCheck stroke={1.5} size="1.2rem" />
+              </ActionIcon>
+            </Group>
+          </Group>
+        </Group>
+      )}
+    </>
+  );
+};
 const defaultColumns: ColumnDef<Deal>[] = [
   {
     accessorKey: "action",
@@ -536,10 +711,11 @@ const defaultColumns: ColumnDef<Deal>[] = [
   {
     accessorKey: "price",
     header: "Price",
+    cell: PriceCell,
   },
   {
     accessorKey: "hashtags",
-    header: "Hashtags",
+    header: ({ table }) => <HashTagHeader table={table} />,
     cell: HashTagCell,
   },
   {
@@ -632,7 +808,7 @@ const defaultColumn: Partial<ColumnDef<Deal>> = {
         )}
         {onEdit && (
           <TextInput
-            className={classesG.inputExcel}
+            className={classesG.editingExcelCell}
             ref={inputRef}
             onKeyDown={(event) => {
               if (event.key == "Enter") onSave();
@@ -757,7 +933,7 @@ export function AppTable() {
   const defaults = () => {
     let dta: any = [];
     let dta_s = JSON.stringify(defaultData);
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 5; i++) {
       let df = JSON.parse(dta_s);
       for (let i = 0; i < df.length; i++) {
         dta.push(df[i]);
@@ -1063,8 +1239,7 @@ export function AppTable() {
 
           if (targetRow < newData.length && targetColId != "") {
             if (targetColId === "hashtags") {
-              let cellData_arr =
-                cellData && cellData.split ? cellData.split(",") : [];
+              let cellData_arr = SplitHashtags(cellData);
               newData[targetRow][targetColId] = cellData_arr;
             } else newData[targetRow][targetColId] = cellData;
           }

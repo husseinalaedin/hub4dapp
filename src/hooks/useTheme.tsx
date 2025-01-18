@@ -261,16 +261,7 @@ export const AppGlobalStylProvider = ({ children }: any) => {
         fontSize: "8px" /* Adjust the font size if needed */,
         lineHeight: "18px !important",
       },
-      inputExcel: {
-        border: `2px solid ${
-          colorScheme === "dark" ? theme.colors.teal[5] : theme.colors.indigo[9]
-        }  !important`,
-        outline: "none", // Removes default browser focus
-        "&:focus": {
-          border: "2px solid blue",
-        },
-      },
-      typeInputExcel: {
+      editingExcelCell: {
         backgroundColor: `${
           colorScheme === "dark"
             ? darken(theme.colors.green[9], 0.9)
@@ -291,6 +282,9 @@ export const AppGlobalStylProvider = ({ children }: any) => {
             ? darken(theme.colors.teal[9], 1)
             : lighten(theme.colors.green[7], 0.9)
         }  !important`,
+      },
+      width75: {
+        width: "75px !important" 
       },
       //     white-space: nowrap;
       // overflow: hidden;

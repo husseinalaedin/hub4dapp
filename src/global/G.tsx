@@ -84,6 +84,12 @@ export class G {
   static replace_all(string, search, replace) {
     return string.split(search).join(replace);
   }
+  static replace_all_arr(string, search, replace) {
+    if (search.length > 0)
+      for (let i = 0; i < search.length; i++)
+        string = string.split(search[i]).join(replace);
+    return string;
+  }
   static form_cell_whats(cell) {
     let c = this.replace_all(cell, "+", "");
     c = this.replace_all(cell, " ", "");
@@ -127,6 +133,15 @@ export class G {
   static uid(prefix) {
     let short = nanoid(10);
     return prefix + short; // //tms.toString(32)
+  }
+  static parseNumberAndString(input) {
+    const match = input.match(/^([\d,]+(\.\d+)?)(.*)$/);
+    if (match) {
+      const number = parseFloat(match[1].replace(/,/g, "")); // Parse the number after removing commas
+      const text = match[3].trim(); // Extract and trim the remaining string
+      return { number: number.toString(), text };
+    }
+    return { number: "", text: input.trim() }; // Handle case when no number is found
   }
 }
 

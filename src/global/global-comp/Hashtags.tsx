@@ -1,8 +1,22 @@
-import { Box, CloseButton, Flex, MultiSelect, rem } from "@mantine/core";
+import {
+  ActionIcon,
+  Alert,
+  Box,
+  CloseButton,
+  Flex,
+  MultiSelect,
+  Popover,
+  rem,
+  Text,
+} from "@mantine/core";
 import { forwardRef, useEffect, useState } from "react";
 import { useAxiosGet } from "../../hooks/Https";
 import { BUILD_API, G, useMessage } from "../G";
-import { IconHash } from "@tabler/icons-react";
+import {
+  IconHash,
+  IconInfoCircle,
+  IconQuestionMark,
+} from "@tabler/icons-react";
 import { useGlobalStyl } from "../../hooks/useTheme";
 import {
   AppMultiSelect,
@@ -10,6 +24,7 @@ import {
 } from "./AppMultiSelect";
 import { ArrayToAppSelect } from "../Hashtags";
 import { useTranslation } from "react-i18next";
+import { useDisclosure } from "@mantine/hooks";
 
 // export const Hashtags = ({ initval,...others }) => {
 //     const { error, succeed, info } = useMessage();
@@ -61,7 +76,7 @@ import { useTranslation } from "react-i18next";
 
 //             data={data}
 //             label="Hashtag#"
-//             placeholder="#"
+//             placeholder=HASHTAGS_SEP
 //             searchable
 //             searchValue={searchValue}
 //             onSearchChange={(event) => {
@@ -85,7 +100,7 @@ import { useTranslation } from "react-i18next";
 //         />
 //     )
 // }
-
+export const HASHTAGS_SEP = ["#", ","];
 export function HashValue({
   value,
   label,
@@ -112,7 +127,7 @@ export function HashValue({
           <IconHash size={12} />
         </Box>
         <Box style={{ lineHeight: 1, fontSize: rem(12) }}>
-          {G.replace_all(label, "#", "")}
+          {G.replace_all_arr(label, HASHTAGS_SEP, "")}
         </Box>
         <CloseButton
           onMouseDown={onRemove}
@@ -152,7 +167,7 @@ export function HashValue4BoardSearch({
           <IconHash size={13} />
         </Box>
         <Box style={{ lineHeight: 1.5, fontSize: rem(18) }}>
-          {G.replace_all(label, "#", "")}
+          {G.replace_all_arr(label, HASHTAGS_SEP, "")}
         </Box>
         <CloseButton
           onMouseDown={() => {
@@ -196,7 +211,7 @@ export function HashValue4Board({
           <IconHash size={14} />
         </Box>
         <Box style={{ lineHeight: 2, fontSize: rem(20) }}>
-          {G.replace_all(value, "#", "")}
+          {G.replace_all_arr(value, HASHTAGS_SEP, "")}
         </Box>
         <Box ml="5px" mt="-20px" mr="5px" c="red">
           {label && +label > 200 ? "200+" : label}
@@ -213,7 +228,7 @@ export function HashValue4Board({
 //                 <Box>
 //                     <IconHash size={12} />
 //                 </Box>
-//                 <div>{G.replace_all(label, '#', '')}</div>
+//                 <div>{G.replace_all_arr(label, HASHTAGS_SEP, '')}</div>
 //             </Flex>
 //         </div>
 //     );
@@ -293,7 +308,6 @@ export function Wtsb4BoardSearch({
 export const HashTagsInput = forwardRef<any, any>(
   ({ readOnly, ...others }, ref) => {
     const { error, succeed, info } = useMessage();
-    const { t } = useTranslation("private", { keyPrefix: "deals" });
     const [searchValue, onSearchChange] = useState("");
     //   const [value, setValue] = useState<any>(defaultValue);
     const {
@@ -336,7 +350,7 @@ export const HashTagsInput = forwardRef<any, any>(
     }, [errorMessageHashGet, succeededHashGet]);
     return (
       <AppMultiSelect
-        charsNotAllowed={['#']}
+        charsNotAllowed={HASHTAGS_SEP}
         ref={ref}
         readOnly={readOnly}
         {...others}
@@ -344,7 +358,7 @@ export const HashTagsInput = forwardRef<any, any>(
         withAsterisk
         data={ArrayToAppSelect(hashData && hashData.length > 0 ? hashData : [])}
         // label="Hashtag#"
-        // placeholder="#"
+        // placeholder=HASHTAGS_SEP
         searchable
         searchValue={searchValue}
         onSearchChange={(event) => {
@@ -367,3 +381,78 @@ export const HashTagsInput = forwardRef<any, any>(
     );
   }
 );
+export const SplitHashtags = (hashtags) => {
+  if (!hashtags) return [];
+  let hash_consolid = G.replace_all(hashtags, HASHTAGS_SEP[1], HASHTAGS_SEP[0]);
+  if (hash_consolid.split) {
+    let hash_split = hash_consolid.split(HASHTAGS_SEP[0]);
+    const cleanedArray = hash_split
+      .map((item) => item.trim())
+      .filter((item) => item !== "");
+    return cleanedArray;
+  }
+  let trm = hashtags.trim();
+  if (trm === "") return [];
+  return [trm];
+};
+export const HashtagsAlert = () => {
+  // const [opened, { close, open }] = useDisclosure(false);
+  const { t } = useTranslation("common", { keyPrefix: "table" });
+  return (
+    <Popover
+      width={400}
+      position="bottom"
+      withArrow
+      shadow="md"
+      // opened={opened}
+    >
+      <Popover.Target>
+        <ActionIcon
+          // onTouchStart={() => {
+          //   if (opened) close();
+          //   else open();
+          // }}
+          c="orange"
+          variant="transparent"
+          // onMouseEnter={open}
+          // onMouseLeave={close}
+        >
+          <IconQuestionMark stroke={1.5} size="1.2rem" />
+        </ActionIcon>
+      </Popover.Target>
+      <Popover.Dropdown p="0px">
+        <Alert
+          variant="light"
+          color="blue"
+          // title="Alert title"
+          // icon={<IconInfoCircle />}
+        >
+          <Text size="md">
+            {t(
+              "hashtag_restrictions",
+              `Hashtags cannot contain the # symbol or commas.`
+            )}
+          </Text>
+          <Text size="md" mt="xs">
+            {t(
+              "hashtag_allowence",
+              `However, if you want to paste the hashtags, they must be separated either by the # symbol or by commas.`
+            )}
+          </Text>
+          <Text size="md" mt="xs">
+            {t("hashtag_example", `e.g grade A,Grade B,iphone 15 promax,used`)}
+          </Text>
+          <Text size="md">
+            {t("hashtag_example2", `e.g grade A#Grade B#iphone 15 promax#used`)}
+          </Text>
+          <Text size="md" c="indigo">
+            {t(
+              "hashtag_example_result",
+              `[grade A] [Grade B] [iphone 15 promax] [used]`
+            )}
+          </Text>
+        </Alert>
+      </Popover.Dropdown>
+    </Popover>
+  );
+};
