@@ -283,8 +283,38 @@ export const AppGlobalStylProvider = ({ children }: any) => {
             : lighten(theme.colors.green[7], 0.9)
         }  !important`,
       },
+      excelContainerFullScreen: {
+        position: "fixed",
+        top: "0",
+        left: "0",
+        right: "0",
+        bottom: "0",
+        zIndex: 100000000000000,
+      },
+      excelHeaderToolFullScreen: {
+        position: "fixed",
+        top: "0",
+        left: "0",
+        right: "0",
+        height: "40px",
+        zIndex: 100000000000001,
+      },
+      excelTableContainerFullScreen: {
+        position: "fixed",
+        top: "40px",
+        left: "0",
+        right: "0",
+        bottom: "0",
+        zIndex: 100000000000002,
+        overflow: "auto",
+      },
+      excelTableHeaderFullScreen: {
+        position: "sticky",
+        top: "0px", // Adjust offset based on the header height
+        backgroundColor: "black",
+      },
       width75: {
-        width: "75px !important" 
+        width: "75px !important",
       },
       //     white-space: nowrap;
       // overflow: hidden;

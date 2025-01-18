@@ -141,7 +141,6 @@ const defaultData: Deal[] = [
   },
 ];
 const HashTagHeader = ({ table }) => {
- 
   return (
     <Group justify="center">
       <Box>hashtags</Box>
@@ -433,7 +432,14 @@ const ActionMenuCell = ({
   }, []);
   return (
     <Center>
-      <Menu shadow="md" width={200} position="bottom-start" opened={opened}>
+      <Menu
+        shadow="md"
+        width={200}
+        position="bottom-start"
+        opened={opened}
+        withinPortal={true}
+        zIndex={100000000000005}
+      >
         <Menu.Target>
           <ActionIcon
             variant="subtle"
@@ -1209,7 +1215,12 @@ export function AppTable() {
     const leftCol = Math.min(startCell.col, endCell.col);
     return { row: topRow, col: leftCol };
   };
-
+  const getBottomRightCell = () => {
+    if (!startCell || !endCell) return startCell; // Use startCell if endCell is null
+    const bottomRow = Math.max(startCell.row, endCell.row);
+    const rightCol = Math.max(startCell.col, endCell.col);
+    return { row: bottomRow, col: rightCol };
+  };
   const handlePaste = (event: ClipboardEvent) => {
     if (editingCell) return;
     event.preventDefault();
@@ -1222,29 +1233,59 @@ export function AppTable() {
       .map((row) => row.split("\t")); // Split by tabs
 
     const topLeftCell = getTopLeftCell();
+    const bottomRightCell = getBottomRightCell();
     let all_cols = table.getAllColumns();
 
     if (!topLeftCell) return;
     saveToHistory();
     const newData = [...data];
-    const startRow = topLeftCell.row;
-    const startCol = topLeftCell.col;
+    const startRow0 = topLeftCell.row;
+    const startCol0 = topLeftCell.col;
+    const endRow0 = bottomRightCell.row;
+    const endCol0 = bottomRightCell.col;
+    const colCount = endCol0 - startCol0 + 1;
+    let startPastMass = 0;
     try {
-      rows.forEach((rowData, rowIndex) => {
-        rowData.forEach((cellData, colIndex) => {
-          const targetRow = startRow + rowIndex;
-          const targetCol = startCol + colIndex;
-          let targetColId =
-            all_cols.length > targetCol ? all_cols[targetCol].id : "";
+      let startRow = startRow0;
+      while (startRow === startRow0 || startRow + rows.length - 1 <= endRow0) {
+        rows.forEach((rowData, rowIndex) => {
+          let startCol = startCol0;
+          while (
+            startCol == startCol0 ||
+            startCol + rowData.length - 1 <= endCol0
+          ) {
+            rowData.forEach((cellData, colIndex) => {
+              const targetRow = startRow + rowIndex;
+              const targetCol = startCol + colIndex;
+              let targetColId =
+                all_cols.length > targetCol ? all_cols[targetCol].id : "";
 
-          if (targetRow < newData.length && targetColId != "") {
-            if (targetColId === "hashtags") {
-              let cellData_arr = SplitHashtags(cellData);
-              newData[targetRow][targetColId] = cellData_arr;
-            } else newData[targetRow][targetColId] = cellData;
+              if (targetRow < newData.length && targetColId != "") {
+                if (targetColId === "hashtags") {
+                  let cellData_arr = SplitHashtags(cellData);
+                  newData[targetRow][targetColId] = cellData_arr;
+                } else newData[targetRow][targetColId] = cellData;
+              }
+            });
+            // console.log(
+            //   "before",
+            //   startCol,
+            //   startCol + rowData.length - 1,
+            //   endCol0,
+            //   "count",
+            //   colCount
+            // );
+            startCol = startCol + rowData.length;
+            // console.log(
+            //   "after",
+            //   startCol,
+            //   startCol + rowData.length - 1,
+            //   endCol0
+            // );
           }
         });
-      });
+        startRow = startRow + rows.length;
+      }
 
       setData(newData);
     } catch (error) {}
@@ -1382,90 +1423,144 @@ export function AppTable() {
       element.focus();
     } catch (error) {}
   };
+  const [isFixed, setIsFixed] = useState(false);
 
+  const togglePosition = () => {
+    setIsFixed((prev) => !prev);
+  };
+   const contentRef = useRef<any>(null);
+   const [maxHeight, setMaxHeight] = useState("100%");
+  const adjustHeight = () => {
+    try {
+      if (contentRef.current) {
+        window.scrollTo(0, 0);
+        // Get the top offset of the div relative to the viewport
+        const topOffset = contentRef.current.getBoundingClientRect().top;
+
+        // Calculate the maximum height
+        const availableHeight = window.innerHeight - topOffset-20;
+
+        // Set the calculated height
+        setMaxHeight(`${availableHeight}px`);
+      }
+    } catch (error) {
+      
+    }
+    
+  };
+
+  useEffect(() => {
+    // Adjust height on mount and resize
+    adjustHeight();
+    window.addEventListener("resize", adjustHeight);
+
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener("resize", adjustHeight);
+    };
+  }, []);
   return (
     <>
-      <Group justify="flex-start" mb="md" gap="2px">
-        <ActionIcon
-          variant="filled"
-          onClick={() => {
-            setDesktopfocus((prev) => !prev);
-          }}
-          title={
-            desktopFocus ? t("minimize", "Minimize") : t("maximize", "Maximize")
-          }
+      <Box
+        bg="dark"
+        className={`${isFixed ? classesG.excelContainerFullScreen : ""}`}
+      >
+        <Group
+          bg="dark"
+          justify="flex-start"
+          mb="md"
+          gap="2px"
+          className={`${isFixed ? classesG.excelHeaderToolFullScreen : ""}`}
         >
-          {!desktopFocus && <IconMaximize stroke={1.5} size="1rem" />}
-          {desktopFocus && <IconMinimize stroke={1.5} size="1rem" />}
-        </ActionIcon>
+          <ActionIcon
+            variant="filled"
+            onClick={() => {
+              // setDesktopfocus((prev) => !prev);
+              togglePosition();
+            }}
+            title={
+              desktopFocus
+                ? t("minimize", "Minimize")
+                : t("maximize", "Maximize")
+            }
+          >
+            {!desktopFocus && <IconMaximize stroke={1.5} size="1rem" />}
+            {desktopFocus && <IconMinimize stroke={1.5} size="1rem" />}
+          </ActionIcon>
 
-        <ActionIcon
-          variant="light"
-          onClick={undo}
-          title={t("undo", "Undo")}
-          disabled={history.length === 0}
-        >
-          <IconArrowBackUp stroke={1.5} size="1rem" />
-        </ActionIcon>
-        <ActionIcon
-          variant="light"
-          onClick={redo}
-          title={t("redo", "Redo")}
-          disabled={redoStack.length === 0}
-        >
-          <IconArrowForwardUp stroke={1.5} size="1rem" />
-        </ActionIcon>
-        <ActionIcon
-          variant="light"
-          onClick={() => selectAll()}
-          title={t("select_all", "Select All")}
-          disabled={!data || !data.length}
-        >
-          <IconSelectAll stroke={1.5} size="1rem" />
-        </ActionIcon>
-        <ActionIcon
-          variant="light"
-          c="red"
-          onClick={() => deSelectAny()}
-          title={t("deselect", "DeSelect")}
-          disabled={!getTopLeftCell()}
-        >
-          <IconDeselect stroke={1.5} size="1rem" />
-        </ActionIcon>
-        <ActionIcon
-          variant="light"
-          onClick={() => copyToClipboard(false)}
-          title={t("copy", "Copy")}
-          disabled={!getTopLeftCell()}
-        >
-          <IconCopy stroke={1.5} size="1rem" />
-        </ActionIcon>
-        <ActionIcon
-          variant="light"
-          onClick={() => copyToClipboard(true)}
-          title={t("copy_with_header", "Copy With Header")}
-          disabled={!getTopLeftCell()}
-        >
-          <IconCopyPlus stroke={1.5} size="1rem" />
-        </ActionIcon>
-        <ActionIcon
-          variant="light"
-          onClick={() => {
-            setDensity((prev) => !prev);
-          }}
-          title={
-            density
-              ? t("low_density", "Low Density")
-              : t("high_density", "High Density")
-          }
-        >
-          {!density && <IconBaselineDensitySmall stroke={1.5} size="1rem" />}
-          {density && <IconBaselineDensityMedium stroke={1.5} size="1rem" />}
-        </ActionIcon>
-      </Group>
+          <ActionIcon
+            variant="light"
+            onClick={undo}
+            title={t("undo", "Undo")}
+            disabled={history.length === 0}
+          >
+            <IconArrowBackUp stroke={1.5} size="1rem" />
+          </ActionIcon>
+          <ActionIcon
+            variant="light"
+            onClick={redo}
+            title={t("redo", "Redo")}
+            disabled={redoStack.length === 0}
+          >
+            <IconArrowForwardUp stroke={1.5} size="1rem" />
+          </ActionIcon>
+          <ActionIcon
+            variant="light"
+            onClick={() => selectAll()}
+            title={t("select_all", "Select All")}
+            disabled={!data || !data.length}
+          >
+            <IconSelectAll stroke={1.5} size="1rem" />
+          </ActionIcon>
+          <ActionIcon
+            variant="light"
+            c="red"
+            onClick={() => deSelectAny()}
+            title={t("deselect", "DeSelect")}
+            disabled={!getTopLeftCell()}
+          >
+            <IconDeselect stroke={1.5} size="1rem" />
+          </ActionIcon>
+          <ActionIcon
+            variant="light"
+            onClick={() => copyToClipboard(false)}
+            title={t("copy", "Copy")}
+            disabled={!getTopLeftCell()}
+          >
+            <IconCopy stroke={1.5} size="1rem" />
+          </ActionIcon>
+          <ActionIcon
+            variant="light"
+            onClick={() => copyToClipboard(true)}
+            title={t("copy_with_header", "Copy With Header")}
+            disabled={!getTopLeftCell()}
+          >
+            <IconCopyPlus stroke={1.5} size="1rem" />
+          </ActionIcon>
+          <ActionIcon
+            variant="light"
+            onClick={() => {
+              setDensity((prev) => !prev);
+            }}
+            title={
+              density
+                ? t("low_density", "Low Density")
+                : t("high_density", "High Density")
+            }
+          >
+            {!density && <IconBaselineDensitySmall stroke={1.5} size="1rem" />}
+            {density && <IconBaselineDensityMedium stroke={1.5} size="1rem" />}
+          </ActionIcon>
+        </Group>
 
-      <Box pb="xl">
-        <ScrollArea maw={"100%"} mx="auto" type="auto">
+        <Box
+          // ref={contentRef}
+          
+          className={`${isFixed ? classesG.excelTableContainerFullScreen : ""}`}
+          style={{ overflow: "auto" }}
+          // mah={isFixed ? "auto" : maxHeight}
+        >
+          {/* <ScrollArea maw={"100%"} mx="auto" type="auto"> */}
           <table
             ref={elementRef}
             {...{
@@ -1484,11 +1579,12 @@ export function AppTable() {
                       {...{
                         key: header.id,
                         colSpan: header.colSpan,
-                        className: `${classesG.actionSides}`,
+                        className: `${classesG.actionSides} ${
+                          isFixed ? classesG.excelTableHeaderFullScreen : ""
+                        } `,
                         style: {
                           width: header_idx == 0 ? "30px" : header.getSize(),
                           maxWidth: header_idx == 0 ? "30px" : "auto",
-                          height: "30px",
                         },
                       }}
                     >
@@ -1650,7 +1746,8 @@ export function AppTable() {
               ))}
             </tbody>
           </table>
-        </ScrollArea>
+          {/* </ScrollArea> */}
+        </Box>
       </Box>
     </>
   );

@@ -125,8 +125,8 @@ import {
   useAppMultiSelectToAddMissedSearchVal,
 } from "../../../global/global-comp/AppMultiSelect";
 import { ArrayToAppSelect } from "../../../global/Hashtags";
-import { AppTable } from "./Table";
-
+import { DealsSpreadSheet } from "./DealsSpreadSheet";
+ 
 export const SHARES_TYPE = {
   SHARE_BY_DEFAULT: "share_by_default",
   SHARE_BY_CHANNEL: "share_by_channel",
@@ -879,8 +879,18 @@ export const CompanyDeals = () => {
                     })}
                   </SimpleGrid>
                 )}
-                {listDir != "grid_view" && listDir != "img_grid_view" && (
-                  <DealsList
+                {listDir != "grid_view" &&
+                  listDir != "img_grid_view" &&
+                  listDir != "spread" && (
+                    <DealsList
+                      data={data}
+                      searchMyDeals={searchMyDeals}
+                      renew_or_terminate={renew_or_terminate}
+                      t={t}
+                    />
+                  )}
+                {listDir == "spread" && (
+                  <DealsSpreadSheet
                     data={data}
                     searchMyDeals={searchMyDeals}
                     renew_or_terminate={renew_or_terminate}
@@ -1234,7 +1244,7 @@ export const AddEditDeal0 = () => {
         </Group>
       </AppHeader>
       <ConfirmUnsaved blocker={blocker} />
-      <AppTable />
+      
       <Box
         className={classesG.editMax800}
         opacity={blocker.state === "blocked" ? 0.1 : 1}
@@ -1618,6 +1628,7 @@ export const DealSearch = (props) => {
           { id: "grid_view", name: t("grid_view", "Grid View") },
           { id: "list_view", name: t("list_view", "List View") },
           { id: "img_grid_view", name: t("img_grid_view", "Image Grid View") },
+          { id: "spread", name: t("spread", "Spreadsheet(Edit Multiple)") },
         ]}
         sortBy={[
           {
