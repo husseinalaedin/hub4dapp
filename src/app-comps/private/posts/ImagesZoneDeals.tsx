@@ -47,6 +47,7 @@ export const ImagesZoneDeals = ({
   setMain_pic,
   images,
   setImages,
+  onChange,
 }) => {
   const { t } = useTranslation("private", { keyPrefix: "deals" });
   const { classes: classesG } = useGlobalStyl();
@@ -221,6 +222,9 @@ export const ImagesZoneDeals = ({
         })
         .then(() => {
           console.log(`${img.file.name} upload successful`);
+          if (onChange) {
+            onChange();
+          }
           setImages((prevData) =>
             prevData.map((item) => {
               if (
@@ -387,6 +391,7 @@ export const ImagesZoneDeals = ({
                           );
                         }}
                         setMain_pic={() => {
+                          if (onChange) onChange();
                           if (
                             img &&
                             img.image_upload_data &&
@@ -530,7 +535,7 @@ const DropImage = ({
             onClick={() => {
               if (!img.error) openCarousel();
             }}
-             
+
             // placeholder={
             //   <Stack
             //     gap={2}

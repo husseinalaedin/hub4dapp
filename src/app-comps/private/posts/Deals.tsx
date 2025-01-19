@@ -1279,6 +1279,9 @@ export const AddEditDeal0 = () => {
             pictures={pictures}
             main_pic={main_pic}
             setMain_pic={setMain_pic}
+            onChange={()=>{
+              
+            }}
           />
           <Grid gutter={small ? 5 : medium ? 10 : 15}>
             <Grid.Col span={{ base: 12, md: 6 }}>
