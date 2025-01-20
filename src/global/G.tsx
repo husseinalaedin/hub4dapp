@@ -135,6 +135,11 @@ export class G {
     return prefix + short; // //tms.toString(32)
   }
   static parseNumberAndString(input) {
+    if(!input){
+      return{
+         number:'', text:'' 
+      }
+    }
     const match = input.match(/^([\d,]+(\.\d+)?)(.*)$/);
     if (match) {
       const number = parseFloat(match[1].replace(/,/g, "")); // Parse the number after removing commas

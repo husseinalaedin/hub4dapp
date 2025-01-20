@@ -310,7 +310,7 @@ export const CopyAlert = ({ clipboard, t }) => {
                 `Your browser doesn't support copying formatted text. The data has been copied in plain text.`
               )}
             </Box>
-            <Group noWrap gap={2}>
+            <Group style={{ whiteSpace: "nowrap" }} gap={2}>
               <Box>{t("browser_not_supported_ctrl_c", `Press`)}</Box>
               <Box>
                 <Kbd>Ctrl</Kbd> + <Kbd>C</Kbd>

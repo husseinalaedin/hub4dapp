@@ -1844,16 +1844,7 @@ export const DealSearch = (props) => {
 };
 
 export const NumericEntry = ({ initVal, form, formKey, ...others }) => {
-  // const [numbValue, setNumbValue] = useState<any>(() => {
-  //     return form && form.values && form.values[formKey] ? form.values[formKey] : null
-  // })
-  // useEffect(() => {
-  //     setNumbValue(() => {
-  //         let val=form && form.values && form.values[formKey] ? form.values[formKey] : null
-  //         return val
-  //     })
-  // }, [])
-  // let { form } = props
+ 
   return (
     <NumericFormat
       value={initVal}

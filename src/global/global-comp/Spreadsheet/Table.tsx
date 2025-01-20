@@ -1,9 +1,11 @@
 import React, {
   Dispatch,
+  forwardRef,
   Fragment,
   SetStateAction,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useReducer,
   useRef,
   useState,
@@ -21,7 +23,18 @@ import {
   PaginationState,
   getExpandedRowModel,
 } from "@tanstack/react-table";
-import { ActionIcon, Box, Group, TextInput } from "@mantine/core";
+import {
+  ActionIcon,
+  Alert,
+  Box,
+  Button,
+  Divider,
+  Group,
+  Modal,
+  Popover,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { getFilteredRowModel } from "@tanstack/react-table";
 import { useGlobalStyl } from "../../../hooks/useTheme";
 import { useTranslation } from "react-i18next";
@@ -31,11 +44,17 @@ import {
   IconBaselineDensityMedium,
   IconBaselineDensitySmall,
   IconCheck,
+  IconCircleXFilled,
   IconCopy,
   IconCopyPlus,
   IconDeselect,
+  IconDeviceFloppy,
+  IconHelp,
   IconMaximize,
   IconMinimize,
+  IconPlus,
+  IconQuestionMark,
+  IconRotate360,
   IconSelectAll,
   IconX,
 } from "@tabler/icons-react";
@@ -43,6 +62,7 @@ import { useMessage } from "../../G";
 import { SplitHashtags } from "../Hashtags";
 
 import { useAppHeaderNdSide } from "../../../hooks/useAppHeaderNdSide";
+import { useDisclosure } from "@mantine/hooks";
 const MAX_HISTORY_SIZE = 40;
 
 declare module "@tanstack/react-table" {
@@ -53,10 +73,7 @@ declare module "@tanstack/react-table" {
       value: unknown,
       beforEditingValue: unknown
     ) => void;
-    updateValues:(
-      rowIndex: number,
-      values: any,
-    )=>void,
+    updateValues: (rowIndex: number, values: any) => void;
     onEdit: (onEdit_: boolean) => void;
     editingCell: [number, number, string, string] | null;
     cellIsHighlighted: (rowIndex: number, columnIndex: number) => boolean;
@@ -67,118 +84,6 @@ declare module "@tanstack/react-table" {
     cellInEdit: (rowIndex: number, colIndex: number, id: string) => boolean;
   }
 }
-
-// const defaultColumn: Partial<ColumnDef<Deal>> = {
-//   cell: ({ getValue, row: { index }, column: { id }, table }) => {
-//     const inputRef = useRef<any>(null);
-//     const { classes: classesG } = useGlobalStyl();
-//     const editingCell = table.options.meta?.editingCell;
-//     const onEdit =
-//       editingCell && editingCell[0] === index && editingCell[2] === id;
-//     const initialValue = getValue();
-//     const [beforEditingValue, setBeforEditingValue] = useState(initialValue);
-//     const [value, setValue] = useState(initialValue);
-//     const HandleOnEdit = (val) => {
-//       table.options.meta?.onEdit(val);
-//     };
-//     useEffect(() => {
-//       if (onEdit && inputRef.current && inputRef.current.focus) {
-//         inputRef.current.focus();
-//         resizeInput();
-//         setBeforEditingValue(value);
-//         if (editingCell[3] == "Backspace") {
-//           setValue("");
-//         }
-//       }
-//     }, [onEdit]);
-//     const onSave = () => {
-//       HandleOnEdit(false);
-//       table.options.meta?.updateData(index, id, value, beforEditingValue);
-//     };
-//     const onCancel = () => {
-//       setValue(beforEditingValue);
-//       table.options.meta?.cancelEditing();
-//     };
-//     useEffect(() => {
-//       setValue(initialValue);
-//     }, [initialValue]);
-//     const resizeInput = () => {
-//       if (inputRef.current) {
-//         inputRef.current.style.width = "auto";
-//         inputRef.current.style.width = `${inputRef.current.scrollWidth + 10}px`;
-//       }
-//     };
-//     useEffect(() => {
-//       resizeInput();
-//     }, [value]);
-
-//     return (
-//       <>
-//         {!onEdit && (
-//           <Box
-//             bg="transparent"
-//             pl="2px"
-//             pr="2px"
-//             style={{
-//               display: "block",
-//               alignItems: "center",
-//               fontFamily: "inherit",
-//               fontSize: "inherit",
-//               fontWeight: "inherit",
-//               pointerEvents: "none",
-//             }}
-//           >
-//             {value as string}
-//           </Box>
-//         )}
-//         {onEdit && (
-//           <TextInput
-//             className={classesG.editingExcelCell}
-//             ref={inputRef}
-//             onKeyDown={(event) => {
-//               if (event.key == "Enter") onSave();
-//               if (event.key == "Escape") {
-//                 onCancel();
-//               }
-//             }}
-//             value={value as string}
-//             onChange={(e) => setValue(e.target.value)}
-//             onBlur={() => {
-//               if (beforEditingValue === value) onCancel();
-//               // onSave()
-//             }}
-//             style={{
-//               fontFamily: "inherit",
-//               fontSize: "inherit",
-//               fontWeight: "inherit",
-//               whiteSpace: "nowrap",
-//               overflow: "hidden",
-//               border: "1px solid red;",
-//               position: "absolute",
-//               top: -2,
-//               left: -2,
-//               // bottom: 0,
-//               width: "auto",
-//               minWidth: "100px",
-//               zIndex: 400000000000000,
-//             }}
-//             rightSectionWidth={60}
-//             rightSection={
-//               <Group gap={"2px"}>
-//                 <ActionIcon c="red" variant="light" onClick={onCancel}>
-//                   <IconX stroke={1.5} size="1.2rem" />
-//                 </ActionIcon>
-//                 <ActionIcon variant="filled" onClick={onSave}>
-//                   <IconCheck stroke={1.5} size="1.2rem" />
-//                 </ActionIcon>
-//               </Group>
-//             }
-//           />
-//         )}
-//       </>
-//     );
-//   },
-// };
 
 function useSkipper() {
   const shouldSkipRef = useRef(true);
@@ -195,15 +100,20 @@ function useSkipper() {
 
   return [shouldSkip, skip] as const;
 }
-export function AppTable({
-  initData,
-  columns,
-  SecondRowRender,
-  defaultColumn,
-  showSecondRow,
-  fixedCols,
-}) {
-  const elementRef: any = useRef(null);
+export const AppTable = forwardRef((props: any, ref) => {
+  let {
+    data,
+    setData,
+    columns,
+    SecondRowRender,
+    defaultColumn,
+    showSecondRow,
+    fixedCols,
+    onCopyCell,
+    onSave
+  } = props;
+
+  const tableRef: any = useRef(null);
   const [forceCloseTm, setForceCloseTm] = useState("");
   const [lastTap, setLastTap] = useState(0);
   const doubleTapDelay = 300; // Maximum delay between taps in milliseconds
@@ -217,19 +127,6 @@ export function AppTable({
     pageSize: 1000,
   });
 
-  // const defaults = () => {
-  //   let dta: any = [];
-  //   let dta_s = JSON.stringify(defaultData);
-  //   for (let i = 0; i < 5; i++) {
-  //     let df = JSON.parse(dta_s);
-  //     for (let i = 0; i < df.length; i++) {
-  //       dta.push(df[i]);
-  //     }
-  //   }
-  //   console.log(dta, "DATA");
-  //   return dta;
-  // };
-  const [data, setData] = useState<any>(() => [...initData]);
   const [history, setHistory] = useState<any>([]);
   const [redoStack, setRedoStack] = useState<any>([]);
   const [deletedIds, setDeletedIds] = useState<any>([]);
@@ -241,6 +138,22 @@ export function AppTable({
   const [editingCell, setEditingCell] = useState<
     [number, number, string, string] | null
   >(null);
+  const [initData,setInitData]=useState(data)
+  const cancelChanges=()=>{
+    setData(initData);
+    setHistory([])
+    setRedoStack([])
+    setDeletedIds([])
+    setEditedIds([])
+    setStartCell(null)
+    setEndCell(null);
+    setOnEdit(false)
+    setEditingCell(null)
+  }
+  const add = () => {
+    const newItem = { id:'new',ref:new Date().getTime().toString() };
+    setData([...data, newItem]); // Add the new item to the array immutably
+  };
   const cellInEdit = (
     rowIndex: number,
     colIndex: number,
@@ -258,6 +171,11 @@ export function AppTable({
     );
   };
   const [isShiftPressed, setIsShiftPressed] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    getDeletedIds: () => deletedIds,
+    getEditedIds:()=>editedIds
+  }));
 
   const handleMouseDown = (event, row, col) => {
     setForceCloseTm(new Date().getTime().toString());
@@ -454,38 +372,52 @@ export function AppTable({
     const colCount = Math.abs(startCell.col - endCell.col) + 1;
 
     let all_cols = table.getAllColumns();
-    let selectedData = "";
+    let copyAsText = "";
+    let copyAsHTML = "<table>";
     if (withheader) {
+      copyAsHTML = "<thead><tr>";
       for (let jj = 0; jj < colCount; jj++) {
         let col_d = cols + jj;
         let targetColId_d = all_cols.length > col_d ? all_cols[col_d].id : "";
         let colHeader: any = all_cols[col_d].columnDef.header;
         colHeader = colHeader && colHeader != "" ? colHeader : targetColId_d;
-        if (colHeader)
-          selectedData += colHeader + (jj === colCount - 1 ? "" : "\t");
+        colHeader = onCopyCell("H", col_d, targetColId_d, colHeader, "");
+        copyAsText += colHeader.text + (jj === colCount - 1 ? "" : "\t");
+        copyAsHTML += "<th>" + colHeader.html + "<th>";
       }
+      copyAsHTML += "</tr></thead>";
     }
-    if (selectedData != "") selectedData += "\n";
-
+    if (copyAsText != "") copyAsText += "\n";
+    copyAsHTML += "<tbody>";
     for (let i = 0; i < rowCount; i++) {
+      copyAsHTML += "<tr>";
       for (let j = 0; j < colCount; j++) {
         const row = rows + i;
         const col = cols + j;
+        let colidx = all_cols.length > col ? col : all_cols.length - 1;
         let targetColId = all_cols.length > col ? all_cols[col].id : "";
 
         if (data[row] && targetColId != "") {
-          selectedData +=
-            data[row][targetColId] + (j === colCount - 1 ? "" : "\t");
+          let cellData = data[row][targetColId];
+          cellData = onCopyCell(
+            "D",
+            colidx,
+            all_cols[col].id,
+            cellData,
+            data[row]
+          );
+          copyAsText += cellData.text + (j === colCount - 1 ? "" : "\t");
+          copyAsHTML += "<th>" + cellData.html + "<th>";
         }
       }
-      selectedData += "\n";
+      copyAsText += "\n";
+      copyAsHTML += "</tr>";
     }
-    // alert(selectedData);
-    // Copy the selected data to clipboard
+    copyAsHTML += "</tbody></table>";
+    console.log(copyAsText);
     navigator.clipboard
-      .writeText(selectedData)
+      .writeText(copyAsText)
       .then(() => {
-        // alert("Copied to clipboard!");
         succeed(t("data_copied", "Data copied!."));
       })
       .catch((error) => {
@@ -630,7 +562,24 @@ export function AppTable({
       document.removeEventListener("touchmove", touchMoveHandler);
     };
   }, [data, startCell, endCell, editingCell]);
+  const goToNext = (row, col) => {
+    return; //come back later to this
+    if (row < 0 || col < 0) return;
+    let row_count = table.getRowCount();
+    let col_count = table.getAllColumns().length;
+    if (col + 1 > col_count) row_count = row_count + 1;
+    else col = col + 1;
+    if (row_count > row_count) return;
+    let all_cols = table.getAllColumns();
+    let id = all_cols[col].id;
 
+    setStartCell({ row: row, col: col });
+    setEndCell({ row: row, col: col });
+    setEditingCell([row, col, id, ""]);
+  };
+  useEffect(()=>{
+console.log(data,'data changed')
+  },[data])
   const table = useReactTable({
     data,
     columns,
@@ -645,6 +594,12 @@ export function AppTable({
     meta: {
       updateData: (rowIndex, columnId, value, beforEditingValue) => {
         skipAutoResetPageIndex();
+        let row = -1;
+        let col = -1;
+        if (editingCell) {
+          row = editingCell[0];
+          col = editingCell[1];
+        }
         setEditingCell(null);
 
         if (value === beforEditingValue) return;
@@ -665,6 +620,8 @@ export function AppTable({
             return row;
           })
         );
+        console.log(data, "data changed");
+        goToNext(row, col);
       },
 
       updateValues: (rowIndex, values) => {
@@ -696,7 +653,7 @@ export function AppTable({
             return row;
           })
         );
-        console.log('data after updated',data)
+        console.log("data after updated", data);
       },
       onEdit: (onEdit_) => setOnEdit(onEdit_),
       editingCell: editingCell,
@@ -734,7 +691,7 @@ export function AppTable({
   }, [editingCell]);
   const enforceTabIndex = () => {
     try {
-      const element = elementRef.current;
+      const element = tableRef.current;
       if (!element) return;
       element.tabIndex = 0;
       element.focus();
@@ -780,19 +737,15 @@ export function AppTable({
   };
   return (
     <>
-      <Box
-        bg="dark"
-        className={`${isFixed ? classesG.excelContainerFullScreen : ""}`}
-      >
+      <Box className={`${isFixed ? classesG.excelContainerFullScreen : ""}`}>
         <Group
-          bg="dark"
           justify="flex-start"
           mb="md"
           gap="2px"
           className={`${isFixed ? classesG.excelHeaderToolFullScreen : ""}`}
         >
           <ActionIcon
-            variant="filled"
+            variant="outline"
             onClick={() => {
               // setDesktopfocus((prev) => !prev);
               togglePosition();
@@ -806,7 +759,39 @@ export function AppTable({
             {!desktopFocus && <IconMaximize stroke={1.5} size="1rem" />}
             {desktopFocus && <IconMinimize stroke={1.5} size="1rem" />}
           </ActionIcon>
-
+          <Divider orientation="vertical" size="sm" ml="2px" mr="2px" />
+          <ActionIcon
+            variant="filled"
+            onClick={onSave}
+            title={t("save", "Save")}
+            disabled={!(editedIds.length > 0 || deletedIds.length > 0)}
+          >
+            <IconDeviceFloppy stroke={1.5} size="1rem" />
+          </ActionIcon>
+          {/* <ActionIcon
+            
+            color="red"
+            variant="filled"
+            onClick={cancelChanges}
+            title={t("cancel", "Cancel")}
+            disabled={!(editedIds.length > 0 || deletedIds.length > 0)}
+          >
+            <IconRotate360 stroke={1.5} size="1rem" />
+          </ActionIcon> */}
+          <ConfirmCancelChanges
+            t={t}
+            disabled={!(editedIds.length > 0 || deletedIds.length > 0)}
+            onConfirm={cancelChanges}
+          />
+          <ActionIcon
+            variant="outline"
+            onClick={add}
+            title={t("new", "New")}
+            // disabled={!(editedIds.length > 0 || deletedIds.length > 0)}
+          >
+            <IconPlus stroke={1.5} size="1rem" />
+          </ActionIcon>
+          <Divider orientation="vertical" size="sm" ml="2px" mr="2px" />
           <ActionIcon
             variant="light"
             onClick={undo}
@@ -823,6 +808,8 @@ export function AppTable({
           >
             <IconArrowForwardUp stroke={1.5} size="1rem" />
           </ActionIcon>
+
+          <Divider orientation="vertical" size="sm" ml="2px" mr="2px" />
           <ActionIcon
             variant="light"
             onClick={() => selectAll()}
@@ -856,6 +843,8 @@ export function AppTable({
           >
             <IconCopyPlus stroke={1.5} size="1rem" />
           </ActionIcon>
+
+          <Divider orientation="vertical" size="sm" ml="2px" mr="2px" />
           <ActionIcon
             variant="light"
             onClick={() => {
@@ -870,6 +859,23 @@ export function AppTable({
             {!density && <IconBaselineDensitySmall stroke={1.5} size="1rem" />}
             {density && <IconBaselineDensityMedium stroke={1.5} size="1rem" />}
           </ActionIcon>
+          <Popover width={400} position="bottom" withArrow shadow="md">
+            <Popover.Target>
+              <ActionIcon c="orange" variant="transparent">
+                <IconQuestionMark stroke={1.5} size="1.2rem" />
+              </ActionIcon>
+            </Popover.Target>
+            <Popover.Dropdown p="0px">
+              <Alert icon={<IconHelp />} color="blue" maw="500px">
+                <Text size="md">
+                  {t(
+                    "double_click_to_edit_cell",
+                    "Double-click any cell to edit it, including those containing pictures."
+                  )}
+                </Text>
+              </Alert>
+            </Popover.Dropdown>
+          </Popover>
         </Group>
 
         <Box
@@ -881,7 +887,7 @@ export function AppTable({
         >
           {/* <ScrollArea maw={"100%"} mx="auto" type="auto"> */}
           <table
-            ref={elementRef}
+            ref={tableRef}
             {...{
               style: {
                 width: table.getCenterTotalSize(),
@@ -1080,9 +1086,90 @@ export function AppTable({
               ))}
             </tbody>
           </table>
-          {/* </ScrollArea> */}
         </Box>
       </Box>
+    </>
+  );
+});
+export function getDivContentWithLineBreaks(divElement) {
+  // Clone the div to avoid modifying the original content
+  const clone = divElement.cloneNode(true);
+
+  // Replace <br> with a tab for proper CSV tab spacing
+  const brElements = clone.querySelectorAll("br");
+  brElements.forEach((br) => br.replaceWith("\n"));
+
+  // Replace block elements like <p>, <div>, <h1>, etc., with new lines or tabs depending on structure
+  const blockElements = clone.querySelectorAll(
+    "p, div, h1, h2, h3, h4, h5, h6, section, article, footer, header"
+  );
+  blockElements.forEach((block) => {
+    block.insertAdjacentText("beforebegin", "\n"); // Insert newline before block elements
+  });
+
+  // Convert the content to text
+  let text = clone.textContent || clone.innerText;
+
+  // Ensure proper handling of nested elements and format for CSV (removes extra spaces or lines)
+  text = text.replace(/[ \t]+/g, " "); // Clean up extra spaces
+  text = text.replace(/\n+/g, "\n");
+  if (text[0] === "\n") {
+    text = text.slice(1); // Remove the first character
+  }
+  return text;
+}
+
+
+function ConfirmCancelChanges({ t, onConfirm,disabled }) {
+  const [opened, { close, open }] = useDisclosure(false);
+
+  return (
+    <>
+      <Modal
+        opened={opened}
+        onClose={close}
+        size="auto"
+        withCloseButton={true}
+        title={t("cancel_confirmation", "Cancel Confirmation..")}
+      >
+        <Text>
+          {" "}
+          {t(
+            "are_you_sure_you_want_to_cancel_changes_undo_impossible",
+            "Are you sure you want to cancel the changes? This action cannot be undone."
+          )}
+        </Text>
+
+        <Group mt="xl" justify="right" gap="md">
+          <Button variant="light" onClick={close}>
+            {t("no", "No")}
+          </Button>
+          <Button
+            variant="filled"
+            color="red"
+            onClick={() => {
+              onConfirm();
+              close();
+            }}
+          >
+            {t("yes", "Yes")}
+          </Button>
+        </Group>
+      </Modal>
+      <Group justify="center">
+       
+
+        <ActionIcon
+          // c="orange"
+          color="red"
+          variant="filled"
+          onClick={open}
+          title={t("cancel", "Cancel")}
+          disabled={disabled}
+        >
+          <IconRotate360 stroke={1.5} size="1rem" />
+        </ActionIcon>
+      </Group>
     </>
   );
 }

@@ -14,8 +14,8 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
-import { CurrenciesDropped } from "../Currencies";
-import { useEffect, useRef, useState } from "react";
+import { CurrenciesDropped, UomsDropped } from "../Currencies";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { CLOUDFARE_IMAGE_URL1, G } from "../../G";
 import { useGlobalStyl } from "../../../hooks/useTheme";
 import { useTranslation } from "react-i18next";
@@ -23,8 +23,17 @@ import { Wtsb } from "../Wtsb";
 import { HashtagsAlert, HashTagsInput } from "../Hashtags";
 import { ColumnDef } from "@tanstack/react-table";
 import { MemoEditorApp } from "../../AppEditor";
-import { ImagesZoneDeals, MAX_NB_IMAGES } from "../../../app-comps/private/posts/ImagesZoneDeals";
+import {
+  ImagesZoneDeals,
+  MAX_NB_IMAGES,
+} from "../../../app-comps/private/posts/ImagesZoneDeals";
+import { AppDiv } from "../../AppDiv";
+import { NumericFormat } from "react-number-format";
+import { decimalSep, thousandSep } from "../../Misc";
 
+const NumericFormatRef = forwardRef((props: any, ref) => (
+  <NumericFormat {...props} getInputRef={ref} />
+));
 // const defaultData: Deal[] = [
 //   {
 //     dealtype: "WTS",
@@ -83,8 +92,8 @@ import { ImagesZoneDeals, MAX_NB_IMAGES } from "../../../app-comps/private/posts
 // ];
 export const HashTagHeader = ({ table }) => {
   return (
-    <Group justify="center">
-      <Box>hashtags</Box>
+    <Group justify="center" gap={0}>
+      <Box>Hashtags</Box>
       <HashtagsAlert />
     </Group>
   );
@@ -257,9 +266,9 @@ export const TypeCell = ({
       setForceClick(new Date().getTime().toString());
     }
   }, [onEdit]);
-  const onSave = () => {
+  const onSave = (val) => {
     HandleOnEdit(false);
-    table.options.meta?.updateData(index, id, value, beforEditingValue);
+    table.options.meta?.updateData(index, id, val, beforEditingValue);
   };
   const onCancel = () => {
     setValue(beforEditingValue);
@@ -324,12 +333,16 @@ export const TypeCell = ({
             defaultValue={initialValue}
             value={value}
             onChange={setValue}
+            onSubmit={(val)=>{
+              setValue(val);
+              onSave(val)
+            }}
             onBlur={() => {
               if (beforEditingValue === value) onCancel();
-              // onSave()
+              // else onSave();
             }}
             onKeyDown={(event) => {
-              if (event.key == "Enter") onSave();
+              // if (event.key == "Enter") onSave();
               if (event.key == "Escape") {
                 setValue(beforEditingValue);
                 table.options.meta?.cancelEditing();
@@ -428,11 +441,21 @@ export const ReadOnlyCell = ({
   table,
 }) => {
   const { t } = useTranslation("common", { keyPrefix: "table" });
-
+  const [show, setShow] = useState(false);
   const editingCell = table.options.meta?.editingCell;
   const onEdit =
     editingCell && editingCell[0] === index && editingCell[2] === id;
   const initialValue = getValue();
+  useEffect(() => {
+    if (!onEdit) {
+      setShow(false);
+      return;
+    }
+    let tmr = setTimeout(() => {
+      setShow(true);
+    }, 750);
+    return () => clearTimeout(tmr);
+  }, [onEdit]);
   return (
     <>
       {!onEdit && (
@@ -446,14 +469,24 @@ export const ReadOnlyCell = ({
             fontSize: "inherit",
             fontWeight: "inherit",
             pointerEvents: "none",
+            overflow: "hidden",
+            maxHeight: "20px",
           }}
         >
-          {initialValue}
+          <AppDiv contRef={null} html={initialValue} />
         </Box>
       )}
-      {onEdit && (
+      {onEdit && show && (
         <Group gap={1} justify="center">
-          <Box>....</Box>
+          <ActionIcon
+            variant="transparent"
+            c="red"
+            onClick={() => {
+              table.options.meta?.cancelEditing();
+            }}
+          >
+            <IconX />
+          </ActionIcon>
         </Group>
       )}
     </>
@@ -466,22 +499,42 @@ export const IamageCell = ({
   table,
 }) => {
   const { t } = useTranslation("common", { keyPrefix: "table" });
-
+  const [show, setShow] = useState(false);
   const editingCell = table.options.meta?.editingCell;
   const onEdit =
     editingCell && editingCell[0] === index && editingCell[2] === id;
   const initialValue = getValue();
+  useEffect(() => {
+    if (!onEdit) {
+      setShow(false);
+      return;
+    }
+    let tmr = setTimeout(() => {
+      setShow(true);
+    }, 750);
+    return () => clearTimeout(tmr);
+  }, [onEdit]);
   return (
     <>
       {!onEdit && (
         <Group gap={1} justify="center">
-          <Image maw={"20px"} src={`${CLOUDFARE_IMAGE_URL1}${initialValue}/public`} />
+          <Image
+            maw={"20px"}
+            src={`${CLOUDFARE_IMAGE_URL1}${initialValue}/public`}
+          />
         </Group>
-        
       )}
-      {onEdit && (
+      {onEdit && show && (
         <Group gap={1} justify="center">
-          <Box>....</Box>
+          <ActionIcon
+            variant="transparent"
+            c="red"
+            onClick={() => {
+              table.options.meta?.cancelEditing();
+            }}
+          >
+            <IconX />
+          </ActionIcon>
         </Group>
       )}
     </>
@@ -489,16 +542,17 @@ export const IamageCell = ({
 };
 export const IamgeCellEdit = ({
   data,
-  row, rowIndex, table,
+  row,
+  rowIndex,
+  table,
   // images,
   // setImages,
   // pictures,
   // main_pic,
   // setMain_pic,
 }) => {
-  
   const { t } = useTranslation("common", { keyPrefix: "table" });
-  const [changed,setChanged]=useState(false)
+  const [changed, setChanged] = useState(false);
   const bodyRef = useRef<any>(null);
   const [pictures, setPictures] = useState([]);
   const [main_pic, setMain_pic] = useState("");
@@ -525,7 +579,7 @@ export const IamgeCellEdit = ({
     table.options.meta?.onEdit(val);
   };
   useEffect(() => {
-    if (data ) {
+    if (data) {
       console.log(data[rowIndex]["pictures"], "pictures");
       setMain_pic(data[rowIndex]["main_pic"]);
       if (data[rowIndex]["pictures"] && data[rowIndex]["pictures"] != "")
@@ -571,11 +625,179 @@ export const IamgeCellEdit = ({
         pictures={pictures}
         main_pic={main_pic}
         setMain_pic={setMain_pic}
-        onChange={()=>{
-          setChanged(true)
+        onChange={() => {
+          setChanged(true);
         }}
       />
     </Box>
+  );
+};
+export const QuantityCell = ({
+  getValue,
+  row: { index },
+  column: { id },
+  table,
+}) => {
+  const inputRef = useRef<any>(null);
+  const contnrRef = useRef<any>(null);
+  const uomRef = useRef<any>(null);
+  const { classes: classesG } = useGlobalStyl();
+  const editingCell = table.options.meta?.editingCell;
+  const onEdit =
+    editingCell && editingCell[0] === index && editingCell[2] === id;
+  const initialValue = getValue();
+  const [beforEditingValue, setBeforEditingValue] = useState(initialValue);
+  const [value, setValue] = useState(
+    G.parseNumberAndString(initialValue).number
+  );
+  const [uom, setUom] = useState(G.parseNumberAndString(initialValue).text);
+
+  const HandleOnEdit = (val) => {
+    table.options.meta?.onEdit(val);
+  };
+  useEffect(() => {
+    if (onEdit && inputRef.current && inputRef.current.focus) {
+      inputRef.current.focus();
+      resizeInput();
+      setBeforEditingValue(value + uom);
+      if (editingCell[3] == "Backspace") {
+        // setValue("");
+      }
+    }
+  }, [onEdit]);
+  const onSave = (quom) => {
+    HandleOnEdit(false);
+    let val = value.replace(thousandSep(), "").replace(decimalSep(), ".");
+    table.options.meta?.updateData(index, id, val + quom, beforEditingValue);
+  };
+  const onCancel = () => {
+    updateMixedValues(beforEditingValue);
+    table.options.meta?.cancelEditing();
+  };
+  useEffect(() => {
+    updateMixedValues(initialValue);
+  }, [initialValue]);
+  const updateMixedValues = (iput) => {
+    let vl = G.parseNumberAndString(iput);
+    setValue(vl.number);
+    setUom(vl.text);
+  };
+  const resizeInput = () => {
+    if (contnrRef.current && inputRef.current) {
+      inputRef.current.style.width = "auto";
+      inputRef.current.style.width = `${inputRef.current.scrollWidth}px`;
+
+      contnrRef.current.style.width = "auto";
+      contnrRef.current.style.width = `${inputRef.current.scrollWidth + 155}px`;
+    }
+  };
+  useEffect(() => {
+    resizeInput();
+  }, [value]);
+
+  return (
+    <>
+      {!onEdit && (
+        <Box
+          bg="transparent"
+          pl="2px"
+          pr="2px"
+          style={{
+            display: "block",
+            alignItems: "center",
+            fontFamily: "inherit",
+            fontSize: "inherit",
+            fontWeight: "inherit",
+            pointerEvents: "none",
+          }}
+        >
+          <NumericFormat
+            decimalScale={0}
+            readOnly={true}
+            displayType="text"
+            value={value}
+            thousandSeparator={thousandSep()}
+            decimalSeparator={decimalSep()}
+          />
+          {uom}
+        </Box>
+      )}
+      {onEdit && (
+        <Group
+          gap={2}
+          style={{
+            fontFamily: "inherit",
+            fontSize: "inherit",
+            fontWeight: "inherit",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            border: "1px solid red;",
+            position: "absolute",
+            top: -2,
+            left: -2,
+            // bottom: 0,
+            width: "auto",
+            minWidth: "200px",
+            zIndex: 400000000000000,
+          }}
+          className={classesG.editingExcelCell}
+          ref={contnrRef}
+          justify="space-between"
+          pl="2px"
+          pr="2px"
+        >
+          <NumericFormatRef
+            ref={inputRef}
+            customInput={TextInput}
+            classNames={{
+              input: classesG.width75,
+            }}
+            style={{ width: 75 }}
+            variant="unstyled"
+            //
+            thousandSeparator={thousandSep()}
+            decimalSeparator={decimalSep()}
+            onKeyDown={(event) => {
+              if (event.key == "Enter") {
+                if (uomRef.current) uomRef.current.focus();
+                //onSave();
+              }
+              if (event.key == "Escape") {
+                onCancel();
+              }
+            }}
+            value={value as string}
+            onChange={(e) => setValue(e.target.value)}
+          />
+          <Group justify="flex-end" w={135}>
+            <Group gap={"2px"} w={"100%"} justify="flex-end">
+              <UomsDropped
+                defaultValue={uom}
+                ref={uomRef}
+                onSubmit={(val) => {
+                  setUom(val);
+                  onSave(val);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key == "Escape") {
+                    onCancel();
+                  }
+                }}
+              />
+
+              <ActionIcon c="red" variant="light" onClick={onCancel}>
+                <IconX stroke={1.5} size="1.2rem" />
+              </ActionIcon>
+              <ActionIcon variant="filled" onClick={()=>{
+                onSave(uom)
+              }}>
+                <IconCheck stroke={1.5} size="1.2rem" />
+              </ActionIcon>
+            </Group>
+          </Group>
+        </Group>
+      )}
+    </>
   );
 };
 export const PriceCell = ({
@@ -611,9 +833,10 @@ export const PriceCell = ({
       }
     }
   }, [onEdit]);
-  const onSave = () => {
+  const onSave = (pcurr) => {
     HandleOnEdit(false);
-    table.options.meta?.updateData(index, id, value + curr, beforEditingValue);
+    let val = value?.replace(thousandSep(), "").replace(decimalSep(), ".");
+    table.options.meta?.updateData(index, id, val + pcurr, beforEditingValue);
   };
   const onCancel = () => {
     updateMixedValues(beforEditingValue);
@@ -681,13 +904,16 @@ export const PriceCell = ({
           ref={contnrRef}
           justify="space-between"
         >
-          <TextInput
+          <NumericFormatRef
+            ref={inputRef}
+            customInput={TextInput}
             classNames={{
               input: classesG.width75,
             }}
             style={{ width: 75 }}
             variant="unstyled"
-            ref={inputRef}
+            thousandSeparator={thousandSep()}
+            decimalSeparator={decimalSep()}
             onKeyDown={(event) => {
               if (event.key == "Enter") {
                 if (currRef.current) currRef.current.focus();
@@ -711,7 +937,7 @@ export const PriceCell = ({
                 ref={currRef}
                 onSubmit={(val) => {
                   setCurr(val);
-                  onSave();
+                  onSave(val);
                 }}
                 onKeyDown={(event) => {
                   if (event.key == "Escape") {
@@ -723,7 +949,9 @@ export const PriceCell = ({
               <ActionIcon c="red" variant="light" onClick={onCancel}>
                 <IconX stroke={1.5} size="1.2rem" />
               </ActionIcon>
-              <ActionIcon variant="filled" onClick={onSave}>
+              <ActionIcon variant="filled" onClick={()=>{
+                onSave(curr)
+              }}>
                 <IconCheck stroke={1.5} size="1.2rem" />
               </ActionIcon>
             </Group>
@@ -735,7 +963,7 @@ export const PriceCell = ({
 };
 export const EditDescription = ({ row, rowIndex, table }) => {
   const { t } = useTranslation("common", { keyPrefix: "table" });
-  const initialValue = row.original.description;
+  const initialValue = row.original.body;
   // const [value, setValue] = useState(initialValue);
   const HandleOnEdit = (val) => {
     table.options.meta?.onEdit(val);
@@ -746,7 +974,7 @@ export const EditDescription = ({ row, rowIndex, table }) => {
     let body = bodyRef?.current?.editorObject?.currentContent;
     table.options.meta?.updateData(
       rowIndex,
-      "description",
+      "body",
       body,
       row.original.description
     );

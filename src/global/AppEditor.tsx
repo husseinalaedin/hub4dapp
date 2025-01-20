@@ -942,8 +942,7 @@ const EditorAppPost = forwardRef(({ edit, content }: any, ref): any => {
   });
   let editor = editorObject?.editor;
   const { classes: classesG } = useGlobalStyl();
-  const { t } = useTranslation("common", { keyPrefix: "tool" });
-  const { enableTableBubbleMenu, setEnableTableBubbleMenu } = editorObject;
+  const { t } = useTranslation("common", { keyPrefix: "tool" }); 
   useEffect(() => {
     if (editor) {
       // setInitiated(true)

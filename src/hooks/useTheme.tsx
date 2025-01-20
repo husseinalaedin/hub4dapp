@@ -267,7 +267,7 @@ export const AppGlobalStylProvider = ({ children }: any) => {
             ? darken(theme.colors.green[9], 0.9)
             : lighten(theme.colors.green[1], 0.9)
         }  !important`,
-        border: `2px solid ${
+        border: `1px solid ${
           colorScheme === "dark" ? theme.colors.teal[5] : theme.colors.indigo[9]
         }  !important`,
       },
@@ -290,6 +290,9 @@ export const AppGlobalStylProvider = ({ children }: any) => {
         right: "0",
         bottom: "0",
         zIndex: 100000000000000,
+        backgroundColor: `${
+          colorScheme === "dark" ? theme.colors.dark[7] : "white"
+        }  !important`,
       },
       excelHeaderToolFullScreen: {
         position: "fixed",
@@ -298,6 +301,9 @@ export const AppGlobalStylProvider = ({ children }: any) => {
         right: "0",
         height: "40px",
         zIndex: 100000000000001,
+        backgroundColor: `${
+          colorScheme === "dark" ? theme.colors.dark[7] : "white"
+        }  !important`,
       },
       excelTableContainerFullScreen: {
         position: "fixed",

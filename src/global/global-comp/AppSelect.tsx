@@ -33,6 +33,7 @@ interface AppSelectProps
   description?: React.ReactNode;
   required?: boolean;
   forceClick?: string;
+  onSubmit?: any;
 }
 export function AppSelect({
   value,
@@ -58,6 +59,7 @@ export function AppSelect({
   description,
   required,
   forceClick,
+  onSubmit,
   ...others
 }: AppSelectProps) {
   const { classes: classesG } = useGlobalStyl();
@@ -153,7 +155,9 @@ export function AppSelect({
       onOptionSubmit={(val: any) => {
         if (readOnly) return;
         setValue(val);
+
         if (onChange) onChange(val);
+        if (onSubmit) onSubmit(val);
         combobox.closeDropdown();
       }}
       readOnly={readOnly}

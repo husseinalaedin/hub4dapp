@@ -395,27 +395,19 @@ export const SplitHashtags = (hashtags) => {
   if (trm === "") return [];
   return [trm];
 };
-export const HashtagsAlert = () => {
-  // const [opened, { close, open }] = useDisclosure(false);
+export const HashtagsAlert = () => { 
   const { t } = useTranslation("common", { keyPrefix: "table" });
   return (
     <Popover
       width={400}
       position="bottom"
       withArrow
-      shadow="md"
-      // opened={opened}
+      shadow="md" 
     >
       <Popover.Target>
-        <ActionIcon
-          // onTouchStart={() => {
-          //   if (opened) close();
-          //   else open();
-          // }}
+        <ActionIcon 
           c="orange"
-          variant="transparent"
-          // onMouseEnter={open}
-          // onMouseLeave={close}
+          variant="transparent" 
         >
           <IconQuestionMark stroke={1.5} size="1.2rem" />
         </ActionIcon>
@@ -423,9 +415,7 @@ export const HashtagsAlert = () => {
       <Popover.Dropdown p="0px">
         <Alert
           variant="light"
-          color="blue"
-          // title="Alert title"
-          // icon={<IconInfoCircle />}
+          color="blue" 
         >
           <Text size="md">
             {t(
