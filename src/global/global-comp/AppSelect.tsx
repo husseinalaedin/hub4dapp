@@ -34,6 +34,8 @@ interface AppSelectProps
   required?: boolean;
   forceClick?: string;
   onSubmit?: any;
+  onEmptyEnter?: any;
+  onEscape?:any
 }
 export function AppSelect({
   value,
@@ -60,6 +62,8 @@ export function AppSelect({
   required,
   forceClick,
   onSubmit,
+  onEmptyEnter,
+  onEscape,
   ...others
 }: AppSelectProps) {
   const { classes: classesG } = useGlobalStyl();
@@ -99,6 +103,7 @@ export function AppSelect({
     onChange,
   });
   const [search, setSearch] = useState<string>("");
+  const [changed,setChanged]=useState(false)
   useEffect(() => {
     SetSearchDrop(_value);
   }, [_value, data]);
@@ -162,6 +167,7 @@ export function AppSelect({
       }}
       readOnly={readOnly}
       offset={2}
+      zIndex={1000000000000000}
     >
       <Combobox.Target>
         <InputBase
@@ -215,13 +221,23 @@ export function AppSelect({
             combobox.openDropdown();
             combobox.updateSelectedOptionIndex();
             setSearch(event.currentTarget.value);
+            setChanged(true)
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !changed) {
+              if (onEmptyEnter) onEmptyEnter();
+            }
+            if (event.key === "Escape") {
+              event.preventDefault();
+              onEscape(event);
+            }
           }}
           {...others}
           error={error}
         />
       </Combobox.Target>
-      <Combobox.Dropdown>
-        <Combobox.Options>
+      <Combobox.Dropdown >
+        <Combobox.Options >
           <ScrollArea.Autosize
             mah={
               maxDropdownHeight &&

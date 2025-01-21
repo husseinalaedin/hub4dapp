@@ -6,9 +6,11 @@ import { useEffect, useState } from "react";
 import {
   change_curr,
   change_privacy,
+  change_uom,
   change_wtsb,
   selectCurr,
   selectPrivacy,
+  selectUom,
   selectWtsb,
 } from "../store/features/DbData";
 import { useAxiosGet } from "../hooks/Https";
@@ -28,7 +30,7 @@ export const useDbData = () => {
   const privacy_db = useSelector(selectPrivacy);
   const [privacy, setPrivacy] = useState<any>([]);
 
-  const uom_db = useSelector(selectPrivacy);
+  const uom_db = useSelector(selectUom);
   const [uom, setUom] = useState<any>([]);
 
   const {
@@ -103,7 +105,7 @@ useEffect(() => {
   if (errorMessageUoms) error("Uoms:" + errorMessageUoms);
   if (succeededUoms) {
     dispatch(
-      change_privacy({
+      change_uom({
         lang: language,
         values: dataUoms,
       })
@@ -142,7 +144,7 @@ useEffect(() => {
       executeGetPrivacies();
     else fillPrivacy(privacy_db.values);
   };
-  const checkUom = () => {
+  const checkUom = () => { 
     if (!islogged) return;
     if (
       !(uom_db && uom_db.values.length >= 1) ||

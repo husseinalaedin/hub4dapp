@@ -307,8 +307,9 @@ export function Wtsb4BoardSearch({
 
 export const HashTagsInput = forwardRef<any, any>(
   ({ readOnly, ...others }, ref) => {
+    let {initSearchValue}:any = { ...others };
     const { error, succeed, info } = useMessage();
-    const [searchValue, onSearchChange] = useState("");
+    const [searchValue, onSearchChange] = useState(initSearchValue);
     //   const [value, setValue] = useState<any>(defaultValue);
     const {
       data: hashGet,
@@ -326,7 +327,7 @@ export const HashTagsInput = forwardRef<any, any>(
       if (succeededHashGet && hashGet) {
         setHashData(() => {
           if (hashGet) {
-            let value: any = { others };
+            let {value}: any = { others };
             let hashtags = value;
             if (hashtags && hashtags.length > 0) {
               hashtags.map((item) => {

@@ -5,6 +5,7 @@ import {
 } from "../../../global/global-comp/Spreadsheet/Table";
 import {
   ActionMenuCell,
+  ChangeFlagCell,
   DefaultCell,
   EditDescription,
   HashTagCell,
@@ -48,6 +49,11 @@ export const DealsSpreadSheet = ({
       accessorKey: "action",
       header: "#",
       cell: ActionMenuCell,
+    },
+    {
+      accessorKey: "changed",
+      header: "c",
+      cell: ChangeFlagCell,
     },
     {
       accessorKey: "main_pic",
@@ -126,16 +132,24 @@ export const DealsSpreadSheet = ({
   } = useAxiosPut(BUILD_API("deals/company/mass"), dataToPut);
   useEffect(() => {
     let errorMsg = errorMessagePut;
-
+    if (tableRef && tableRef.current && tableRef.current.gotSaved)
+      if (errorMsg) tableRef.current.gotSaved(true, errorMsg);
     if (succeededPut) {
+      console.log(dataPut, "dataPut");
       let succeededMsg = dataPut?.message;
+      let ids = dataPut?.info?.ids;
+      ids = ids ? ids : [];
+      if (tableRef && tableRef.current && tableRef.current.gotSaved) {
+        tableRef.current.gotSaved(false, succeededMsg, ids);
+      }
+
       succeed(succeededMsg);
     }
 
     if (errorMsg) error(errorMsg);
   }, [errorMessagePut, succeededPut]);
   const formulate_object = (i) => {
-    console.log(data[i],'new');
+    console.log(data[i], "new");
     let quantity = G.parseNumberAndString(data[i].quantity_n_uom);
     let price = G.parseNumberAndString(data[i].price_n_curr);
     let pics =
@@ -154,6 +168,7 @@ export const DealsSpreadSheet = ({
       curr: getCurrFromSymbol(price.text),
       hashtags: data[i].hashtags,
       body: data[i].body,
+      ref: data[i].id == "new" ? data[i].ref : "",
     };
   };
   const onSave = () => {
@@ -201,8 +216,13 @@ export const DealsSpreadSheet = ({
           );
         }}
         fixedCols={(colidx) => {
-          if (colidx == 1) return 40;
+          if (colidx == 1) return 20;
+          if (colidx == 2) return 40;
           return null;
+        }}
+        colIs4Data={(colidx) => {
+          if (colidx > 1) return true;
+          return false;
         }}
         onCopyCell={(place, colidx, colid, defaultval, obj) => {
           let text = defaultval;

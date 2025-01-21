@@ -700,10 +700,11 @@ export const useEditorApp = ({ content, isFor, ...others }) => {
   };
 };
 
-export const EditorApp = forwardRef(({ edit, content }: any, ref): any => {
+export const EditorApp = forwardRef(({ edit, content,...others }: any, ref): any => {
   // const [history, setHistory] = useState<any>([]);
   const [showEditor, setShowEditor] = useState(false);
   let editorObject = useEditorApp({ content: content, isFor: EditorFor.ANY });
+  let {onEscape}=others
   let editor = editorObject?.editor;
   const { classes: classesG } = useGlobalStyl();
   const { t } = useTranslation("common", { keyPrefix: "tool" });
@@ -727,7 +728,19 @@ export const EditorApp = forwardRef(({ edit, content }: any, ref): any => {
       }, 50);
       return () => clearTimeout(timer);
     }
+    
   }, [edit]);
+  useEffect(() => {
+    try {
+      if (editor) editor?.commands.focus();
+    } catch (error) {}
+  }, [editor]);
+   const handleKeyDown = (event) => {
+    if (event.key === 'Escape') {
+      if(onEscape)
+        onEscape()
+    }
+  };
   return (
     <>
       {editorObject && (
@@ -889,6 +902,7 @@ export const EditorApp = forwardRef(({ edit, content }: any, ref): any => {
                 style={{ overflow: "auto" }}
               >
                 <RichTextEditor.Content
+                  onKeyDown={handleKeyDown}
                   mt={0}
                   mih={
                     !editorObject.fullscreen

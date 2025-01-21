@@ -46,6 +46,7 @@ interface AppMultiSelectProps
   rightSection?: any;
   ref?: any;
   charsNotAllowed?: string[];
+  onEmptyEnter?:any;
 }
 export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
   (
@@ -80,6 +81,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       onEscape,
       rightSection,
       charsNotAllowed,
+      onEmptyEnter,
       ...others
     }: AppMultiSelectProps,
     ref // Receive the ref as the second argument
@@ -141,7 +143,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       });
     };
     const handleValueByEnter = async () => {
-      console.log("enter123");
+       
       if (!searchValue || searchValue == "") return;
       let item: any = current_object(searchValue);
       if (!(!item || !item.value)) {
@@ -206,7 +208,10 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
         </Combobox.Option>
       ));
 
-    const values = _value?.map((val) => (
+    const values = _value?.map((val) => {
+      if(!val || val=='')
+        return <></>
+      return(
       <Pill
         key={val}
         withRemoveButton={!readOnly}
@@ -214,7 +219,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       >
         {_renderSelectedValue(val)}
       </Pill>
-    ));
+    )});
     const getAllowedValue = (val) => {
       if (charsNotAllowed && charsNotAllowed.length > 0) {
         for (let i = 0; i < charsNotAllowed.length; i++) {
@@ -223,10 +228,11 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       }
       return val;
     };
-    useEffect(() => {
-      if (enterClicked == "" || searchValue=='') return;
+    useEffect(() => { 
+      if (enterClicked == "" || !searchValue || searchValue?.trim()=='') return;
        handleValueByEnter();
     }, [enterClicked]);
+     
     return (
       <Combobox
         store={combobox}
@@ -234,6 +240,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
         onOptionSubmit={handleValueSelect}
         readOnly={readOnly}
         offset={2}
+        zIndex={1000000000000000}
       >
         <Combobox.DropdownTarget>
           <PillsInput
@@ -281,7 +288,6 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
                     setSearch(allowed_v);
                   }}
                   onKeyDown={(event) => {
-                    console.log(event.key, "ENTER");
                     if (readOnly) return;
                     let lnt =
                       _searchValue && _searchValue.length > 0
@@ -296,8 +302,13 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
                     if (event.key === "Enter" && lnt > 0) {
                       setEnterClicked(new Date().getTime().toString())
                       event.preventDefault();
-                     
                     }
+                    if (event.key === "Enter" && lnt == 0) {
+                      if (onEmptyEnter)
+                        onEmptyEnter() 
+                      event.preventDefault();
+                    }
+                    
                     if (event.key === "Escape") {
                       event.preventDefault();
                       onEscape(event);

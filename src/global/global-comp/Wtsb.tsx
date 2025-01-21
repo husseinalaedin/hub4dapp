@@ -3,7 +3,7 @@ import { renderWtsWtbDropVOption } from "../WtsWtbDropV";
 import { AppSelect } from "./AppSelect";
 import { useAxiosGet } from "../../hooks/Https";
 import { BUILD_API } from "../G";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDbData } from "../DbData";
 
 export const Wtsb = ({ ...others }) => {
@@ -21,6 +21,7 @@ export const Wtsb = ({ ...others }) => {
     privacy: dataPrivacies,
   } = useDbData();
   const { t } = useTranslation("common", { keyPrefix: "wtsb" });
+ 
 //   useEffect(() => {
 //     executeGetWTSB();
 //   }, []);

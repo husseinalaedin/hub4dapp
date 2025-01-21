@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import {
   IconCheck,
+  IconCircleFilled,
   IconDotsVertical,
   IconTrash,
   IconX,
@@ -123,6 +124,7 @@ export const HashTagCell = ({
       inputRef.current.focus();
       resizeInput();
     }
+    
   }, [onEdit]);
   const onSave = () => {
     HandleOnEdit(false);
@@ -203,7 +205,16 @@ export const HashTagCell = ({
         >
           <Box w="250px">
             <HashTagsInput
-              withinPortal={30000}
+              // zIndex={30000000}
+              initSearchValue={
+                onEdit &&
+                editingCell &&
+                editingCell[3].length == 1 &&
+                editingCell[3] != "Enter"
+                  ? editingCell[3]
+                  : ""
+              }
+              withinPortal={true}
               placeholder={t("enter_hashtags", "Please Enter#")}
               ref={inputRef}
               // h="100%"
@@ -211,7 +222,8 @@ export const HashTagCell = ({
               defaultValue={
                 Array.isArray(initialValue) ? initialValue : [initialValue]
               }
-              value={Array.isArray(value) ? value : [value]}
+              value={ Array.isArray(value) ? value : []}
+             
               onChange={setValue}
               onBlur={() => {
                 if (beforEditingValue === value) onCancel();
@@ -219,6 +231,7 @@ export const HashTagCell = ({
               }}
               readOnly={false}
               onEscape={onCancel}
+              onEmptyEnter={onSave}
             />
           </Box>
 
@@ -333,27 +346,36 @@ export const TypeCell = ({
             defaultValue={initialValue}
             value={value}
             onChange={setValue}
-            onSubmit={(val)=>{
+            onSubmit={(val) => {
               setValue(val);
-              onSave(val)
+              onSave(val);
             }}
             onBlur={() => {
               if (beforEditingValue === value) onCancel();
               // else onSave();
             }}
-            onKeyDown={(event) => {
-              // if (event.key == "Enter") onSave();
-              if (event.key == "Escape") {
-                setValue(beforEditingValue);
-                table.options.meta?.cancelEditing();
-              }
+            // onKeyDown={(event) => {
+            //   // if (event.key == "Enter") onSave();
+            //   if (event.key == "Escape") {
+            //     setValue(beforEditingValue);
+            //     table.options.meta?.cancelEditing();
+            //   }
+            // }}
+            onEscape={onCancel}
+            onEmptyEnter={() => {
+              onSave(value);
             }}
           />
           <Group gap={"3px"} justify="space-between" p="2px">
             <ActionIcon c="red" variant="light" onClick={onCancel}>
               <IconX stroke={1.5} size="1.2rem" />
             </ActionIcon>
-            <ActionIcon variant="filled" onClick={onSave}>
+            <ActionIcon
+              variant="filled"
+              onClick={() => {
+                onSave(value);
+              }}
+            >
               <IconCheck stroke={1.5} size="1.2rem" />
             </ActionIcon>
           </Group>
@@ -586,10 +608,23 @@ export const IamgeCellEdit = ({
         setPictures(data[rowIndex]["pictures"].split(" "));
     }
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        onCancel();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   const onSave = () => {
     HandleOnEdit(false);
     // let picts = pictures.;
-    table.options.meta?.updateValues(rowIndex, [
+    table.options.meta?.updateValues(rowIndex, "main_pic", [
       { columnId: "main_pic", value: main_pic },
       { columnId: "pictures", value: updatePicturesFromImages().join(" ") },
     ]);
@@ -647,9 +682,8 @@ export const QuantityCell = ({
     editingCell && editingCell[0] === index && editingCell[2] === id;
   const initialValue = getValue();
   const [beforEditingValue, setBeforEditingValue] = useState(initialValue);
-  const [value, setValue] = useState(
-    G.parseNumberAndString(initialValue).number
-  );
+
+  const [value, setValue] = useState(() => G.parseNumberAndString(initialValue).number);
   const [uom, setUom] = useState(G.parseNumberAndString(initialValue).text);
 
   const HandleOnEdit = (val) => {
@@ -660,6 +694,19 @@ export const QuantityCell = ({
       inputRef.current.focus();
       resizeInput();
       setBeforEditingValue(value + uom);
+      if (
+        onEdit &&
+        editingCell &&
+        editingCell[3] != "" &&
+        editingCell[3].length == 1 &&
+        editingCell[3] != "Enter"
+      ) {
+        if (G.isNumber(editingCell[3])) {
+          setValue(editingCell[3]);
+        } else {
+          setValue("");
+        }
+      }
       if (editingCell[3] == "Backspace") {
         // setValue("");
       }
@@ -788,9 +835,12 @@ export const QuantityCell = ({
               <ActionIcon c="red" variant="light" onClick={onCancel}>
                 <IconX stroke={1.5} size="1.2rem" />
               </ActionIcon>
-              <ActionIcon variant="filled" onClick={()=>{
-                onSave(uom)
-              }}>
+              <ActionIcon
+                variant="filled"
+                onClick={() => {
+                  onSave(uom);
+                }}
+              >
                 <IconCheck stroke={1.5} size="1.2rem" />
               </ActionIcon>
             </Group>
@@ -828,6 +878,19 @@ export const PriceCell = ({
       inputRef.current.focus();
       resizeInput();
       setBeforEditingValue(value + curr);
+      if (
+        onEdit &&
+        editingCell &&
+        editingCell[3] != "" &&
+        editingCell[3].length == 1 &&
+        editingCell[3] != "Enter"
+      ) {
+        if (G.isNumber(editingCell[3])) {
+          setValue(editingCell[3]);
+        } else {
+          setValue("");
+        }
+      }
       if (editingCell[3] == "Backspace") {
         // setValue("");
       }
@@ -949,9 +1012,12 @@ export const PriceCell = ({
               <ActionIcon c="red" variant="light" onClick={onCancel}>
                 <IconX stroke={1.5} size="1.2rem" />
               </ActionIcon>
-              <ActionIcon variant="filled" onClick={()=>{
-                onSave(curr)
-              }}>
+              <ActionIcon
+                variant="filled"
+                onClick={() => {
+                  onSave(curr);
+                }}
+              >
                 <IconCheck stroke={1.5} size="1.2rem" />
               </ActionIcon>
             </Group>
@@ -1003,11 +1069,31 @@ export const EditDescription = ({ row, rowIndex, table }) => {
           {t("confirm", "Confirm")}
         </Button>
       </Group>
-      <MemoEditorApp ref={bodyRef} content={initialValue} edit={true} />
+      <MemoEditorApp
+        ref={bodyRef}
+        content={initialValue}
+        edit={true}
+        onEscape={onCancel}
+      />
     </Box>
   );
 };
+export const ChangeFlagCell = ({
+  getValue,
+  row: { index },
+  column: { id },
+  table,
+}) => {
+  const rowEdited = table.options.meta?.rowEdited(index);
 
+  return (
+    <>
+      <Center c={rowEdited ? "red" : "blue"}>
+        <IconCircleFilled size={"1rem"} />
+      </Center>
+    </>
+  );
+};
 export const DefaultCell = ({
   getValue,
   row: { index },
@@ -1030,6 +1116,15 @@ export const DefaultCell = ({
       inputRef.current.focus();
       resizeInput();
       setBeforEditingValue(value);
+      if (
+        onEdit &&
+        editingCell &&
+        editingCell[3] != "" &&
+        editingCell[3].length == 1 &&
+        editingCell[3] != "Enter"
+      ) {
+        setValue(editingCell[3]);
+      }
       if (editingCell[3] == "Backspace") {
         setValue("");
       }

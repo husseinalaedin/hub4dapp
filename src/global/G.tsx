@@ -135,10 +135,11 @@ export class G {
     return prefix + short; // //tms.toString(32)
   }
   static parseNumberAndString(input) {
-    if(!input){
-      return{
-         number:'', text:'' 
-      }
+    if (!input) {
+      return {
+        number: "",
+        text: "",
+      };
     }
     const match = input.match(/^([\d,]+(\.\d+)?)(.*)$/);
     if (match) {
@@ -148,7 +149,11 @@ export class G {
     }
     return { number: "", text: input.trim() }; // Handle case when no number is found
   }
+  static isNumber(char) {
+    return !isNaN(char);
+  }
 }
+
 
 export const API_URL = "http://localhost:1000/"; // process.env.REACT_APP_API_URL
 export const APP_URL = "http://localhost:5173/"; //process.env.REACT_APP_URL

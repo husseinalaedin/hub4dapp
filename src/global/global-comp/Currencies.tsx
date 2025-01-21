@@ -9,12 +9,13 @@ export const UomsDropped = forwardRef<any, any>(
     const [value, setValue] = useState<string | null>(defaultValue);
     const [search, setSearch] = useState(defaultValue);
     const [submitOnEnter, setSubmitOnEnter] = useState("");
-    let { uom: dataUOM } = useDbData();
+    let { uom: dataUOM, checks } = useDbData();
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
     const combobox = useCombobox({
       onDropdownClose: () => combobox.resetSelectedOption(),
     });
-    useEffect(() => {
+    useEffect(() => { 
+      checks()
       combobox.openDropdown();
     }, []);
     useEffect(() => {
@@ -22,11 +23,11 @@ export const UomsDropped = forwardRef<any, any>(
       submit(search);
     }, [submitOnEnter]);
     const shouldFilterOptions = dataUOM && dataUOM.length > 0;
-    const valueFound = dataUOM.some((item) => item.uom === search.trim());
+    const valueFound = dataUOM.some((item) => item?.uom === search?.trim());
     
     const filteredOptions = shouldFilterOptions
       ? dataUOM.filter((item) =>
-          item.uom.toLowerCase().includes(search.toLowerCase().trim())
+          item?.uom?.toLowerCase()?.includes(search?.toLowerCase()?.trim())
         )
       : dataUOM;
     const options = filteredOptions.map((item) => (
@@ -96,12 +97,13 @@ export const CurrenciesDropped = forwardRef<any, any>(
     const [value, setValue] = useState<string | null>(defaultValue);
     const [search, setSearch] = useState(defaultValue);
     const [submitOnEnter, setSubmitOnEnter] = useState("");
-    let { curr: dataCURR } = useDbData();
+    let { curr: dataCURR, checks } = useDbData();
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
     const combobox = useCombobox({
       onDropdownClose: () => combobox.resetSelectedOption(),
     });
     useEffect(() => {
+      checks()
       combobox.openDropdown();
     }, []);
     useEffect(() => {

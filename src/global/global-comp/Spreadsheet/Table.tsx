@@ -73,7 +73,7 @@ declare module "@tanstack/react-table" {
       value: unknown,
       beforEditingValue: unknown
     ) => void;
-    updateValues: (rowIndex: number, values: any) => void;
+    updateValues: (rowIndex: number, columnId: string, values: any) => void;
     onEdit: (onEdit_: boolean) => void;
     editingCell: [number, number, string, string] | null;
     cellIsHighlighted: (rowIndex: number, columnIndex: number) => boolean;
@@ -82,6 +82,7 @@ declare module "@tanstack/react-table" {
     getRowCanExpand: (row: Row<TData>) => boolean;
     forceCloseTm: string;
     cellInEdit: (rowIndex: number, colIndex: number, id: string) => boolean;
+    rowEdited:(rowIndex: number)=>boolean
   }
 }
 
@@ -110,7 +111,8 @@ export const AppTable = forwardRef((props: any, ref) => {
     showSecondRow,
     fixedCols,
     onCopyCell,
-    onSave
+    onSave,
+    colIs4Data,
   } = props;
 
   const tableRef: any = useRef(null);
@@ -138,20 +140,32 @@ export const AppTable = forwardRef((props: any, ref) => {
   const [editingCell, setEditingCell] = useState<
     [number, number, string, string] | null
   >(null);
-  const [initData,setInitData]=useState(data)
-  const cancelChanges=()=>{
+  const [initData, setInitData] = useState(data);
+  const [saveMsg, setSaveMsg] = useState("");
+  const [isError, setIsError] = useState(false);
+  const cancelChanges = () => {
     setData(initData);
-    setHistory([])
-    setRedoStack([])
-    setDeletedIds([])
-    setEditedIds([])
-    setStartCell(null)
+    setHistory([]);
+    setRedoStack([]);
+    setDeletedIds([]);
+    setEditedIds([]);
+    setStartCell(null);
     setEndCell(null);
-    setOnEdit(false)
-    setEditingCell(null)
-  }
+    setOnEdit(false);
+    setEditingCell(null);
+  };
+  const afterGotSucceededSaved = () => {
+    setHistory([]);
+    setRedoStack([]);
+    setDeletedIds([]);
+    setEditedIds([]);
+    setStartCell(null);
+    setEndCell(null);
+    setOnEdit(false);
+    setEditingCell(null);
+  };
   const add = () => {
-    const newItem = { id:'new',ref:new Date().getTime().toString() };
+    const newItem = { id: "new", ref: new Date().getTime().toString() };
     setData([...data, newItem]); // Add the new item to the array immutably
   };
   const cellInEdit = (
@@ -174,7 +188,28 @@ export const AppTable = forwardRef((props: any, ref) => {
 
   useImperativeHandle(ref, () => ({
     getDeletedIds: () => deletedIds,
-    getEditedIds:()=>editedIds
+    getEditedIds: () => editedIds,
+    gotSaved: (error, msg,ids) => {
+      if (error) setIsError(true);
+
+      else {
+        const updatedData = data.map((item) => {
+          // Find a matching userData entry by ref
+          const match = ids.find((userItem) => userItem.ref === item.ref);
+          // Update the name if a match is found
+          return match ? { ...item, id: match.id,changed:false } : {...item,changed:false};
+        });
+
+        setData(updatedData);
+        afterGotSucceededSaved()
+
+      };
+      setSaveMsg(msg);
+      setTimeout(() => {
+        setIsError(false);
+        setSaveMsg("");
+      }, 5000);
+    },
   }));
 
   const handleMouseDown = (event, row, col) => {
@@ -529,7 +564,7 @@ export const AppTable = forwardRef((props: any, ref) => {
     };
   }, [history, redoStack, data]);
   const selectAll = () => {
-    setStartCell({ row: 0, col: 1 });
+    setStartCell({ row: 0, col: 2 });
     setEndCell({
       row: table.getRowCount() - 1,
       col: table.getAllColumns().length - 1,
@@ -562,24 +597,29 @@ export const AppTable = forwardRef((props: any, ref) => {
       document.removeEventListener("touchmove", touchMoveHandler);
     };
   }, [data, startCell, endCell, editingCell]);
-  const goToNext = (row, col) => {
-    return; //come back later to this
-    if (row < 0 || col < 0) return;
+  const goToNext = (row, col, colid) => {
+    // return; //come back later to this
+    if (row < 0 || (col < 0 && colid == "")) return;
+    if (col < 0 && colid != "") {
+      let colsmn = table.getAllColumns();
+      for (let i = 0; i < colsmn.length; i++) {
+        if (colsmn[i].id == colid) {
+          col = i;
+          break;
+        }
+      }
+    }
+    if (col < 0) return;
     let row_count = table.getRowCount();
     let col_count = table.getAllColumns().length;
     if (col + 1 > col_count) row_count = row_count + 1;
     else col = col + 1;
     if (row_count > row_count) return;
-    let all_cols = table.getAllColumns();
-    let id = all_cols[col].id;
 
     setStartCell({ row: row, col: col });
     setEndCell({ row: row, col: col });
-    setEditingCell([row, col, id, ""]);
   };
-  useEffect(()=>{
-console.log(data,'data changed')
-  },[data])
+ 
   const table = useReactTable({
     data,
     columns,
@@ -594,18 +634,20 @@ console.log(data,'data changed')
     meta: {
       updateData: (rowIndex, columnId, value, beforEditingValue) => {
         skipAutoResetPageIndex();
-        let row = -1;
-        let col = -1;
-        if (editingCell) {
-          row = editingCell[0];
-          col = editingCell[1];
-        }
+        // let row = -1;
+        // let col = -1;
+        // if (editingCell) {
+        //   row = editingCell[0];
+        //   col = editingCell[1];
+        // }
+        goToNext(rowIndex, -1, columnId);
         setEditingCell(null);
 
         if (value === beforEditingValue) return;
 
         saveToHistory();
         let id = data[rowIndex]["id"];
+        if (id == "new") id = data[rowIndex]["ref"];
         const editedIds_n = [...editedIds];
         editedIds_n.push(id);
         setEditedIds(editedIds_n);
@@ -615,18 +657,17 @@ console.log(data,'data changed')
               return {
                 ...old[rowIndex]!,
                 [columnId]: value,
+                ["changed"]: true,
               };
             }
             return row;
           })
         );
-        console.log(data, "data changed");
-        goToNext(row, col);
       },
 
-      updateValues: (rowIndex, values) => {
+      updateValues: (rowIndex, columnId, values) => {
+        goToNext(rowIndex, -1, columnId);
         if (!values || !values.length) return;
-        console.log("data before updated", data);
         skipAutoResetPageIndex();
         setEditingCell(null);
         saveToHistory();
@@ -678,6 +719,10 @@ console.log(data,'data changed')
       getRowCanExpand: (row) => true,
       forceCloseTm: forceCloseTm,
       cellInEdit: cellInEdit,
+      rowEdited: (rowIndex) => {
+        let changed = data[rowIndex]["changed"];
+        return !!changed;
+      },
     },
     state: {
       pagination,
@@ -869,13 +914,18 @@ console.log(data,'data changed')
               <Alert icon={<IconHelp />} color="blue" maw="500px">
                 <Text size="md">
                   {t(
-                    "double_click_to_edit_cell",
-                    "Double-click any cell to edit it, including those containing pictures."
+                    "help_excel",
+                    "Most Excel-like behaviors are supported. You can double-click, start typing, or press Enter on any cell to edit it—even if the cell contains pictures."
                   )}
                 </Text>
               </Alert>
             </Popover.Dropdown>
           </Popover>
+          {saveMsg !== "" && (
+            <Alert color={!isError ? "blue" : "red"} p="2px" pl="lg" pr="lg">
+              <Box>{saveMsg}</Box>
+            </Alert>
+          )}
         </Group>
 
         <Box
@@ -891,6 +941,7 @@ console.log(data,'data changed')
             {...{
               style: {
                 width: table.getCenterTotalSize(),
+                marginBottom: editingCell ? "150px" : "auto",
               },
               tabIndex: 0,
               onKeyDown: (event) => tableKeyDown(event),
@@ -1003,7 +1054,7 @@ console.log(data,'data changed')
                                 : "1.5px solid lightgray",
                             },
                             onDoubleClick: (event) => {
-                              if (cell.column.id == "action") {
+                              if (!colIs4Data(colIndex)) {
                                 return;
                               }
                               setEditingCell([
@@ -1015,25 +1066,25 @@ console.log(data,'data changed')
                             },
                             onMouseDown: (event) => {
                               setForceCloseTm(new Date().getTime().toString());
-                              if (cell.column.id == "action") {
+                              if (!colIs4Data(colIndex)) {
                                 return;
                               }
                               handleMouseDown(event, rowIndex, colIndex);
                             },
                             onMouseMove: (event) => {
-                              if (cell.column.id == "action") {
+                              if (!colIs4Data(colIndex)) {
                                 return;
                               }
                               handleMouseMove(event, rowIndex, colIndex);
                             },
                             onTouchStart: (event) => {
-                              if (cell.column.id == "action") {
+                              if (!colIs4Data(colIndex)) {
                                 return;
                               }
                               const now = Date.now();
                               if (now - lastTap <= doubleTapDelay) {
                                 //handleDoubleClick(); // Trigger double-tap action
-                                if (cell.column.id == "action") {
+                                if (!colIs4Data(colIndex)) {
                                   return;
                                 }
                                 setEditingCell([
@@ -1049,7 +1100,7 @@ console.log(data,'data changed')
                               // event.preventDefault();
                             },
                             onTouchMove: (event) => {
-                              if (cell.column.id == "action") {
+                              if (!colIs4Data(colIndex)) {
                                 return;
                               }
                               handleTouchMove(event);
@@ -1119,8 +1170,7 @@ export function getDivContentWithLineBreaks(divElement) {
   return text;
 }
 
-
-function ConfirmCancelChanges({ t, onConfirm,disabled }) {
+function ConfirmCancelChanges({ t, onConfirm, disabled }) {
   const [opened, { close, open }] = useDisclosure(false);
 
   return (
@@ -1157,8 +1207,6 @@ function ConfirmCancelChanges({ t, onConfirm,disabled }) {
         </Group>
       </Modal>
       <Group justify="center">
-       
-
         <ActionIcon
           // c="orange"
           color="red"
