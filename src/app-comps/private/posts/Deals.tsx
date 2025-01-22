@@ -27,6 +27,7 @@ import {
   Divider,
   Table,
   Tooltip,
+  Radio,
 } from "@mantine/core";
 
 import { useForm } from "@mantine/form";
@@ -126,7 +127,7 @@ import {
 } from "../../../global/global-comp/AppMultiSelect";
 import { ArrayToAppSelect } from "../../../global/Hashtags";
 import { DealsSpreadSheet } from "./DealsSpreadSheet";
- 
+
 export const SHARES_TYPE = {
   SHARE_BY_DEFAULT: "share_by_default",
   SHARE_BY_CHANNEL: "share_by_channel",
@@ -957,6 +958,7 @@ export const AddEditDeal0 = () => {
       uom: "",
       price: "",
       curr: "",
+      is_draft: "X",
     },
     validate: {
       wtsb: (value) =>
@@ -1178,17 +1180,12 @@ export const AddEditDeal0 = () => {
   }, [unsavedChanges]);
 
   const save = () => {
-    // form.setValues({wtsb:""});
-    // form.validate();
-    // e.preventDefault();
-    // if (bodyBeforeSave == '') {
-    //     return
-    // }
     let body = bodyRef?.current?.editorObject?.currentContent;
     form.setValues({
       body: body,
       main_pic: main_pic,
       pictures: updatePicturesFromImages(),
+      // is_draft
     });
 
     form.validate();
@@ -1210,6 +1207,9 @@ export const AddEditDeal0 = () => {
     ({ currentLocation, nextLocation }: any) =>
       !!form.isDirty() && currentLocation.pathname !== nextLocation.pathname
   );
+  const is_draft = () => {
+    return form.values.is_draft == "X";
+  };
   return (
     <>
       <AppHeader
@@ -1244,7 +1244,7 @@ export const AddEditDeal0 = () => {
         </Group>
       </AppHeader>
       <ConfirmUnsaved blocker={blocker} />
-      
+
       <Box
         className={classesG.editMax800}
         opacity={blocker.state === "blocked" ? 0.1 : 1}
@@ -1279,11 +1279,41 @@ export const AddEditDeal0 = () => {
             pictures={pictures}
             main_pic={main_pic}
             setMain_pic={setMain_pic}
-            onChange={()=>{
-              
-            }}
+            onChange={() => {}}
           />
           <Grid gutter={small ? 5 : medium ? 10 : 15}>
+            {
+              <Grid.Col span={{ base: 12 }}>
+                <Group justify="flex-start" gap="md" mt="md">
+                  <Radio
+                    disabled={id != "new"}
+                    style={{ cursor: "pointer" }}
+                    checked={is_draft()}
+                    onChange={() => {
+                      form.setValues({ is_draft: "X" });
+                    }}
+                    label={
+                      <Box style={{ cursor: "pointer" }}>
+                        {t("draft", "Draft")}
+                      </Box>
+                    }
+                  />
+                  <Radio
+                    disabled={id != "new"}
+                    style={{ cursor: "pointer" }}
+                    checked={!is_draft()}
+                    onChange={() => {
+                      form.setValues({ is_draft: "" });
+                    }}
+                    label={
+                      <Box style={{ cursor: "pointer" }}>
+                        {t("final", "Final")}
+                      </Box>
+                    }
+                  />
+                </Group>
+              </Grid.Col>
+            }
             <Grid.Col span={{ base: 12, md: 6 }}>
               <AppSelect
                 {...form.getInputProps("wtsb")}
@@ -1844,7 +1874,6 @@ export const DealSearch = (props) => {
 };
 
 export const NumericEntry = ({ initVal, form, formKey, ...others }) => {
- 
   return (
     <NumericFormat
       value={initVal}

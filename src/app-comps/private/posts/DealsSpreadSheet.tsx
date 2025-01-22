@@ -18,7 +18,7 @@ import {
   TypeCell,
 } from "../../../global/global-comp/Spreadsheet/TableCells";
 import { useEffect, useRef, useState } from "react";
-import { Box } from "@mantine/core";
+import { Box, LoadingOverlay } from "@mantine/core";
 import { MAX_NB_IMAGES } from "./ImagesZoneDeals";
 import {
   BUILD_API,
@@ -121,7 +121,8 @@ export const DealsSpreadSheet = ({
   };
   const { error, succeed, info } = useMessage();
   const [data, setData] = useState<any>(() => [...initData]);
-  const [dataToPut, setDataToPut] = useState();
+  const [dataToPut, setDataToPut] = useState([]);
+  const [dataToDelete, setDataToDelete] = useState([]);
   let { getCurrFromSymbol } = useDbData();
   let {
     data: dataPut,
@@ -129,7 +130,10 @@ export const DealsSpreadSheet = ({
     succeeded: succeededPut,
     errorMessage: errorMessagePut,
     executePut,
-  } = useAxiosPut(BUILD_API("deals/company/mass"), dataToPut);
+  } = useAxiosPut(BUILD_API("deals/company/mass"), {
+    changed: dataToPut,
+    deleted: dataToDelete,
+  });
   useEffect(() => {
     let errorMsg = errorMessagePut;
     if (tableRef && tableRef.current && tableRef.current.gotSaved)
@@ -169,34 +173,31 @@ export const DealsSpreadSheet = ({
       hashtags: data[i].hashtags,
       body: data[i].body,
       ref: data[i].id == "new" ? data[i].ref : "",
+      is_draft: data[i].is_draft,
     };
   };
   const onSave = () => {
-    if (!(tableRef && tableRef.current && tableRef.current.getEditedIds))
-      return;
-    let editedIds = tableRef.current.getEditedIds();
+    if (!(tableRef && tableRef.current)) return;
     let deletedIds = tableRef.current.getDeletedIds();
-
+    setDataToDelete(deletedIds);
     let edited_data: any = [];
     for (let i = 0; i < data.length; i++) {
-      if (data[i].id == "new") {
+      if (!!data[i].changed) {
         let datum = formulate_object(i);
         edited_data.push(datum);
-      } else if (editedIds) {
-        for (let j = 0; j < editedIds.length; j++)
-          if (editedIds[j] == data[i]["id"]) {
-            let datum = formulate_object(i);
-            edited_data.push(datum);
-          }
       }
     }
     setDataToPut(edited_data);
-    if (edited_data.length > 0) {
+    if (edited_data.length > 0 || deletedIds.length > 0) {
       executePut();
     }
   };
   return (
-    <Box mt="lg">
+    <Box mt="lg" pos="relative">
+      <LoadingOverlay
+        visible={isLoadingPut}
+        overlayProps={{ radius: "sm", blur: 2 }}
+      />
       <AppTable
         ref={tableRef}
         data={data}

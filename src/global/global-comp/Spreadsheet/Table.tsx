@@ -30,6 +30,7 @@ import {
   Button,
   Divider,
   Group,
+  Menu,
   Modal,
   Popover,
   Text,
@@ -44,6 +45,8 @@ import {
   IconBaselineDensityMedium,
   IconBaselineDensitySmall,
   IconCheck,
+  IconCircleDashedLetterD,
+  IconCircleLetterFFilled,
   IconCircleXFilled,
   IconCopy,
   IconCopyPlus,
@@ -82,7 +85,7 @@ declare module "@tanstack/react-table" {
     getRowCanExpand: (row: Row<TData>) => boolean;
     forceCloseTm: string;
     cellInEdit: (rowIndex: number, colIndex: number, id: string) => boolean;
-    rowEdited:(rowIndex: number)=>boolean
+    rowData: (rowIndex: number) => any;
   }
 }
 
@@ -132,7 +135,6 @@ export const AppTable = forwardRef((props: any, ref) => {
   const [history, setHistory] = useState<any>([]);
   const [redoStack, setRedoStack] = useState<any>([]);
   const [deletedIds, setDeletedIds] = useState<any>([]);
-  const [editedIds, setEditedIds] = useState<any>([]);
   const [startCell, setStartCell] = useState<any>(null); // Starting cell coordinates
   const [endCell, setEndCell] = useState<any>(null); // Ending cell coordinates
   const [onEdit, setOnEdit] = useState(false);
@@ -148,24 +150,38 @@ export const AppTable = forwardRef((props: any, ref) => {
     setHistory([]);
     setRedoStack([]);
     setDeletedIds([]);
-    setEditedIds([]);
     setStartCell(null);
     setEndCell(null);
     setOnEdit(false);
     setEditingCell(null);
+    const updatedData = data.map((item) => {
+      return { ...item, changed: false };
+    });
+
+    setData(updatedData);
   };
   const afterGotSucceededSaved = () => {
     setHistory([]);
     setRedoStack([]);
     setDeletedIds([]);
-    setEditedIds([]);
     setStartCell(null);
     setEndCell(null);
     setOnEdit(false);
     setEditingCell(null);
+
+    const updatedData = data.map((item) => {
+      return { ...item, changed: false };
+    });
+
+    setData(updatedData);
   };
-  const add = () => {
-    const newItem = { id: "new", ref: new Date().getTime().toString() };
+  const add = (is_draft) => {
+    const newItem = {
+      id: "new",
+      ref: new Date().getTime().toString(),
+      changed: true,
+      is_draft: is_draft,
+    };
     setData([...data, newItem]); // Add the new item to the array immutably
   };
   const cellInEdit = (
@@ -187,23 +203,43 @@ export const AppTable = forwardRef((props: any, ref) => {
   const [isShiftPressed, setIsShiftPressed] = useState(false);
 
   useImperativeHandle(ref, () => ({
-    getDeletedIds: () => deletedIds,
-    getEditedIds: () => editedIds,
-    gotSaved: (error, msg,ids) => {
+    getDeletedIds: () => {
+      let deleted_ids: any = [];
+      for (let i = 0; i < deletedIds.length; i++) {
+        let id_found = false;
+        for (let j = 0; j < data.length; j++)
+          if (deletedIds[i] == data[j]["id"]) {
+            id_found = true;
+            break;
+          }
+        if (!id_found) {
+          let id_found_d=false
+          for (let k = 0; k < deleted_ids.length; k++) {
+            if (deleted_ids[k] == deletedIds[i]) {
+              id_found_d=true
+              break
+            }
+          }
+          if (!id_found_d) deleted_ids.push(deletedIds[i]);
+        }
+      } 
+      return deleted_ids;
+    },
+    gotSaved: (error, msg, ids) => {
       if (error) setIsError(true);
-
       else {
         const updatedData = data.map((item) => {
           // Find a matching userData entry by ref
           const match = ids.find((userItem) => userItem.ref === item.ref);
           // Update the name if a match is found
-          return match ? { ...item, id: match.id,changed:false } : {...item,changed:false};
+          return match
+            ? { ...item, id: match.id, changed: false }
+            : { ...item, changed: false };
         });
 
         setData(updatedData);
-        afterGotSucceededSaved()
-
-      };
+        afterGotSucceededSaved();
+      }
       setSaveMsg(msg);
       setTimeout(() => {
         setIsError(false);
@@ -619,7 +655,7 @@ export const AppTable = forwardRef((props: any, ref) => {
     setStartCell({ row: row, col: col });
     setEndCell({ row: row, col: col });
   };
- 
+
   const table = useReactTable({
     data,
     columns,
@@ -648,9 +684,7 @@ export const AppTable = forwardRef((props: any, ref) => {
         saveToHistory();
         let id = data[rowIndex]["id"];
         if (id == "new") id = data[rowIndex]["ref"];
-        const editedIds_n = [...editedIds];
-        editedIds_n.push(id);
-        setEditedIds(editedIds_n);
+
         setData((old) =>
           old.map((row, index) => {
             if (index === rowIndex) {
@@ -672,9 +706,6 @@ export const AppTable = forwardRef((props: any, ref) => {
         setEditingCell(null);
         saveToHistory();
         let id = data[rowIndex]["id"];
-        const editedIds_n = [...editedIds];
-        editedIds_n.push(id);
-        setEditedIds(editedIds_n);
         setData((old) =>
           old.map((row, index) => {
             if (index === rowIndex) {
@@ -682,6 +713,7 @@ export const AppTable = forwardRef((props: any, ref) => {
                 (acc, { columnId, value }) => ({
                   ...acc,
                   [columnId]: value,
+                  ["changed"]: true,
                 }),
                 {}
               );
@@ -712,16 +744,17 @@ export const AppTable = forwardRef((props: any, ref) => {
 
         updatedItems.splice(rowIndex, 1); // Remove item at the index
         setData(updatedItems); // Update state with the modified array
-        const deletedIds_n = [...deletedIds];
-        deletedIds_n.push(id);
-        setDeletedIds(deletedIds_n);
+        if (id !== "new") {
+          const deletedIds_n = [...deletedIds];
+          deletedIds_n.push(id);
+          setDeletedIds(deletedIds_n);
+        }
       },
       getRowCanExpand: (row) => true,
       forceCloseTm: forceCloseTm,
       cellInEdit: cellInEdit,
-      rowEdited: (rowIndex) => {
-        let changed = data[rowIndex]["changed"];
-        return !!changed;
+      rowData: (rowIndex) => {
+        return data[rowIndex];
       },
     },
     state: {
@@ -780,6 +813,10 @@ export const AppTable = forwardRef((props: any, ref) => {
     let fxd = fixedCols(colidx);
     return fxd && fxd > 0 ? fxd : -1;
   };
+  const _dataEdited = () => {
+    for (let i = 0; i < data.length; i++) if (!!data[i]["changed"]) return true;
+    return false;
+  };
   return (
     <>
       <Box className={`${isFixed ? classesG.excelContainerFullScreen : ""}`}>
@@ -809,7 +846,7 @@ export const AppTable = forwardRef((props: any, ref) => {
             variant="filled"
             onClick={onSave}
             title={t("save", "Save")}
-            disabled={!(editedIds.length > 0 || deletedIds.length > 0)}
+            disabled={!(_dataEdited() || deletedIds.length > 0)}
           >
             <IconDeviceFloppy stroke={1.5} size="1rem" />
           </ActionIcon>
@@ -825,17 +862,17 @@ export const AppTable = forwardRef((props: any, ref) => {
           </ActionIcon> */}
           <ConfirmCancelChanges
             t={t}
-            disabled={!(editedIds.length > 0 || deletedIds.length > 0)}
+            disabled={!(_dataEdited() || deletedIds.length > 0)}
             onConfirm={cancelChanges}
           />
-          <ActionIcon
+          {/* <ActionIcon
             variant="outline"
             onClick={add}
             title={t("new", "New")}
-            // disabled={!(editedIds.length > 0 || deletedIds.length > 0)}
           >
             <IconPlus stroke={1.5} size="1rem" />
-          </ActionIcon>
+          </ActionIcon> */}
+          <Add t={t} add={add} />
           <Divider orientation="vertical" size="sm" ml="2px" mr="2px" />
           <ActionIcon
             variant="light"
@@ -910,11 +947,41 @@ export const AppTable = forwardRef((props: any, ref) => {
                 <IconQuestionMark stroke={1.5} size="1.2rem" />
               </ActionIcon>
             </Popover.Target>
-            <Popover.Dropdown p="0px">
-              <Alert icon={<IconHelp />} color="blue" maw="500px">
+            <Popover.Dropdown p="xs">
+              <Alert icon={<IconHelp />} color="violet" maw="500px">
                 <Text size="md">
                   {t(
-                    "help_excel",
+                    "help_excel_changes",
+                    "All changes are saved at once, so either all of them succeed or they all fail."
+                  )}
+                </Text>
+                <Text size="md">
+                  {t(
+                    "help_excel_changes_loss",
+                    "To avoid losing your work, save your data as often as you can."
+                  )}
+                </Text>
+              </Alert>
+              <Alert icon={<IconHelp />} color="green" maw="500px" mt="xs">
+                <Text size="md">
+                  {t(
+                    "help_excel_recommendation",
+                    "It is recommended to create a draft first and then renew it later from a different screen view."
+                  )}
+                </Text>
+              </Alert>
+              <Alert icon={<IconHelp />} color="red" maw="500px" mt="xs">
+                <Text size="md">
+                  {t(
+                    "help_excel_delete",
+                    "Delete or terminate: If the deal is in draft status, it will be completely removed from the system; otherwise, it will be terminated."
+                  )}
+                </Text>
+              </Alert>
+              <Alert icon={<IconHelp />} color="blue" maw="500px" mt="xs">
+                <Text size="md">
+                  {t(
+                    "help_excel_behaviors",
                     "Most Excel-like behaviors are supported. You can double-click, start typing, or press Enter on any cell to edit it—even if the cell contains pictures."
                   )}
                 </Text>
@@ -933,6 +1000,7 @@ export const AppTable = forwardRef((props: any, ref) => {
 
           className={`${isFixed ? classesG.excelTableContainerFullScreen : ""}`}
           style={{ overflow: "auto" }}
+          pb="50px"
           // mah={isFixed ? "auto" : maxHeight}
         >
           {/* <ScrollArea maw={"100%"} mx="auto" type="auto"> */}
@@ -1221,3 +1289,47 @@ function ConfirmCancelChanges({ t, onConfirm, disabled }) {
     </>
   );
 }
+const Add = ({ t, add }) => {
+  return (
+    <Menu
+      shadow="md"
+      width={200}
+      position="bottom-start"
+      withinPortal={true}
+      zIndex={100000000000005}
+    >
+      <Menu.Target>
+        <ActionIcon variant="outline" title={t("new", "New")}>
+          <IconPlus stroke={1.5} size="1rem" />
+        </ActionIcon>
+      </Menu.Target>
+
+      <Menu.Dropdown>
+        <Menu.Item
+          leftSection={
+            <Box c="orange">
+              <IconCircleDashedLetterD stroke={1.5} size="1rem" />
+            </Box>
+          }
+          onClick={() => {
+            add("X");
+          }}
+        >
+          {t("new_as_draft", "New draft")}
+        </Menu.Item>
+        <Menu.Item
+          leftSection={
+            <Box c="blue">
+              <IconCircleLetterFFilled stroke={1.5} size="1rem" />
+            </Box>
+          }
+          onClick={() => {
+            add("");
+          }}
+        >
+          {t("new_as_final_version", "New final")}
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
+  );
+};

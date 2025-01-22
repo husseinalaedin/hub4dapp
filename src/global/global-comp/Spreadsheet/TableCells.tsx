@@ -10,7 +10,9 @@ import {
 } from "@mantine/core";
 import {
   IconCheck,
+  IconCircleDashedLetterD,
   IconCircleFilled,
+  IconCircleLetterFFilled,
   IconDotsVertical,
   IconTrash,
   IconX,
@@ -449,7 +451,7 @@ export const ActionMenuCell = ({
               setOpened(false);
             }}
           >
-            {t("delete", "Delete Record")}
+            {t("delete_or_terminate", "Delete / Terminate Deal")}
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>
@@ -634,23 +636,23 @@ export const IamgeCellEdit = ({
   };
   return (
     <Box>
-      <Group gap={"2px"} justify="flex-end" p="2px">
+      <Group gap={"2px"} justify="flex-start" m="md">
         <Button
-          size="compact-lg"
+          size="compact-sm"
+          variant="filled"
+          onClick={onSave}
+          leftSection={<IconCheck stroke={1.5} size="1.2rem" />}
+        >
+          {t("confirm", "Confirm")}
+        </Button>
+        <Button
+          size="compact-sm"
           c="red"
           variant="light"
           onClick={onCancel}
           leftSection={<IconX stroke={1.5} size="1.2rem" />}
         >
           {t("cancel", "Cancel")}
-        </Button>
-        <Button
-          size="compact-lg"
-          variant="filled"
-          onClick={onSave}
-          leftSection={<IconCheck stroke={1.5} size="1.2rem" />}
-        >
-          {t("confirm", "Confirm")}
         </Button>
       </Group>
 
@@ -1050,23 +1052,23 @@ export const EditDescription = ({ row, rowIndex, table }) => {
   };
   return (
     <Box>
-      <Group gap={"2px"} justify="flex-end" p="2px">
+      <Group gap={"2px"} justify="flex-start" m="md">
         <Button
-          size="compact-lg"
+          size="compact-sm"
+          variant="filled"
+          onClick={onSave}
+          leftSection={<IconCheck stroke={1.5} size="1.2rem" />}
+        >
+          {t("confirm", "Confirm")}
+        </Button>
+        <Button
+          size="compact-sm"
           c="red"
           variant="light"
           onClick={onCancel}
           leftSection={<IconX stroke={1.5} size="1.2rem" />}
         >
           {t("cancel", "Cancel")}
-        </Button>
-        <Button
-          size="compact-lg"
-          variant="filled"
-          onClick={onSave}
-          leftSection={<IconCheck stroke={1.5} size="1.2rem" />}
-        >
-          {t("confirm", "Confirm")}
         </Button>
       </Group>
       <MemoEditorApp
@@ -1084,12 +1086,14 @@ export const ChangeFlagCell = ({
   column: { id },
   table,
 }) => {
-  const rowEdited = table.options.meta?.rowEdited(index);
-
+  const rowData = table.options.meta?.rowData(index);
+  const rowEdited = rowData && !!rowData["changed"];
+  const is_draft = rowData && rowData["is_draft"] == "X";
   return (
     <>
       <Center c={rowEdited ? "red" : "blue"}>
-        <IconCircleFilled size={"1rem"} />
+        {is_draft && <IconCircleDashedLetterD stroke={1.5} size="1rem" />}
+        {!is_draft && <IconCircleLetterFFilled size={"1rem"} />}
       </Center>
     </>
   );
