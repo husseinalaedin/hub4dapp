@@ -322,6 +322,7 @@ export const AppGlobalStylProvider = ({ children }: any) => {
       width75: {
         width: "75px !important",
       },
+      readioRoot: {},
       //     white-space: nowrap;
       // overflow: hidden;
       // text-overflow: ellipsis;

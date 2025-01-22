@@ -91,6 +91,7 @@ import { decimalSep, GridLayOut, thousandSep } from "../../../global/Misc";
 import { D } from "../../../global/Date";
 import { Pages } from "../../../hooks/usePage";
 import { SearchPannel } from "../../../global/SearchPannel";
+import appClasses from "../../../app.module.css";
 
 import {
   renderWtsWtbDropVOption,
@@ -1284,8 +1285,8 @@ export const AddEditDeal0 = () => {
           <Grid gutter={small ? 5 : medium ? 10 : 15}>
             {
               <Grid.Col span={{ base: 12 }}>
-                <Group justify="flex-start" gap="md" mt="md">
-                  <Radio
+                {/* <Group justify="flex-start" gap="md" mt="md"> */}
+                {/* <Radio
                     color="silver"
                     readOnly={id != "new"}
                     style={{ cursor: "pointer" }}
@@ -1299,8 +1300,60 @@ export const AddEditDeal0 = () => {
                         {t("draft", "Draft")}
                       </Box>
                     }
-                  />
-                  <Radio
+                  /> */}
+                <Radio.Group value={form.values.is_draft}>
+                  <Group justify="flex-start" gap="xs">
+                    <Radio.Card
+                      className={appClasses.RadioRoot}
+                      radius="md"
+                      value={"X"}
+                      key={"X"}
+                      maw={"45%"}
+                      onClick={() => {
+                        if (id != "new") return;
+                        form.setValues({ is_draft: "X" });
+                      }}
+                    >
+                      <Group wrap="nowrap" align="flex-start">
+                        <Radio.Indicator />
+                        <div>
+                          <Text className={classesG.RadioLabel}>
+                            {t("draft", "Draft")}
+                          </Text>
+                          <Text className={classesG.RadioDescription}>
+                            {t("draft", "Draft")}
+                          </Text>
+                        </div>
+                      </Group>
+                    </Radio.Card>
+
+                    <Radio.Card
+                      className={appClasses.RadioRoot}
+                      radius="md"
+                      value={""}
+                      key={"F"}
+                      maw={"45%"}
+                      onClick={() => {
+                        if (id != "new") return;
+                        form.setValues({ is_draft: "" });
+                      }}
+                    >
+                      <Group wrap="nowrap" align="flex-start">
+                        <Radio.Indicator />
+                        <div>
+                          <Text className={classesG.RadioLabel}>
+                            {t("final", "Final")}
+                          </Text>
+                          <Text className={classesG.RadioDescription}>
+                            {t("final", "Final")}
+                          </Text>
+                        </div>
+                      </Group>
+                    </Radio.Card>
+                  </Group>
+                </Radio.Group>
+
+                {/* <Radio
                     readOnly={id != "new"}
                     style={{ cursor: "pointer" }}
                     checked={!is_draft()}
@@ -1313,9 +1366,9 @@ export const AddEditDeal0 = () => {
                         {t("final", "Final")}
                       </Box>
                     }
-                  />
-                </Group>
-                {id != "new" && (
+                  /> */}
+                {/* </Group> */}
+                {/* {id != "new" && (
                   <Box fz="sm" opacity={0.5} c="red">
                     {t("read_only", "Read Only")}
                   </Box>
@@ -1327,7 +1380,7 @@ export const AddEditDeal0 = () => {
                       "To switch the deal from draft please renew"
                     )}
                   </Box>
-                )}
+                )} */}
               </Grid.Col>
             }
             <Grid.Col span={{ base: 12, md: 6 }}>
