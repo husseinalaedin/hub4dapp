@@ -1286,10 +1286,12 @@ export const AddEditDeal0 = () => {
               <Grid.Col span={{ base: 12 }}>
                 <Group justify="flex-start" gap="md" mt="md">
                   <Radio
-                    disabled={id != "new"}
+                    color="silver"
+                    readOnly={id != "new"}
                     style={{ cursor: "pointer" }}
                     checked={is_draft()}
                     onChange={() => {
+                      if (id != "new") return;
                       form.setValues({ is_draft: "X" });
                     }}
                     label={
@@ -1299,10 +1301,11 @@ export const AddEditDeal0 = () => {
                     }
                   />
                   <Radio
-                    disabled={id != "new"}
+                    readOnly={id != "new"}
                     style={{ cursor: "pointer" }}
                     checked={!is_draft()}
                     onChange={() => {
+                      if (id != "new") return;
                       form.setValues({ is_draft: "" });
                     }}
                     label={
@@ -1312,6 +1315,19 @@ export const AddEditDeal0 = () => {
                     }
                   />
                 </Group>
+                {id != "new" && (
+                  <Box fz="sm" opacity={0.5} c="red">
+                    {t("read_only", "Read Only")}
+                  </Box>
+                )}
+                {id != "new" && is_draft() && (
+                  <Box opacity={0.7}>
+                    {t(
+                      "to_switch_the_del",
+                      "To switch the deal from draft please renew"
+                    )}
+                  </Box>
+                )}
               </Grid.Col>
             }
             <Grid.Col span={{ base: 12, md: 6 }}>
