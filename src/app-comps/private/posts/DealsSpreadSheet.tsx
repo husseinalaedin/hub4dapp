@@ -28,6 +28,9 @@ import {
 } from "../../../global/G";
 import { useAxiosPut } from "../../../hooks/Https";
 import { useDbData } from "../../../global/DbData";
+import { useBlocker } from "react-router";
+import { ConfirmUnsaved } from "../../../global/PopUpDialogs";
+import { useGlobalStyl } from "../../../hooks/useTheme";
 type Deal = {
   main_pic: string;
   wtsb: string;
@@ -124,6 +127,7 @@ export const DealsSpreadSheet = ({
   const [dataToPut, setDataToPut] = useState([]);
   const [dataToDelete, setDataToDelete] = useState([]);
   let { getCurrFromSymbol } = useDbData();
+  const { classes: classesG } = useGlobalStyl();
   let {
     data: dataPut,
     isLoading: isLoadingPut,
@@ -139,7 +143,6 @@ export const DealsSpreadSheet = ({
     if (tableRef && tableRef.current && tableRef.current.gotSaved)
       if (errorMsg) tableRef.current.gotSaved(true, errorMsg);
     if (succeededPut) {
-      console.log(dataPut, "dataPut");
       let succeededMsg = dataPut?.message;
       let ids = dataPut?.info?.ids;
       ids = ids ? ids : [];
@@ -152,8 +155,7 @@ export const DealsSpreadSheet = ({
 
     if (errorMsg) error(errorMsg);
   }, [errorMessagePut, succeededPut]);
-  const formulate_object = (i) => {
-    console.log(data[i], "new");
+  const formulate_object = (i) => { 
     let quantity = G.parseNumberAndString(data[i].quantity_n_uom);
     let price = G.parseNumberAndString(data[i].price_n_curr);
     let pics =
@@ -192,61 +194,77 @@ export const DealsSpreadSheet = ({
       executePut();
     }
   };
+  let blocker = useBlocker(
+    ( ) =>
+      tableRef &&
+      tableRef.current &&
+      tableRef.current.dataEdited() 
+  );
   return (
     <Box mt="lg" pos="relative">
       <LoadingOverlay
         visible={isLoadingPut}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-      <AppTable
-        ref={tableRef}
-        data={data}
-        setData={setData}
-        columns={columns}
-        SecondRowRender={SecondRowRender}
-        defaultColumn={defaultColumn}
-        onSave={onSave}
-        showSecondRow={(row, editingCell, table) => {
-          return (
-            table &&
-            table.options &&
-            table.options.meta &&
-            row &&
-            (table.options.meta.cellInEdit(row.index, -1, "body") ||
-              table.options.meta.cellInEdit(row.index, -1, "main_pic"))
-          );
+      <Box>
+        <ConfirmUnsaved blocker={blocker} />
+      </Box>
+      <Box 
+        opacity={blocker.state === "blocked" ? 0.1 : 1}
+        style={{
+          pointerEvents: blocker.state === "blocked" ? "none" : "inherit",
         }}
-        fixedCols={(colidx) => {
-          if (colidx == 1) return 20;
-          if (colidx == 2) return 40;
-          return null;
-        }}
-        colIs4Data={(colidx) => {
-          if (colidx > 1) return true;
-          return false;
-        }}
-        onCopyCell={(place, colidx, colid, defaultval, obj) => {
-          let text = defaultval;
-          let html = defaultval;
-          if (place == "H" && colid == "hashtags") return "hashtags";
-          if (place == "D") {
-            if (colid == "main_pic" && obj && obj["main_pic"] != "") {
-              text = `${CLOUDFARE_IMAGE_URL1}${obj["main_pic"]}/public`;
-              html = text;
+      >
+        <AppTable
+          ref={tableRef}
+          data={data}
+          setData={setData}
+          columns={columns}
+          SecondRowRender={SecondRowRender}
+          defaultColumn={defaultColumn}
+          onSave={onSave}
+          showSecondRow={(row, editingCell, table) => {
+            return (
+              table &&
+              table.options &&
+              table.options.meta &&
+              row &&
+              (table.options.meta.cellInEdit(row.index, -1, "body") ||
+                table.options.meta.cellInEdit(row.index, -1, "main_pic"))
+            );
+          }}
+          fixedCols={(colidx) => {
+            if (colidx == 1) return 20;
+            if (colidx == 2) return 40;
+            return null;
+          }}
+          colIs4Data={(colidx) => {
+            if (colidx > 1) return true;
+            return false;
+          }}
+          onCopyCell={(place, colidx, colid, defaultval, obj) => {
+            let text = defaultval;
+            let html = defaultval;
+            if (place == "H" && colid == "hashtags") return "hashtags";
+            if (place == "D") {
+              if (colid == "main_pic" && obj && obj["main_pic"] != "") {
+                text = `${CLOUDFARE_IMAGE_URL1}${obj["main_pic"]}/public`;
+                html = text;
+              }
+              if (colid == "body" && obj && obj["body"] != "") {
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = defaultval;
+                text = getDivContentWithLineBreaks(tempDiv);
+                text = `"` + text + `"`;
+              }
             }
-            if (colid == "body" && obj && obj["body"] != "") {
-              const tempDiv = document.createElement("div");
-              tempDiv.innerHTML = defaultval;
-              text = getDivContentWithLineBreaks(tempDiv);
-              text = `"` + text + `"`;
-            }
-          }
-          return {
-            text: text,
-            html: html,
-          };
-        }}
-      />
+            return {
+              text: text,
+              html: html,
+            };
+          }}
+        />
+      </Box>
     </Box>
   );
 };

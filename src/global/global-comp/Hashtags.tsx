@@ -356,7 +356,7 @@ export const HashTagsInput = forwardRef<any, any>(
         readOnly={readOnly}
         {...others}
         required
-        withAsterisk
+        
         data={ArrayToAppSelect(hashData && hashData.length > 0 ? hashData : [])}
         // label="Hashtag#"
         // placeholder=HASHTAGS_SEP
@@ -396,32 +396,40 @@ export const SplitHashtags = (hashtags) => {
   if (trm === "") return [];
   return [trm];
 };
-export const HashtagsAlert = () => { 
+export const HashtagsAlert = ({ withinPortal }) => {
   const { t } = useTranslation("common", { keyPrefix: "table" });
   return (
     <Popover
       width={400}
       position="bottom"
       withArrow
-      shadow="md" 
+      shadow="md"
+      withinPortal={withinPortal}
+      zIndex={200000000000000000}
     >
       <Popover.Target>
-        <ActionIcon 
-          c="orange"
-          variant="transparent" 
-        >
+        <ActionIcon c="orange" variant="transparent">
           <IconQuestionMark stroke={1.5} size="1.2rem" />
         </ActionIcon>
       </Popover.Target>
-      <Popover.Dropdown p="0px">
-        <Alert
-          variant="light"
-          color="blue" 
-        >
-          <Text size="md">
+      <Popover.Dropdown p="xs">
+        <Alert variant="light" color="blue">
+          <Text size="md" mt="xs">
+            {t(
+              "hashtag_autocomplete",
+              `Please start typing to show the existing hashtags.`
+            )}
+          </Text>
+          <Text size="md" mt="xs">
             {t(
               "hashtag_restrictions",
-              `Hashtags cannot contain the # symbol or commas.`
+              `Hashtags cannot contain the # symbol or commas, but it can contains spaces.`
+            )}
+          </Text>
+          <Text size="md" mt="xs">
+            {t(
+              "hashtag_end",
+              `When you press Enter, it marks the end of the hashtag, and it will be treated as a single hashtag phrase.`
             )}
           </Text>
           <Text size="md" mt="xs">
@@ -430,6 +438,8 @@ export const HashtagsAlert = () => {
               `However, if you want to paste the hashtags, they must be separated either by the # symbol or by commas.`
             )}
           </Text>
+        </Alert>
+        <Alert variant="light" color="teal" mt="xs">
           <Text size="md" mt="xs">
             {t("hashtag_example", `e.g grade A,Grade B,iphone 15 promax,used`)}
           </Text>

@@ -57,6 +57,7 @@ import {
   IconMinimize,
   IconPlus,
   IconQuestionMark,
+  IconRestore,
   IconRotate360,
   IconSelectAll,
   IconX,
@@ -142,11 +143,22 @@ export const AppTable = forwardRef((props: any, ref) => {
   const [editingCell, setEditingCell] = useState<
     [number, number, string, string] | null
   >(null);
-  const [initData, setInitData] = useState(data);
+  const [initData, setInitData] = useState([]);
   const [saveMsg, setSaveMsg] = useState("");
   const [isError, setIsError] = useState(false);
+  const [afterSaved, setAfterSaved] = useState("");
+  const [isHandlingPaste, setIsHandlingPaste] = useState(false); 
+  useEffect(() => { 
+    console.log(data, "initData changed 0");
+    let initD = JSON.parse(JSON.stringify(data));
+    setInitData(initD); 
+  }, [afterSaved]);
+  useEffect(() => {
+    console.log(initData, "initData changed");
+  }, [initData]);
   const cancelChanges = () => {
-    setData(initData);
+    let initD = JSON.parse(JSON.stringify(initData));
+    setData(initD); 
     setHistory([]);
     setRedoStack([]);
     setDeletedIds([]);
@@ -154,13 +166,14 @@ export const AppTable = forwardRef((props: any, ref) => {
     setEndCell(null);
     setOnEdit(false);
     setEditingCell(null);
-    const updatedData = data.map((item) => {
-      return { ...item, changed: false };
-    });
+    // const updatedData = data.map((item) => {
+    //   return { ...item, changed: false };
+    // });
 
-    setData(updatedData);
+    // setData(updatedData);
   };
   const afterGotSucceededSaved = () => {
+    console.log(initData, "afterGotSucceededSaved");
     setHistory([]);
     setRedoStack([]);
     setDeletedIds([]);
@@ -168,14 +181,15 @@ export const AppTable = forwardRef((props: any, ref) => {
     setEndCell(null);
     setOnEdit(false);
     setEditingCell(null);
-
     const updatedData = data.map((item) => {
       return { ...item, changed: false };
     });
-
     setData(updatedData);
+    setAfterSaved(new Date().getTime().toString());
   };
+
   const add = (is_draft) => {
+    saveToHistory();
     const newItem = {
       id: "new",
       ref: new Date().getTime().toString(),
@@ -203,6 +217,9 @@ export const AppTable = forwardRef((props: any, ref) => {
   const [isShiftPressed, setIsShiftPressed] = useState(false);
 
   useImperativeHandle(ref, () => ({
+    dataEdited: () => {
+      return _dataEdited() || deletedIds.length > 0;
+    },
     getDeletedIds: () => {
       let deleted_ids: any = [];
       for (let i = 0; i < deletedIds.length; i++) {
@@ -213,16 +230,16 @@ export const AppTable = forwardRef((props: any, ref) => {
             break;
           }
         if (!id_found) {
-          let id_found_d=false
+          let id_found_d = false;
           for (let k = 0; k < deleted_ids.length; k++) {
             if (deleted_ids[k] == deletedIds[i]) {
-              id_found_d=true
-              break
+              id_found_d = true;
+              break;
             }
           }
           if (!id_found_d) deleted_ids.push(deletedIds[i]);
         }
-      } 
+      }
       return deleted_ids;
     },
     gotSaved: (error, msg, ids) => {
@@ -249,6 +266,7 @@ export const AppTable = forwardRef((props: any, ref) => {
   }));
 
   const handleMouseDown = (event, row, col) => {
+    handleRemoveText(tableRef);
     setForceCloseTm(new Date().getTime().toString());
     if (isShiftPressed) {
       setEndCell({ row, col });
@@ -261,13 +279,14 @@ export const AppTable = forwardRef((props: any, ref) => {
     }
   };
   const handleMouseMove = (event, row, col) => {
+    handleRemoveText(tableRef);
     if (startCell && event.buttons === 1) {
       setEndCell({ row, col });
     }
   };
   const handleTouchMove = (event) => {
     if (!startCell) return;
-
+    handleRemoveText(tableRef);
     const touch = event.touches[0]; // Get the first touch point
     const targetElement = document.elementFromPoint(
       touch.clientX,
@@ -425,8 +444,9 @@ export const AppTable = forwardRef((props: any, ref) => {
     setData(nextState);
   };
   const saveToHistory = () => {
+    let currentData = JSON.parse(JSON.stringify(data));
     setHistory((prevHistory) => {
-      const newHistory = [...prevHistory, JSON.parse(JSON.stringify(data))];
+      const newHistory = [...prevHistory, currentData];
       if (newHistory.length > MAX_HISTORY_SIZE) newHistory.shift(); // Limit history size
       return newHistory;
     });
@@ -509,29 +529,33 @@ export const AppTable = forwardRef((props: any, ref) => {
   };
   const handlePaste = (event: ClipboardEvent) => {
     if (editingCell) return;
-    event.preventDefault();
-    const clipboardText = event.clipboardData?.getData("text/plain");
-    if (!clipboardText) return;
-
-    const rows = clipboardText
-      .split("\n")
-      .filter((row) => row.trim() !== "") // Ignore empty rows
-      .map((row) => row.split("\t")); // Split by tabs
-
-    const topLeftCell = getTopLeftCell();
-    const bottomRightCell = getBottomRightCell();
-    let all_cols = table.getAllColumns();
-
-    if (!topLeftCell) return;
-    saveToHistory();
-    const newData = [...data];
-    const startRow0 = topLeftCell.row;
-    const startCol0 = topLeftCell.col;
-    const endRow0 = bottomRightCell.row;
-    const endCol0 = bottomRightCell.col;
-    const colCount = endCol0 - startCol0 + 1;
-    let startPastMass = 0;
+    if (isHandlingPaste) return;
     try {
+      setIsHandlingPaste(true);
+      event.preventDefault();
+      const clipboardText = event.clipboardData?.getData("text/plain");
+      if (!clipboardText) return;
+
+      const rows = clipboardText
+        .split("\n")
+        .filter((row) => row.trim() !== "") // Ignore empty rows
+        .map((row) => row.split("\t")); // Split by tabs
+
+      const topLeftCell = getTopLeftCell();
+      const bottomRightCell = getBottomRightCell();
+      let all_cols = table.getAllColumns();
+
+      if (!topLeftCell) return;
+      saveToHistory();
+
+      const newData = [...data];
+      const startRow0 = topLeftCell.row;
+      const startCol0 = topLeftCell.col;
+      const endRow0 = bottomRightCell.row;
+      const endCol0 = bottomRightCell.col;
+      const colCount = endCol0 - startCol0 + 1;
+      let startPastMass = 0;
+
       let startRow = startRow0;
       while (startRow === startRow0 || startRow + rows.length - 1 <= endRow0) {
         rows.forEach((rowData, rowIndex) => {
@@ -547,34 +571,23 @@ export const AppTable = forwardRef((props: any, ref) => {
                 all_cols.length > targetCol ? all_cols[targetCol].id : "";
 
               if (targetRow < newData.length && targetColId != "") {
+                newData[targetRow]["changed"] = true;
                 if (targetColId === "hashtags") {
                   let cellData_arr = SplitHashtags(cellData);
                   newData[targetRow][targetColId] = cellData_arr;
                 } else newData[targetRow][targetColId] = cellData;
               }
             });
-            // console.log(
-            //   "before",
-            //   startCol,
-            //   startCol + rowData.length - 1,
-            //   endCol0,
-            //   "count",
-            //   colCount
-            // );
             startCol = startCol + rowData.length;
-            // console.log(
-            //   "after",
-            //   startCol,
-            //   startCol + rowData.length - 1,
-            //   endCol0
-            // );
           }
         });
         startRow = startRow + rows.length;
       }
-
       setData(newData);
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setIsHandlingPaste(false);
+    }
   };
 
   useEffect(() => {
@@ -717,7 +730,6 @@ export const AppTable = forwardRef((props: any, ref) => {
                 }),
                 {}
               );
-              console.log("data during update", updates);
               return {
                 ...row,
                 ...updates,
@@ -726,7 +738,6 @@ export const AppTable = forwardRef((props: any, ref) => {
             return row;
           })
         );
-        console.log("data after updated", data);
       },
       onEdit: (onEdit_) => setOnEdit(onEdit_),
       editingCell: editingCell,
@@ -842,14 +853,20 @@ export const AppTable = forwardRef((props: any, ref) => {
             {desktopFocus && <IconMinimize stroke={1.5} size="1rem" />}
           </ActionIcon>
           <Divider orientation="vertical" size="sm" ml="2px" mr="2px" />
-          <ActionIcon
+          <CheckSave
+            t={t}
+            editingCell={editingCell}
+            onSave={onSave}
+            disabled={!(_dataEdited() || deletedIds.length > 0)}
+          />
+          {/* <ActionIcon
             variant="filled"
             onClick={onSave}
             title={t("save", "Save")}
             disabled={!(_dataEdited() || deletedIds.length > 0)}
           >
             <IconDeviceFloppy stroke={1.5} size="1rem" />
-          </ActionIcon>
+          </ActionIcon> */}
           {/* <ActionIcon
             
             color="red"
@@ -860,7 +877,7 @@ export const AppTable = forwardRef((props: any, ref) => {
           >
             <IconRotate360 stroke={1.5} size="1rem" />
           </ActionIcon> */}
-          <ConfirmCancelChanges
+          <ConfirmRestore
             t={t}
             disabled={!(_dataEdited() || deletedIds.length > 0)}
             onConfirm={cancelChanges}
@@ -1237,8 +1254,54 @@ export function getDivContentWithLineBreaks(divElement) {
   }
   return text;
 }
+function CheckSave({ t, onSave, disabled, editingCell }) {
+  const [opened, { close, open }] = useDisclosure(false);
+  useEffect(() => {});
+  return (
+    <>
+      <Modal
+        opened={opened}
+        onClose={close}
+        size="auto"
+        withCloseButton={true}
+        title={t("confirm", "Confirm...")}
+      >
+        <Text>
+          {" "}
+          {t(
+            "please_confirm_the_cell_changes",
+            "Please confirm or cancel the active cell changes,including the images and description."
+          )}
+        </Text>
 
-function ConfirmCancelChanges({ t, onConfirm, disabled }) {
+        <Group mt="xl" justify="right" gap="md">
+          <Button
+            variant="filled"
+            onClick={() => {
+              close();
+            }}
+          >
+            {t("ok", "Ok")}
+          </Button>
+        </Group>
+      </Modal>
+      <Group justify="center">
+        <ActionIcon
+          variant="filled"
+          onClick={() => {
+            if (!editingCell) onSave();
+            else open();
+          }}
+          title={t("save", "Save")}
+          disabled={disabled}
+        >
+          <IconDeviceFloppy stroke={1.5} size="1rem" />
+        </ActionIcon>
+      </Group>
+    </>
+  );
+}
+function ConfirmRestore({ t, onConfirm, disabled }) {
   const [opened, { close, open }] = useDisclosure(false);
 
   return (
@@ -1248,13 +1311,13 @@ function ConfirmCancelChanges({ t, onConfirm, disabled }) {
         onClose={close}
         size="auto"
         withCloseButton={true}
-        title={t("cancel_confirmation", "Cancel Confirmation..")}
+        title={t("restore_confirmation", "Restore Confirmation..")}
       >
         <Text>
           {" "}
           {t(
-            "are_you_sure_you_want_to_cancel_changes_undo_impossible",
-            "Are you sure you want to cancel the changes? This action cannot be undone."
+            "are_you_sure_you_want_to_restore_changes_before_save",
+            "Are you sure you want to revert the data to its previous state? This action is irreversible."
           )}
         </Text>
 
@@ -1280,10 +1343,10 @@ function ConfirmCancelChanges({ t, onConfirm, disabled }) {
           color="red"
           variant="filled"
           onClick={open}
-          title={t("cancel", "Cancel")}
+          title={t("restore", "Restore")}
           disabled={disabled}
         >
-          <IconRotate360 stroke={1.5} size="1rem" />
+          <IconRestore stroke={1.5} size="1rem" />
         </ActionIcon>
       </Group>
     </>
@@ -1332,4 +1395,14 @@ const Add = ({ t, add }) => {
       </Menu.Dropdown>
     </Menu>
   );
+};
+const handleRemoveText = (elementRef) => {
+  const selection = window.getSelection();
+  if (!selection?.rangeCount || !elementRef) return;
+  const range = selection.getRangeAt(0);
+
+  // Check if the selection is inside the referenced element
+  if (elementRef.current.contains(range.commonAncestorContainer)) {
+    selection.removeAllRanges();
+  }
 };

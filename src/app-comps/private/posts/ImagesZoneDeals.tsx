@@ -528,7 +528,7 @@ const DropImage = ({
             </Group>
           )}
           <Image
-            w={75}
+            // w={75}
             height={100}
             src={img.src}
             style={{ cursor: !img.error ? "pointer !important" : "default" }}

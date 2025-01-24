@@ -28,6 +28,9 @@ import {
   Table,
   Tooltip,
   Radio,
+  Center,
+  Flex,
+  Modal,
 } from "@mantine/core";
 
 import { useForm } from "@mantine/form";
@@ -43,6 +46,7 @@ import {
   IconRotate2,
   IconInfoSquareRoundedFilled,
   IconMessageCircleShare,
+  IconTrashFilled,
 } from "@tabler/icons-react";
 import {
   forwardRef,
@@ -98,7 +102,7 @@ import {
   WtsWtbDropV,
 } from "../../../global/WtsWtbDropV";
 import { ExpiredSelect } from "../../../global/ExpiredSelect";
-import { useHover } from "@mantine/hooks";
+import { useDisclosure, useHover } from "@mantine/hooks";
 import { CardIn } from "../../../global/CardIn";
 import {
   DATETIMEVALUES_FILL,
@@ -109,7 +113,12 @@ import {
 
 import { useDbData } from "../../../global/DbData";
 import { MemoEditorApp } from "../../../global/AppEditor";
-import { HashValue4Boardd2 } from "../../../global/global-comp/Hashtags";
+import {
+  HashtagsAlert,
+  HashTagsInput,
+  HashValue4Boardd2,
+  SplitHashtags,
+} from "../../../global/global-comp/Hashtags";
 import {
   ImagesZoneDeals,
   MAX_NB_IMAGES,
@@ -128,6 +137,7 @@ import {
 } from "../../../global/global-comp/AppMultiSelect";
 import { ArrayToAppSelect } from "../../../global/Hashtags";
 import { DealsSpreadSheet } from "./DealsSpreadSheet";
+import { WtsbMulti } from "../../../global/global-comp/Wtsb";
 
 export const SHARES_TYPE = {
   SHARE_BY_DEFAULT: "share_by_default",
@@ -1063,9 +1073,26 @@ export const AddEditDeal0 = () => {
     executeGet: executeHashGet,
   } = useAxiosGet(BUILD_API("hashtags"), { searchterm: searchValue });
 
+  let {
+    data: dataAction,
+    isLoading: isLoadingAction,
+    succeeded: succeededAction,
+    errorMessage: errorMessageAction,
+    executePut: executAction,
+  } = useAxiosPut(BUILD_API("deals/company"), {});
+  // BUILD_API("deals/company/") + id + "/" + action,
   const small = useSelector(selectSmall);
   const medium = useSelector(selectMedium);
-
+  const renew_or_terminate = (action) => {
+    executAction(BUILD_API("deals/company/") + id + "/" + action);
+  };
+  useEffect(() => {
+    if (errorMessageAction) error(errorMessageAction);
+    if (succeededAction) {
+      let succeededMsg = dataAction?.message;
+      succeed(succeededMsg);
+    }
+  }, [succeededAction, errorMessageAction]);
   const Info = (itm) => {
     let dataa = dataGet && dataGet.length > 0 ? dataGet[0] : {};
     return dataa[itm];
@@ -1090,7 +1117,7 @@ export const AddEditDeal0 = () => {
       setDisableSave(notchangable);
 
       if (dataGet[0].hashtags && dataGet[0].hashtags != "")
-        dataGet[0].hashtags = dataGet[0].hashtags.split(" ");
+        dataGet[0].hashtags = dataGet[0].hashtags.split(",");
       else dataGet[0].hashtags = [];
 
       if (dataGet[0].pictures && dataGet[0].pictures != "")
@@ -1284,7 +1311,10 @@ export const AddEditDeal0 = () => {
           />
           <Grid gutter={small ? 5 : medium ? 10 : 15}>
             {
-              <Grid.Col span={{ base: 12 }}>
+              <Grid.Col
+                span={{ base: 12, md: 6 }}
+                style={{ display: "flex", flexWrap: "nowrap" }}
+              >
                 {/* <Group justify="flex-start" gap="md" mt="md"> */}
                 {/* <Radio
                     color="silver"
@@ -1301,55 +1331,70 @@ export const AddEditDeal0 = () => {
                       </Box>
                     }
                   /> */}
-                <Radio.Group value={form.values.is_draft}>
-                  <Group justify="flex-start" gap="xs">
-                    <Radio.Card
-                      className={appClasses.RadioRoot}
-                      radius="md"
-                      value={"X"}
-                      key={"X"}
-                      maw={"45%"}
-                      onClick={() => {
-                        if (id != "new") return;
-                        form.setValues({ is_draft: "X" });
-                      }}
-                    >
-                      <Group wrap="nowrap" align="flex-start">
-                        <Radio.Indicator />
-                        <div>
-                          <Text className={classesG.RadioLabel}>
-                            {t("draft", "Draft")}
-                          </Text>
-                          <Text className={classesG.RadioDescription}>
-                            {t("draft", "Draft")}
-                          </Text>
-                        </div>
-                      </Group>
-                    </Radio.Card>
-
-                    <Radio.Card
-                      className={appClasses.RadioRoot}
-                      radius="md"
-                      value={""}
-                      key={"F"}
-                      maw={"45%"}
-                      onClick={() => {
-                        if (id != "new") return;
-                        form.setValues({ is_draft: "" });
-                      }}
-                    >
-                      <Group wrap="nowrap" align="flex-start">
-                        <Radio.Indicator />
-                        <div>
-                          <Text className={classesG.RadioLabel}>
-                            {t("final", "Final")}
-                          </Text>
-                          <Text className={classesG.RadioDescription}>
-                            {t("final", "Final")}
-                          </Text>
-                        </div>
-                      </Group>
-                    </Radio.Card>
+                <Radio.Group
+                  value={form.values.is_draft}
+                  withAsterisk
+                  label={t(
+                    "please_select_the_deal_v",
+                    "Please select the deal version"
+                  )}
+                  description={t(
+                    "draft_version_is",
+                    "The draft version will not be published unless you renew it."
+                  )}
+                  w={"100%"}
+                >
+                  <Group justify="space-between" gap="sm" w={"100%"} grow>
+                    <Box>
+                      <Radio.Card
+                        className={appClasses.RadioRoot}
+                        radius="md"
+                        value={"X"}
+                        key={"X"}
+                        onClick={() => {
+                          if (id != "new") return;
+                          form.setValues({ is_draft: "X" });
+                        }}
+                        w={"100%"}
+                      >
+                        <Group align="flex-start">
+                          <Radio.Indicator disabled={id != "new"} />
+                          <div>
+                            <Text className={classesG.RadioLabel}>
+                              {t("draft", "Draft")}
+                            </Text>
+                            <Text className={classesG.RadioDescription}>
+                              {t("draft", "Draft")}
+                            </Text>
+                          </div>
+                        </Group>
+                      </Radio.Card>
+                    </Box>
+                    <Box>
+                      <Radio.Card
+                        className={appClasses.RadioRoot}
+                        radius="md"
+                        value={""}
+                        key={"F"}
+                        onClick={() => {
+                          if (id != "new") return;
+                          form.setValues({ is_draft: "" });
+                        }}
+                        w={"100%"}
+                      >
+                        <Group wrap="nowrap" align="flex-start">
+                          <Radio.Indicator disabled={id != "new"} />
+                          <div>
+                            <Text className={classesG.RadioLabel}>
+                              {t("final", "Final")}
+                            </Text>
+                            <Text className={classesG.RadioDescription}>
+                              {t("final", "Final")}
+                            </Text>
+                          </div>
+                        </Group>
+                      </Radio.Card>
+                    </Box>
                   </Group>
                 </Radio.Group>
 
@@ -1383,6 +1428,86 @@ export const AddEditDeal0 = () => {
                 )} */}
               </Grid.Col>
             }
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              {id != "new" && dataGet && dataGet.length > 0 && (
+                <Flex
+                  h="100%"
+                  w="100%"
+                  justify={small || medium ? "flex-start" : "flex-end"}
+                  align="center"
+                  direction="row"
+                  wrap="wrap"
+                  pos="relative"
+                  gap={"5px"}
+                >
+                  <LoadingOverlay
+                    visible={isLoadingAction}
+                    overlayProps={{ radius: "sm", blur: 2 }}
+                  />
+                  {(dataGet[0].is_draft == "X" ||
+                    dataGet[0].expired == "X") && (
+                    <Tooltip
+                      label={
+                        dataGet[0].is_draft == ""
+                          ? t("post", "Post")
+                          : t("renew", "Renew")
+                      }
+                    >
+                      <Button
+                        // className={classesG.renewIcon}
+                        size="xl"
+                        variant="filled"
+                        onClick={() => {
+                          // renew_or_terminate(item.id, "renew");
+                          renew_or_terminate("renew");
+                        }}
+                        leftSection={<IconRotate2 size={25} />}
+                      >
+                        {t("renew", "Renew")}
+                      </Button>
+                    </Tooltip>
+                  )}
+                  {dataGet[0].is_draft == "" && dataGet[0].expired == "" && (
+                    <Tooltip label={t("terminate", "Terminate")}>
+                      <Button
+                        // className={classesG.terminateIcon}
+                        size="xl"
+                        variant="filled"
+                        color="red"
+                        onClick={() => {
+                          // renew_or_terminate(item.id, "terminate");
+                          renew_or_terminate("terminate");
+                        }}
+                        leftSection={<IconTimeDurationOff size={25} />}
+                      >
+                        {t("terminate", "Terminate")}
+                      </Button>
+                    </Tooltip>
+                  )}
+                  {dataGet[0].is_draft == "X" && (
+                    // <Tooltip label={t("delete", "Delete")}>
+                    //   <Button
+                    //     size="xl"
+                    //     variant="filled"
+                    //     color="red"
+                    //     onClick={() => {
+                    //       renew_or_terminate("delete");
+                    //     }}
+                    //     leftSection={<IconTrashFilled size={25} />}
+                    //   >
+                    //     {t("delete", "Delete")}
+                    //   </Button>
+                    // </Tooltip>
+                    <ConfirmDeleteDraft
+                      t={t}
+                      onConfirm={() => {
+                        renew_or_terminate("delete");
+                      }}
+                    />
+                  )}
+                </Flex>
+              )}
+            </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}>
               <AppSelect
                 {...form.getInputProps("wtsb")}
@@ -1431,7 +1556,7 @@ export const AddEditDeal0 = () => {
                 //   }
                 // }}
                 required
-                withAsterisk
+                withAsterisk={true}
                 data={ArrayToAppSelect(
                   hashData && hashData.length > 0 ? hashData : []
                 )}
@@ -1608,8 +1733,8 @@ export const DealSearch = (props) => {
       toD: G.ifNull(searchParams.get("toD"), ""),
       period_hours: G.ifNull(searchParams.get("period_hours"), ""),
       period_days: G.ifNull(searchParams.get("period_days"), ""),
-      hashtags_and: G.anyToArr(searchParams.get("hashtags_and")),
-      hashtags_or: G.anyToArr(searchParams.get("hashtags_or")),
+      hashtags_and: SplitHashtags(searchParams.get("hashtags_and")), // G.anyToArr(searchParams.get("hashtags_and")),
+      hashtags_or: SplitHashtags(searchParams.get("hashtags_or")), //G.anyToArr(searchParams.get("hashtags_or")),
     },
   });
 
@@ -1618,6 +1743,10 @@ export const DealSearch = (props) => {
     if (trm != form.values.searchterm) form.setValues({ searchterm: trm });
   }, [searchParams]);
   const search = () => {
+    // console.log(
+    //   searchParams.get("hashtags_and"),
+    //   'searchParams.get("hashtags_and")'
+    // );
     G.updateParamsFromForm(searchParams, form);
     searchParams.set("page", "1");
     searchParams.set("t", new Date().getTime().toString());
@@ -1796,7 +1925,6 @@ export const DealSearch = (props) => {
       >
         <Grid gutter={15}>
           <Grid.Col>
-            {"create multiselect WTSWTB"}
             {/* <MultiSelect
               itemComponent={WtsWtbDropV}
               {...form.getInputProps("wtsb")}
@@ -1804,6 +1932,27 @@ export const DealSearch = (props) => {
               clearable
               label={t("deal_type", "Deal Type")}
               placeholder={t("deal_type", "Deal Type")}
+              data={dataWTSB?.map((itm) => {
+                return {
+                  value: itm.wtsb,
+                  label: itm.wtsb_desc,
+                  dir: itm.dir,
+                };
+              })}
+            /> */}
+            <WtsbMulti {...form.getInputProps("wtsb")} />
+            {/* <AppSelect
+              {...form.getInputProps("wtsb")}
+              onBlur={() => form.validateField("wtsb")}
+              readOnly={true}
+              renderOption={renderWtsWtbDropVOption}
+              searchable
+              withAsterisk
+              clearable
+              label={t("deal_type", "Deal Type")}
+              placeholder={t("deal_type", "Deal Type")}
+              limit={8}
+              maxDropdownHeight={500}
               data={dataWTSB?.map((itm) => {
                 return {
                   value: itm.wtsb,
@@ -1822,66 +1971,38 @@ export const DealSearch = (props) => {
             />
           </Grid.Col>
           <Grid.Col>
-            {"create multi hashtags"}
-            {/* <MultiSelect
+            <HashTagsInput
+              // zIndex={30000000}
+              withAsterisk={false}
+              label={
+                <Group justify="flex-start" gap={0}>
+                  <Box>{t("hashtag_all", "Hashtag(All)#")}</Box>
+                  <HashtagsAlert withinPortal={false} />
+                </Group>
+              }
               {...form.getInputProps("hashtags_and")}
-              onKeyDown={(event) => {
-                if (event.code === "Space") {
-                  event.preventDefault();
-                }
-              }}
-              required
-              data={hashData}
-              label="Hashtag(All)#"
-              placeholder="#"
-              searchable
-              searchValue={searchValue}
-              onSearchChange={(event) => {
-                executeHashGet();
-                return onSearchChange(event);
-              }}
-              clearable
-              maxDropdownHeight={250}
-              valueComponent={HashValue}
-              itemComponent={HashItem}
-              limit={20}
-              onCreate={(query) => {
-                const item = { value: query, label: query };
-                setHashData((current) => [...current, item]);
-                return item;
-              }}
-            /> */}
+              withinPortal={true}
+              placeholder={t("enter_hashtags", "Please Enter#")}
+              w="100%"
+              readOnly={false}
+            />
           </Grid.Col>
           <Grid.Col>
-            {"create multi select hastags"}
-            {/* <MultiSelect
+            <HashTagsInput
+              // zIndex={30000000}
+              withAsterisk={false}
+              label={
+                <Group justify="flex-start" gap={0}>
+                  <Box>{t("hashtag_any", "Hashtag(Any)#")}</Box>
+                  <HashtagsAlert withinPortal={false} />
+                </Group>
+              }
               {...form.getInputProps("hashtags_or")}
-              onKeyDown={(event) => {
-                if (event.code === "Space") {
-                  event.preventDefault();
-                }
-              }}
-              required
-              data={hashData2}
-              label="Hashtag(Any)#"
-              placeholder="#"
-              searchable
-              searchValue={searchValue2}
-              onSearchChange={(event) => {
-                executeHashGet2();
-                return onSearch2Change(event);
-              }}
-              clearable 
-              maxDropdownHeight={250}
-              valueComponent={HashValue}
-              itemComponent={HashItem}
-              limit={20}
-              onCreate={(query) => {
-                const item = { value: query, label: query };
-                setHash2Data((current) => [...current, item]);
-                return item;
-              }}
-            /> */}
+              withinPortal={true}
+              placeholder={t("enter_hashtags", "Please Enter#")}
+              w="100%"
+              readOnly={false}
+            />
           </Grid.Col>
           <Grid.Col>
             <HoursRangeSelect
@@ -1894,7 +2015,7 @@ export const DealSearch = (props) => {
 
           <Grid.Col>
             <ExpiredSelect
-              disabled={form.values.expired_in_hours != ""}
+              disabled={form.values.expired_in_hours && form.values.expired_in_hours != ""}
               {...form.getInputProps("expired")}
             />
           </Grid.Col>
@@ -2493,3 +2614,55 @@ const useAiParser = (onApply) => {
   };
   return { open };
 };
+
+function ConfirmDeleteDraft({ t, onConfirm }) {
+  const [opened, { close, open }] = useDisclosure(false);
+
+  return (
+    <>
+      <Modal
+        opened={opened}
+        onClose={close}
+        size="auto"
+        withCloseButton={true}
+        title={t("delete_confirmation", "Delete Confirmation..")}
+      >
+        <Text>
+          {" "}
+          {t(
+            "are_you_sure_you_want_to_delete_draft",
+            "Are you sure you want to delete the deal draft?."
+          )}
+        </Text>
+
+        <Group mt="xl" justify="right" gap="md">
+          <Button variant="light" onClick={close}>
+            {t("no", "No")}
+          </Button>
+          <Button
+            variant="filled"
+            color="red"
+            onClick={() => {
+              onConfirm("delete");
+              close();
+            }}
+          >
+            {t("yes", "Yes")}
+          </Button>
+        </Group>
+      </Modal>
+      <Tooltip label={t("delete", "Delete")}>
+        <Button
+          // className={classesG.terminateIcon}
+          size="xl"
+          variant="filled"
+          color="red"
+          onClick={open}
+          leftSection={<IconTrashFilled size={25} />}
+        >
+          {t("delete", "Delete")}
+        </Button>
+      </Tooltip>
+    </>
+  );
+}

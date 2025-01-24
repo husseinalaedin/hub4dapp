@@ -3,10 +3,12 @@ import {
   Box,
   Button,
   Center,
+  Divider,
   Group,
   Image,
   Menu,
   TextInput,
+  Tooltip,
 } from "@mantine/core";
 import {
   IconCheck,
@@ -23,7 +25,7 @@ import { CLOUDFARE_IMAGE_URL1, G } from "../../G";
 import { useGlobalStyl } from "../../../hooks/useTheme";
 import { useTranslation } from "react-i18next";
 import { Wtsb } from "../Wtsb";
-import { HashtagsAlert, HashTagsInput } from "../Hashtags";
+import { HashtagsAlert, HashTagsInput, SplitHashtags } from "../Hashtags";
 import { ColumnDef } from "@tanstack/react-table";
 import { MemoEditorApp } from "../../AppEditor";
 import {
@@ -97,7 +99,7 @@ export const HashTagHeader = ({ table }) => {
   return (
     <Group justify="center" gap={0}>
       <Box>Hashtags</Box>
-      <HashtagsAlert />
+      <HashtagsAlert withinPortal={true} />
     </Group>
   );
 };
@@ -126,7 +128,6 @@ export const HashTagCell = ({
       inputRef.current.focus();
       resizeInput();
     }
-    
   }, [onEdit]);
   const onSave = () => {
     HandleOnEdit(false);
@@ -222,10 +223,11 @@ export const HashTagCell = ({
               // h="100%"
               w="100%"
               defaultValue={
-                Array.isArray(initialValue) ? initialValue : [initialValue]
+                Array.isArray(initialValue)
+                  ? initialValue
+                  : SplitHashtags(initialValue)
               }
-              value={ Array.isArray(value) ? value : []}
-             
+              value={Array.isArray(value) ? value : []}
               onChange={setValue}
               onBlur={() => {
                 if (beforEditingValue === value) onCancel();
@@ -675,6 +677,7 @@ export const QuantityCell = ({
   column: { id },
   table,
 }) => {
+  const { t } = useTranslation("common", { keyPrefix: "table" });
   const inputRef = useRef<any>(null);
   const contnrRef = useRef<any>(null);
   const uomRef = useRef<any>(null);
@@ -685,7 +688,9 @@ export const QuantityCell = ({
   const initialValue = getValue();
   const [beforEditingValue, setBeforEditingValue] = useState(initialValue);
 
-  const [value, setValue] = useState(() => G.parseNumberAndString(initialValue).number);
+  const [value, setValue] = useState(
+    () => G.parseNumberAndString(initialValue).number
+  );
   const [uom, setUom] = useState(G.parseNumberAndString(initialValue).text);
 
   const HandleOnEdit = (val) => {
@@ -817,7 +822,9 @@ export const QuantityCell = ({
             }}
             value={value as string}
             onChange={(e) => setValue(e.target.value)}
+            placeholder={t("enter_cases", "Enter Cases")}
           />
+          <Divider orientation="vertical" size="xs" />
           <Group justify="flex-end" w={135}>
             <Group gap={"2px"} w={"100%"} justify="flex-end">
               <UomsDropped
@@ -833,7 +840,7 @@ export const QuantityCell = ({
                   }
                 }}
               />
-
+              <Divider orientation="vertical" size="xs" />
               <ActionIcon c="red" variant="light" onClick={onCancel}>
                 <IconX stroke={1.5} size="1.2rem" />
               </ActionIcon>
@@ -858,6 +865,7 @@ export const PriceCell = ({
   column: { id },
   table,
 }) => {
+  const { t } = useTranslation("common", { keyPrefix: "table" });
   const inputRef = useRef<any>(null);
   const contnrRef = useRef<any>(null);
   const currRef = useRef<any>(null);
@@ -994,7 +1002,9 @@ export const PriceCell = ({
               // if (beforEditingValue === value) onCancel();
               // onSave()
             }}
+            placeholder={t("enter_price", "Enter Price")}
           />
+          <Divider orientation="vertical" size="xs" />
           <Group justify="flex-end" w={135}>
             <Group gap={"2px"} w={"100%"} justify="flex-end">
               <CurrenciesDropped
@@ -1010,7 +1020,7 @@ export const PriceCell = ({
                   }
                 }}
               />
-
+              <Divider orientation="vertical" size="xs" />
               <ActionIcon c="red" variant="light" onClick={onCancel}>
                 <IconX stroke={1.5} size="1.2rem" />
               </ActionIcon>
@@ -1086,14 +1096,27 @@ export const ChangeFlagCell = ({
   column: { id },
   table,
 }) => {
+  const { t } = useTranslation("common", { keyPrefix: "table" });
   const rowData = table.options.meta?.rowData(index);
   const rowEdited = rowData && !!rowData["changed"];
   const is_draft = rowData && rowData["is_draft"] == "X";
   return (
     <>
       <Center c={rowEdited ? "red" : "blue"}>
-        {is_draft && <IconCircleDashedLetterD stroke={1.5} size="1rem" />}
-        {!is_draft && <IconCircleLetterFFilled size={"1rem"} />}
+        <Tooltip
+          label={
+            (is_draft
+              ? t("draft", "Draft")
+              : t("final", "Final")) + (rowEdited
+              ? ` `+t("in_edit_mode", "In edit mode")
+              : "")
+          }
+        >
+          <Box>
+            {is_draft && <IconCircleDashedLetterD stroke={1.5} size="1rem" />}
+            {!is_draft && <IconCircleLetterFFilled size={"1rem"} />}
+          </Box>
+        </Tooltip>
       </Center>
     </>
   );

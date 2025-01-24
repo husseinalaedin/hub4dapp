@@ -137,8 +137,8 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       setSearch("");
       setValue((current) => {
         if (!current) return [val];
-        return current.includes(val)
-          ? current.filter((v) => v !== val)
+        return current?.includes(val)
+          ? current?.filter((v) => v !== val)
           : [...current, val];
       });
     };
@@ -161,16 +161,19 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       setValue((current) => current.filter((v) => v !== val));
 
     const _data = data && data.length > 0 ? data : [];
-    const shouldFilterOptions =
+    const shouldFilterOptions = 
       _searchValue &&
       _searchValue !== "" &&
-      _data.every((item) => item.label !== _searchValue);
+      _data.every(
+        (item) => item?.label !== _searchValue && item?.value !== _searchValue
+      );
     const filteredOptions = shouldFilterOptions
       ? _data
           .filter((item) => {
-            const label = item.label.toLowerCase();
+            const label = item?.label?.toLowerCase();
+            const value = item?.value?.toLowerCase();
             const searchText = _searchValue?.toLowerCase().trim();
-            return label.includes(searchText);
+            return label?.includes(searchText) || value?.includes(searchText);
           })
           .slice(0, limit)
       : _data.slice(0, limit);
@@ -180,7 +183,8 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       label: string | null | undefined;
     } = (val) => {
       for (let i = 0; i < _data.length; i++)
-        if (_data[i]["label"] === val) return _data[i];
+        if (_data[i]["label"] === val || _data[i]["value"] === val)
+          return _data[i];
       return { value: null, label: null };
     };
 
@@ -195,31 +199,31 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       return item.label;
     };
     const options = filteredOptions
-      ?.filter((item) => !_value?.includes(item.label))
+      ?.filter((item) => !_value?.includes(item?.label) && !_value?.includes(item?.value))
       ?.map((item) => (
         <Combobox.Option
-          value={item.label}
+          value={item.value}
           key={item.value}
           className={
-            value === item.value ? classesG.comboBoxSelectedOption : ""
+            value === item?.value ? classesG.comboBoxSelectedOption : ""
           }
         >
           {_renderOption(item)}
         </Combobox.Option>
       ));
 
-    const values = _value?.map((val) => {
-      if(!val || val=='')
-        return <></>
-      return(
-      <Pill
-        key={val}
-        withRemoveButton={!readOnly}
-        onRemove={() => handleValueRemove(val)}
-      >
-        {_renderSelectedValue(val)}
-      </Pill>
-    )});
+    const values = _value && _value?.map && _value?.map((val) => {
+      if (!val || val == "") return <></>;
+      return (
+        <Pill
+          key={val}
+          withRemoveButton={!readOnly}
+          onRemove={() => handleValueRemove(val)}
+        >
+          {_renderSelectedValue(val)}
+        </Pill>
+      );
+    });
     const getAllowedValue = (val) => {
       if (charsNotAllowed && charsNotAllowed.length > 0) {
         for (let i = 0; i < charsNotAllowed.length; i++) {
@@ -260,6 +264,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
             style={style}
             rightSection={rightSection}
             w="100%"
+            withAsterisk={withAsterisk}
           >
             <Pill.Group>
               {values}
@@ -294,21 +299,19 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
                         ? _searchValue.length
                         : 0;
                     if (event.key === "Backspace" && lnt === 0) {
-                      console.log(event.key, "DELETE", lnt, "VALUE", _value);
                       event.preventDefault();
                       if (_value && _value.length > 0)
                         handleValueRemove(_value[_value.length - 1]);
                     }
                     if (event.key === "Enter" && lnt > 0) {
-                      setEnterClicked(new Date().getTime().toString())
+                      setEnterClicked(new Date().getTime().toString());
                       event.preventDefault();
                     }
                     if (event.key === "Enter" && lnt == 0) {
-                      if (onEmptyEnter)
-                        onEmptyEnter() 
+                      if (onEmptyEnter) onEmptyEnter();
                       event.preventDefault();
                     }
-                    
+
                     if (event.key === "Escape") {
                       event.preventDefault();
                       onEscape(event);
