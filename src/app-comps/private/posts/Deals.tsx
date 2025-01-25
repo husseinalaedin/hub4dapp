@@ -47,6 +47,8 @@ import {
   IconInfoSquareRoundedFilled,
   IconMessageCircleShare,
   IconTrashFilled,
+  IconCircleChevronsLeft,
+  IconStackPop,
 } from "@tabler/icons-react";
 import {
   forwardRef,
@@ -64,6 +66,7 @@ import {
   useParams,
   useSearchParams,
   useBlocker,
+  data,
 } from "react-router";
 
 import { NumericFormat } from "react-number-format";
@@ -1710,6 +1713,7 @@ export const DealSearch = (props) => {
   const { t } = useTranslation("private", { keyPrefix: "deals" });
   const small = useSelector(selectSmall);
   const medium = useSelector(selectMedium);
+  const [forceClose, setForceClose]=useState('');
   const navigate = useNavigate();
   let {
     checks: checkDbData,
@@ -1756,6 +1760,18 @@ export const DealSearch = (props) => {
     navigate({
       search: searchParams.toString(),
     });
+  };
+  const onDateClick = (dt) => {
+    form.reset();
+    G.updateParamsFromForm(searchParams, form);
+    searchParams.set("page", "1");
+    searchParams.set("t", new Date().getTime().toString());
+    searchParams.set("src", "date");
+    searchParams.set("created_on", dt);
+    navigate({
+      search: searchParams.toString(),
+    });
+    setForceClose(new Date().getTime().toString())
   };
   const clear = () => {
     G.clearForm(form);
@@ -1849,6 +1865,7 @@ export const DealSearch = (props) => {
   return (
     <>
       <SearchPannel
+        forceClose={forceClose}
         action={props.action}
         searchterm={t("deal_searchterm", "Search")}
         grid={props.grid}
@@ -1924,6 +1941,9 @@ export const DealSearch = (props) => {
         }}
       >
         <Grid gutter={15}>
+          <Grid.Col>
+            <CreatedTree onDateClick={onDateClick} />
+          </Grid.Col>
           <Grid.Col>
             {/* <MultiSelect
               itemComponent={WtsWtbDropV}
@@ -2015,7 +2035,10 @@ export const DealSearch = (props) => {
 
           <Grid.Col>
             <ExpiredSelect
-              disabled={form.values.expired_in_hours && form.values.expired_in_hours != ""}
+              disabled={
+                form.values.expired_in_hours &&
+                form.values.expired_in_hours != ""
+              }
               {...form.getInputProps("expired")}
             />
           </Grid.Col>
@@ -2484,9 +2507,11 @@ const ParseDeal = ({ onApply }) => {
   const small = useSelector(selectSmall);
   const { t } = useTranslation("private", { keyPrefix: "deals" });
   const [value, setValue] = useState("");
+  const [dealCount, setDealCount] = useState<string | null>("1");
+  const [dealDataCount, setDealDataCount]=useState(['1','2']);
   const { classes: classesG } = useGlobalStyl();
-  const { data, isLoading, errorMessage, succeeded, executePost } =
-    useAxiosPost(BUILD_API("ai-parse-deal"), { deal: value });
+  const { data:dataSet, isLoading, errorMessage, succeeded, executePost } =
+    useAxiosPost(BUILD_API("ai-parse-deal"), { deal: value, count: dealCount });
   useEffect(() => {
     if (succeeded) {
     }
@@ -2494,6 +2519,7 @@ const ParseDeal = ({ onApply }) => {
   const parse = () => {
     executePost();
   };
+  const data = dataSet && dataSet.length>0?dataSet[0]:[]
   return (
     <>
       <LoadingOverlay
@@ -2502,8 +2528,21 @@ const ParseDeal = ({ onApply }) => {
       />
 
       <Box p="lg">
+        <Select
+        mb="lg"
+          maw={350}
+          value={dealCount}
+          onChange={setDealCount}
+          label={t(
+            "nb_deal_to_extract",
+            "The number of deals that can be pulled from the text"
+          )}
+          placeholder={t("select_value", "Select Value")}
+          data={dealDataCount}
+          description={t('that_helps_ai','That helps AI to generate a better results.')}
+        />
         <Textarea
-          placeholder={t("deal_to_patse", "Deal To parse")}
+          placeholder={t("deals_to_parse", "Deal(s) To parse")}
           value={value}
           onChange={(event) => setValue(event.currentTarget.value)}
           autosize
@@ -2666,3 +2705,80 @@ function ConfirmDeleteDraft({ t, onConfirm }) {
     </>
   );
 }
+
+const CreatedTree = ({ onDateClick }) => {
+  const { classes: classesG } = useGlobalStyl();
+  const { error, succeed, info } = useMessage();
+  const { t } = useTranslation("private", { keyPrefix: "deals" });
+  const [opened, { open, close }] = useDisclosure(false);
+  const {
+    data: dataGet,
+    errorMessage: errorMessageGet,
+    succeeded: succeededGet,
+    isLoading: isLoadingGet,
+    executeGet: executeGet,
+  } = useAxiosGet(BUILD_API("deals/company/creation-list"), null);
+  useEffect(() => {
+    if(opened){ 
+    executeGet();
+    }
+  }, [opened]);
+  useEffect(() => {
+    let errorMsg = errorMessageGet;
+    if (errorMsg) error(errorMsg);
+    if(succeededGet){
+      console.log(dataGet, "dataGet");
+    }
+  }, [errorMessageGet, succeededGet]);
+  const rows = dataGet.map((item) => {
+    return (
+      <Group
+        justify="space-between"
+        m="md"
+        p="xs"
+        mr="lg"
+        ml="lg"
+        className={classesG.titleHrefDashed}
+        onClick={()=>{
+          onDateClick(item.created_by_sec);
+          close()
+        }}
+      >
+        <Group justify="flex-start">{1}</Group>
+        <Group justify="flex-end">
+          {D.utc_to_local_with_time(item.created_on)}
+        </Group>
+      </Group>
+    );
+  });
+  return (
+    <>
+      <Drawer
+        opened={opened}
+        onClose={close}
+        title={t("deal_creation_on_n_at", "Deal creation date and time.")}
+        position="right"
+        zIndex={100000000000000}
+      >
+        <Box pos="relative" style={{overflow:"auto"}} h={"700px"}>
+          <LoadingOverlay
+            visible={isLoadingGet}
+            overlayProps={{ radius: "sm", blur: 2 }}
+          />
+          {rows}
+        </Box>
+      </Drawer>
+
+      <Button
+        variant="light"
+        onClick={open}
+        leftSection={<IconStackPop size="1.2rem" />}
+      >
+        {t(
+          "created_on_filter",
+          "Creation Date Filter(Suitable for deals added in bulk)"
+        )}
+      </Button>
+    </>
+  );
+};

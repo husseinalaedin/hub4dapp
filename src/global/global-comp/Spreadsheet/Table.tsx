@@ -148,13 +148,11 @@ export const AppTable = forwardRef((props: any, ref) => {
   const [isError, setIsError] = useState(false);
   const [afterSaved, setAfterSaved] = useState("");
   const [isHandlingPaste, setIsHandlingPaste] = useState(false); 
-  useEffect(() => { 
-    console.log(data, "initData changed 0");
+  useEffect(() => {  
     let initD = JSON.parse(JSON.stringify(data));
     setInitData(initD); 
   }, [afterSaved]);
-  useEffect(() => {
-    console.log(initData, "initData changed");
+  useEffect(() => { 
   }, [initData]);
   const cancelChanges = () => {
     let initD = JSON.parse(JSON.stringify(initData));
@@ -172,8 +170,7 @@ export const AppTable = forwardRef((props: any, ref) => {
 
     // setData(updatedData);
   };
-  const afterGotSucceededSaved = () => {
-    console.log(initData, "afterGotSucceededSaved");
+  const afterGotSucceededSaved = () => { 
     setHistory([]);
     setRedoStack([]);
     setDeletedIds([]);

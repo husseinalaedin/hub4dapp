@@ -171,6 +171,7 @@ export function AppSelect({
     >
       <Combobox.Target>
         <InputBase
+          {...others}
           ref={inputRef}
           leftSection={leftSection}
           withAsterisk={withAsterisk}
@@ -221,7 +222,7 @@ export function AppSelect({
             combobox.openDropdown();
             combobox.updateSelectedOptionIndex();
             setSearch(event.currentTarget.value);
-            setChanged(true)
+            setChanged(true);
           }}
           onKeyDown={(event) => {
             if (event.key === "Enter" && !changed) {
@@ -232,12 +233,11 @@ export function AppSelect({
               onEscape(event);
             }
           }}
-          {...others}
           error={error}
         />
       </Combobox.Target>
-      <Combobox.Dropdown >
-        <Combobox.Options >
+      <Combobox.Dropdown>
+        <Combobox.Options>
           <ScrollArea.Autosize
             mah={
               maxDropdownHeight &&

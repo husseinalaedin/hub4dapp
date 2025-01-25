@@ -58,6 +58,7 @@ export const WtsbMulti = ({ ...others }) => {
   } = useDbData();
   return (
     <AppMultiSelect
+      label={t("deal_type", "Deal Type")}
       {...others}
       renderOption={renderWtsWtbDropVOption}
       data={dataWTSB?.map((itm) => {

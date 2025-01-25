@@ -16,6 +16,7 @@ import {
   IconCircleFilled,
   IconCircleLetterFFilled,
   IconDotsVertical,
+  IconLink,
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
@@ -35,6 +36,7 @@ import {
 import { AppDiv } from "../../AppDiv";
 import { NumericFormat } from "react-number-format";
 import { decimalSep, thousandSep } from "../../Misc";
+import { useNavigate } from "react-router";
 
 const NumericFormatRef = forwardRef((props: any, ref) => (
   <NumericFormat {...props} getInputRef={ref} />
@@ -394,12 +396,14 @@ export const ActionMenuCell = ({
   column: { id },
   table,
 }) => {
+  const navigate = useNavigate();
   const ref = useRef<HTMLDivElement | null>(null); // Explicitly type the ref
   const [opened, setOpened] = useState(false);
   const { t } = useTranslation("common", { keyPrefix: "table" });
   const inputRef = useRef<any>(null);
   const { classes: classesG } = useGlobalStyl();
   const forceCloseTm = table.options.meta?.forceCloseTm;
+  const rowData = table.options.meta?.rowData(index);
   useEffect(() => {
     if (!forceCloseTm || forceCloseTm == "") return;
     // setOpened(false);
@@ -441,6 +445,22 @@ export const ActionMenuCell = ({
         </Menu.Target>
 
         <Menu.Dropdown ref={ref}>
+          {rowData && rowData["id"] != "new" && (
+            <Menu.Item
+              leftSection={
+                <Box>
+                  <IconLink stroke={1.5} size="1rem" />
+                </Box>
+              }
+              onClick={() => {
+                console.log(rowData);
+                navigate(`../mydeals/${rowData["id"]}`);
+                setOpened(false);
+              }}
+            >
+              {t("view_deal_details", "View Deal Details")}
+            </Menu.Item>
+          )}
           <Menu.Item
             c="red"
             leftSection={

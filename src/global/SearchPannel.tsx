@@ -154,6 +154,9 @@ export const SearchPannel = (props) => {
   useEffect(() => {
     dispatch(changeAdvSearchStatus(opened));
   }, [opened]);
+  useEffect(() => {
+    if (props && props.forceClose != "") close();
+  }, [props?.forceClose]);
   return (
     <>
       {/* <Box className="flex-stretch-parent">
@@ -358,7 +361,7 @@ export const SearchPannel = (props) => {
               </>
             )}
             {sortBy && sortBy.length > 0 && (
-              <Menu justify="bottom-end" offset={0}>
+              <Menu position="bottom-end" offset={0}>
                 <Menu.Target>
                   <Button
                     color="dark.3"
@@ -470,7 +473,7 @@ export const SearchPannel = (props) => {
         position="right"
         withCloseButton={false}
       >
-        <Group justify="space-between" m="md"  mb="xl" mt="md">
+        <Group justify="space-between" m="md" mb="xl" mt="md">
           <ActionIcon onClick={close} variant="subtle">
             {<IconX size={30} color="red" />}
           </ActionIcon>
