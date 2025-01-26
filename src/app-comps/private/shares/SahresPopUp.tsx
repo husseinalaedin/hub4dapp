@@ -66,17 +66,16 @@ import { CardIn } from "../../../global/CardIn";
 import { IconShare2 } from "@tabler/icons-react";
 import { IconPencilShare } from "@tabler/icons-react";
 import { SHARES_TYPE } from "../posts/Deals";
-export const useDealToShareMain = ({ t }) => {
+export const useDealToShareMain = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
   const [queryParams, setQueryParams] = useState({});
 
-  const handleClearQuery = () => {
-    // Navigate to the current path without query parameters
-    const pathWithoutQuery = location.pathname;
-    navigate(pathWithoutQuery, { replace: true });
-  };
-  const [searchParams, setSearchParams] = useSearchParams();
+  // const handleClearQuery = () => { 
+  //   const pathWithoutQuery = location.pathname;
+  //   navigate(pathWithoutQuery, { replace: true });
+  // };
+  // const [searchParams, setSearchParams] = useSearchParams();
   const [onSucceeded, setOnSucceeded] = useState<any>(null);
   const [onCloseM, setOnCloseM] = useState<any>(null);
   const [openas, setOpenas] = useState<any>(null);
@@ -89,7 +88,7 @@ export const useDealToShareMain = ({ t }) => {
   const closeToShare = () => {
     setOpened(false);
   };
-  useEffect(() => {
+  useEffect(() => { 
     if (opened) {
       const searchParams = new URLSearchParams(location.search);
       const params = {};
@@ -100,8 +99,8 @@ export const useDealToShareMain = ({ t }) => {
       const pathWithoutQuery = location.pathname;
       navigate(pathWithoutQuery, { replace: true });
     } else {
-      const searchParams = new URLSearchParams(queryParams).toString();
-      navigate(`?${searchParams}`, { replace: true });
+      // const searchParams = new URLSearchParams(queryParams).toString();
+      // navigate(`?${searchParams}`, { replace: true });
     }
   }, [opened]);
   return {
@@ -221,6 +220,7 @@ const DealToShareCom = ({ t, openas, closeToShare }) => {
     closeToShare();
   };
   useEffect(() => {
+     
     if (activeTab !== SHARES_TYPE.SHARE_BY_CHANNEL) return;
     refresh();
   }, [searchParams]);
@@ -234,6 +234,7 @@ const DealToShareCom = ({ t, openas, closeToShare }) => {
   }, [errorMessageDefault]);
 
   const refresh = () => {
+    
     fit_data_grid_view();
     setSearchChannles(Object.fromEntries([...searchParams]));
     executeGetDefault();
@@ -243,6 +244,7 @@ const DealToShareCom = ({ t, openas, closeToShare }) => {
     executeGetDefault();
   }, []);
   useEffect(() => {
+    
     if (initiated || activeTab !== SHARES_TYPE.SHARE_BY_CHANNEL) return;
     refresh();
   }, [initiated, activeTab]);

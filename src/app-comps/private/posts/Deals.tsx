@@ -31,6 +31,8 @@ import {
   Center,
   Flex,
   Modal,
+  Tabs,
+  Checkbox,
 } from "@mantine/core";
 
 import { useForm } from "@mantine/form";
@@ -232,7 +234,7 @@ export const CompanyDeals = () => {
     closeToShare,
     setOnCloseM,
     setOpenas,
-  } = useDealToShareMain({ t: t });
+  } = useDealToShareMain();
 
   const small = useSelector(selectSmall);
   const medium = useSelector(selectMedium);
@@ -242,13 +244,14 @@ export const CompanyDeals = () => {
   const { classes: classesG } = useGlobalStyl();
   const [objectUpdated, setObjectUpdated] = useState<any>({});
   const [showHiddenMsg, setShowHiddenMsg] = useState(true);
+   let { open: openAI } = useAiParser(()=>{}, false);
   // const [isBusy,setIsBusy]=useState(false)
   useEffect(() => {
     dispatch(changeActive("mydeals"));
   }, []);
 
   useEffect(() => {
-    if (!opened_share) refresh();
+    if (!opened_share) refresh(); //okokok
   }, [searchParams]);
 
   const refresh = () => {
@@ -395,13 +398,25 @@ export const CompanyDeals = () => {
 
       <AppHeader title={t("my_deal_title", "My Deals")}>
         <Group justify="right" gap="xs">
+          <Button
+            variant="gradient"
+            gradient={{ from: "teal", to: "blue", deg: 60 }}
+            
+            type="button"
+            style={{ width: 100 }}
+            onClick={() => {
+              openAI();
+            }}
+          >
+            {t("ai_parse", "By AI")}
+          </Button>
           <Tooltip
             label={t("share_by_default_channel", "Share by default channel.")}
           >
             <Button
               variant="light"
               color={theme == "dark" || theme == "dim" ? "orange" : "orange"}
-              onClick={() => {
+              onClick={() => {//okokok
                 setOpenas(SHARES_TYPE.SHARE_BY_DEFAULT);
                 setOnCloseM({
                   onclose: () => {
@@ -424,6 +439,7 @@ export const CompanyDeals = () => {
               variant="filled"
               color={theme == "dark" || theme == "dim" ? "orange" : "orange"}
               onMouseDown={() => {
+                //okokok
                 setOpenas(SHARES_TYPE.SHARE_BY_CHANNEL);
                 setOnCloseM({
                   onclose: () => {
@@ -954,6 +970,8 @@ export const AddEditDeal0 = () => {
   const [pictures, setPictures] = useState([]);
   const [main_pic, setMain_pic] = useState("");
   const [initBody, setInitBody] = useState("");
+  const small = useSelector(selectSmall);
+  const medium = useSelector(selectMedium);
   useEffect(() => {
     dispatch(changeActive("mydeals"));
   }, []);
@@ -1024,7 +1042,7 @@ export const AddEditDeal0 = () => {
     });
     console.log(data);
   };
-  let { open: openAI } = useAiParser(onApply);
+  let { open: openAI } = useAiParser(()=>{}, small || medium);
   const {
     data: dataGet,
     errorMessage: errorMessageGet,
@@ -1084,8 +1102,7 @@ export const AddEditDeal0 = () => {
     executePut: executAction,
   } = useAxiosPut(BUILD_API("deals/company"), {});
   // BUILD_API("deals/company/") + id + "/" + action,
-  const small = useSelector(selectSmall);
-  const medium = useSelector(selectMedium);
+
   const renew_or_terminate = (action) => {
     executAction(BUILD_API("deals/company/") + id + "/" + action);
   };
@@ -1241,12 +1258,15 @@ export const AddEditDeal0 = () => {
   const is_draft = () => {
     return form.values.is_draft == "X";
   };
+  const openAI2 = () => {
+    openAI();
+  };
   return (
     <>
       <AppHeader
         title={t("deal_title_my_deals", "My Deals")}
         titleClicked={() => {
-          navigate("../mydeals", { replace: true });
+          // navigate("../mydeals", { replace: true });
         }}
       >
         <Group justify="right" gap="xs">
@@ -1257,7 +1277,7 @@ export const AddEditDeal0 = () => {
             type="button"
             style={{ width: 100 }}
             onClick={() => {
-              openAI();
+              openAI2();
             }}
           >
             {t("ai_parse", "By AI")}
@@ -1713,7 +1733,7 @@ export const DealSearch = (props) => {
   const { t } = useTranslation("private", { keyPrefix: "deals" });
   const small = useSelector(selectSmall);
   const medium = useSelector(selectMedium);
-  const [forceClose, setForceClose]=useState('');
+  const [forceClose, setForceClose] = useState("");
   const navigate = useNavigate();
   let {
     checks: checkDbData,
@@ -1771,7 +1791,7 @@ export const DealSearch = (props) => {
     navigate({
       search: searchParams.toString(),
     });
-    setForceClose(new Date().getTime().toString())
+    setForceClose(new Date().getTime().toString());
   };
   const clear = () => {
     G.clearForm(form);
@@ -2507,67 +2527,347 @@ const ParseDeal = ({ onApply }) => {
   const small = useSelector(selectSmall);
   const { t } = useTranslation("private", { keyPrefix: "deals" });
   const [value, setValue] = useState("");
-  const [dealCount, setDealCount] = useState<string | null>("1");
-  const [dealDataCount, setDealDataCount]=useState(['1','2']);
+  const [dealCount, setDealCount] = useState<string | null>("");
+  const [dealDataCount, setDealDataCount] = useState([]);
   const { classes: classesG } = useGlobalStyl();
-  const { data:dataSet, isLoading, errorMessage, succeeded, executePost } =
-    useAxiosPost(BUILD_API("ai-parse-deal"), { deal: value, count: dealCount });
+  const [activeTab, setActiveTab] = useState<string | null>("input");
+  const textareaRef: any = useRef(null);
+  const [selectAll0, SetSelectAll0] = useState(false);
+  const [intermidiate0, setIntermidiate0] = useState(false);
+  const [dataToPut, setDataToPut] = useState([]);
+  const { error, succeed, info } = useMessage();
+  const [searchParams, setSearchParams] = useSearchParams();
+   const navigate = useNavigate();
+  let { getCurrFromSymbol } = useDbData();
   useEffect(() => {
-    if (succeeded) {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto"; // Reset height
+      textarea.style.height = `${
+        textarea.scrollHeight >= 500 ? 500 : textarea.scrollHeight
+      }px`; // Adjust height
     }
+  }, [value]);
+  const {
+    data: dataSet,
+    isLoading,
+    errorMessage,
+    succeeded,
+    executePost,
+    setData,
+  } = useAxiosPost(BUILD_API("ai-parse-deal"), {
+    deal: value,
+    count: dealCount,
+  });
+  const {
+    data: dataDealCount,
+    isLoading: isLoadingDealCount,
+    errorMessage: errorMessageDealCount,
+    succeeded: succeededDealCount,
+    executeGet: executeGetDealCount,
+  } = useAxiosGet(BUILD_API("util/deal-count"), {
+    deal: value,
+    count: dealCount,
+  });
+  let {
+    data: dataPut,
+    isLoading: isLoadingPut,
+    succeeded: succeededPut,
+    errorMessage: errorMessagePut,
+    executePut,
+  } = useAxiosPut(BUILD_API("deals/company/mass"), {
+    changed: dataToPut,
+    deleted: [],
+  });
+  useEffect(() => {
+    executeGetDealCount();
   }, []);
+  useEffect(() => {
+    if (succeededDealCount) {
+      if (dataDealCount && +dataDealCount > 0) {
+        let cnt: any = [];
+        for (let i = 1; i <= +dataDealCount; i++) {
+          cnt.push(i.toString());
+        }
+        setDealDataCount(cnt);
+      }
+    }
+  }, [succeededDealCount, errorMessageDealCount]);
   const parse = () => {
     executePost();
   };
-  const data = dataSet && dataSet.length>0?dataSet[0]:[]
+  useEffect(() => {
+    if (errorMessage) error(errorMessage);
+    if (succeeded) {
+      setActiveTab("output");
+      setDealCount(null);
+      SetSelectAll0(true);
+      selectAll(true);
+    }
+  }, [errorMessage, succeeded]);
+  const selectAll = (val) => {
+    setData((prevData) =>
+      prevData.map((item) => ({
+        ...item, // Keep other properties unchanged
+        selected: val, // Update the 'selected' field
+      }))
+    );
+  };
+  const changeSelect = (val, idx) => {
+    setData((prevData) =>
+      prevData.map((item, index) => ({
+        ...item, // Keep other properties unchanged
+        selected: index === idx ? val : item.selected, // Update 'selected' only for the matching index
+      }))
+    );
+  };
+  const recheckAllCheck = () => {
+    let checked = 0;
+    let notcheked = 0;
+     
+    for(let i=0;i<dataSet?.length;i++){
+      if (dataSet[i].selected) 
+          checked++;
+      else 
+        notcheked++;
+    } 
+    if (checked > 0 && notcheked > 0) {
+      setIntermidiate0(true);
+      SetSelectAll0(false);
+    } else {
+      if (checked > 0 || notcheked == 0) {
+        setIntermidiate0(false);
+        SetSelectAll0(true);
+      }
+      else {
+        setIntermidiate0(false);
+        SetSelectAll0(false);
+      }
+    }
+  };
+  useEffect(() => {
+    recheckAllCheck();
+  }, [dataSet]);
+  const anySelect=()=>{
+    for(let i=0;i<dataSet?.length;i++){
+      if (dataSet[i].selected) 
+          return true
+    } 
+    return false
+  }
+  const formulate_object = (item,is_draft) => { 
+    let quantity = G.parseNumberAndString(item.quantity);
+    let price = G.parseNumberAndString(item.price);
+   
+    return {
+      id: 'new',
+      main_pic: '',
+      title: item.title,
+      pictures: [],
+      wtsb: item.type,
+      quantity: quantity.number,
+      uom: quantity.text,
+      price: price.number,
+      curr: getCurrFromSymbol(price.text),
+      hashtags: item.hashtags,
+      body: item.details,
+      ref: '',
+      is_draft:is_draft
+    };
+  };
+  const createDraft=(is_draft)=>{
+    let dta:any=[]
+    for(let i=0;i<dataSet?.length;i++){
+      if (dataSet[i].selected) 
+          dta.push(formulate_object(dataSet[i],is_draft))
+    } 
+    setDataToPut(dta)
+    if(dta.length>0){
+      executePut()
+    }
+  }
+   useEffect(() => {
+    let errorMsg = errorMessagePut;
+    if (errorMsg) error(errorMsg);
+    if(succeededPut){
+      let created_on = dataPut?.info?.created_on;
+      goToSpread(created_on)
+    }
+  }, [errorMessagePut, succeededPut]);
+  const goToSpread=(dt)=>{
+    closeModal("ai_parser_pop_up");
+    navigate("../app/mydeals?created_on="+dt);
+    // searchParams.set("page", "1");
+    // searchParams.set("t", new Date().getTime().toString());
+    // searchParams.set("src", "date");
+    // searchParams.set("created_on", dt);
+    // navigate({
+    //   search: searchParams.toString(),
+    // });
+  }
+  const data = dataSet && dataSet.length > 0 ? dataSet : [];
+  const rows = data.map((element, idx) => (
+    <Table.Tr
+      key={idx}
+      className={element.selected ? classesG.rowSelected : ""}
+    >
+      <Table.Td>
+        <Checkbox
+          checked={element.selected}
+          onChange={() => {
+            changeSelect(!element.selected, idx);
+            // setTimeout(() => {
+            //   recheckAllCheck();
+            // }, 5000);
+          }}
+          // onChange={(event) => setChecked(event.currentTarget.checked)}
+        />
+      </Table.Td>
+      <Table.Td>{element.type}</Table.Td>
+      <Table.Td>{element.title}</Table.Td>
+      <Table.Td>{element.hashtags && element.hashtags.length>0? element.hashtags.join(','):''}</Table.Td>
+      <Table.Td>{element.quantity}</Table.Td>
+      <Table.Td>{element.price}</Table.Td>
+    </Table.Tr>
+  ));
   return (
-    <>
+    <Box>
       <LoadingOverlay
-        visible={isLoading}
+        visible={isLoading || isLoadingDealCount ||isLoadingPut}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-
+<Button onClick={()=>{
+  navigate("../app/mydeals?created_on=1737846563",{replace:false});
+}}>
+  goto
+</Button>
       <Box p="lg">
-        <Select
-        mb="lg"
-          maw={350}
-          value={dealCount}
-          onChange={setDealCount}
-          label={t(
-            "nb_deal_to_extract",
-            "The number of deals that can be pulled from the text"
-          )}
-          placeholder={t("select_value", "Select Value")}
-          data={dealDataCount}
-          description={t('that_helps_ai','That helps AI to generate a better results.')}
-        />
-        <Textarea
-          placeholder={t("deals_to_parse", "Deal(s) To parse")}
-          value={value}
-          onChange={(event) => setValue(event.currentTarget.value)}
-          autosize
-          minRows={5}
-          maxRows={10}
-        />
-        <Group p="md" justify="right">
-          <Button
-            variant="light"
-            onClick={() => {
-              closeModal("ai_parser_pop_up");
-            }}
-          >
-            {t("close", "Close")}
-          </Button>
-          <Button
-            onClick={parse}
-            variant="gradient"
-            gradient={{ from: "teal", to: "blue", deg: 60 }}
-          >
-            {t("parse", "Parse")}
-          </Button>
-        </Group>
-        <Box className={classesG.seperator2} />
-        <Stack mt="xs">
+        <Tabs value={activeTab} onChange={setActiveTab}>
+          <Tabs.List>
+            <Tabs.Tab value="input">{t("input", "Input")}</Tabs.Tab>
+            <Tabs.Tab value="output">
+              {t("output_deals", "Output Deal(s)")}
+            </Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="input" pt="lg">
+            <Group justify="space-between" gap={5} mb="xs">
+              <Select
+                withAsterisk
+                maw={350}
+                value={dealCount}
+                onChange={setDealCount}
+                label={t(
+                  "nb_deal_to_extract",
+                  "The number of deals that can be pulled from the text"
+                )}
+                placeholder={t("select_value", "Select Value")}
+                data={dealDataCount}
+                description={t(
+                  "that_helps_ai",
+                  "That helps AI to generate a better results."
+                )}
+              />
+              <Group justify="right">
+                <Button
+                  variant="light"
+                  onClick={() => {
+                    closeModal("ai_parser_pop_up");
+                  }}
+                >
+                  {t("close", "Close")}
+                </Button>
+                <Button
+                  disabled={
+                    !value || value == "" || !dealCount || dealCount == ""
+                  }
+                  onClick={parse}
+                  variant="gradient"
+                  gradient={{ from: "teal", to: "blue", deg: 60 }}
+                >
+                  {t("parse", "Parse")}
+                </Button>
+              </Group>
+            </Group>
+
+            <Textarea
+              ref={textareaRef}
+              placeholder={t("deals_to_parse", "Deal(s) To parse")}
+              value={value}
+              onChange={(event) => setValue(event.currentTarget.value)}
+
+              // mih={400}
+            />
+          </Tabs.Panel>
+          <Tabs.Panel value="output" pt="lg">
+            <Group justify="right" mb="xs">
+                <Button
+                  variant="light"
+                  onClick={() => {
+                    closeModal("ai_parser_pop_up");
+                  }}
+                >
+                  {t("close", "Close")}
+                </Button>
+                <Button
+                  disabled={
+                   !(dataSet && dataSet.length>0) || !anySelect()
+                  }
+                  onClick={()=>{
+                    createDraft('X')
+                  }}
+                  variant="gradient"
+                  gradient={{ from: "teal", to: "blue", deg: 60 }}
+                >
+                  {t("create_draft", "Create Draft")}
+                </Button>
+                <Button
+                  disabled={
+                   !(dataSet && dataSet.length>0) || !anySelect()
+                  }
+                  onClick={()=>{
+                    createDraft('')
+                  }}
+                  variant="gradient"
+                  gradient={{ from: "orange", to: "blue", deg: 60 }}
+                >
+                  {t("create_final", "Create Final")}
+                </Button>
+              </Group>
+            <Box style={{ overflow: "auto", maxWidth: "100%" }}>
+              <Table className={`${"TableCss"} ${classesG.table}`}>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>
+                      {" "}
+                      <Checkbox
+                        checked={selectAll0}
+                        indeterminate={intermidiate0}
+                        onChange={(event) => {
+                          SetSelectAll0(event.currentTarget.checked);
+                          selectAll(event.currentTarget.checked);
+                        }}
+
+                        // onChange={(event) => setChecked(event.currentTarget.checked)}
+                      />
+                    </Table.Th>
+                    <Table.Th>{t("deal_type", "Deal Type")}</Table.Th>
+                    <Table.Th>{t("deal_title", "Title")}</Table.Th>
+                    <Table.Th>{t("hashtags", "Hashtags")}</Table.Th>
+                    <Table.Th>{t("quantity", "Quantity")}</Table.Th>
+                    <Table.Th>{t("price", "Price")}</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+              </Table>
+            </Box>
+            <Box c="orange" mt="xs">
+              {data.length} {t("deals_extracted", "Deals extracted")}
+            </Box>
+          </Tabs.Panel>
+        </Tabs>
+
+        {/* <Stack mt="xs">
           <TextInput
             label={t("deal_type", "Deal Type")}
             placeholder={t("deal_type", "Deal Type")}
@@ -2621,35 +2921,49 @@ const ParseDeal = ({ onApply }) => {
               {t("apply", "Apply")}
             </Button>
           </Group>
-        </Stack>
+        </Stack> */}
       </Box>
-    </>
+    </Box>
   );
 };
 
-const useAiParser = (onApply) => {
-  const small = useSelector(selectSmall);
-  const medium = useSelector(selectMedium);
-
-  const open = () => {
+const useAiParser = (onApply, isFull) => {
+  // const small0 = useSelector(selectSmall);
+  // const medium0 = useSelector(selectMedium);
+  //  const [isFull,setIsFull]=useState(isFull0)
+  const [forceOpen, setForceOpen] = useState("");
+  // useEffect(()=>{
+  //   alert(isFull0+'00')
+  // setIsFull(isFull0)
+  // },[isFull0])
+  useEffect(() => {
+    if (forceOpen == "") return;
+    // alert(isFull)
     modals.open({
-      // styles: {
-      //   content: { backgroundColor: "rgba(0, 0, 0, 0.5) !important" },
-      // },
+      keepMounted: false,
       padding: 0,
       yOffset: 0,
       xOffset: 0,
+      h: isFull ? "auto" : "100vh",
       modalId: "ai_parser_pop_up",
-      fullScreen: small || medium ? true : false,
-      withCloseButton: true,
+      fullScreen: isFull ? true : false,
+      withCloseButton: false,
       withOverlay: true,
       withinPortal: true,
-      size: small || medium ? "100%" : "65vw",
+      size: isFull ? "100%" : "65vw",
       onClose: () => {
         closeModal("ai_parser_pop_up");
       },
       children: <ParseDeal onApply={onApply} />,
     });
+  }, [forceOpen]);
+  // useEffect(()=>{
+  // setIsFull(small0||medium0)
+  // },[small0,medium0])
+  const open = () => {
+    setForceOpen(new Date().getTime().toString());
+    //  const small0 = useSelector(selectSmall);
+    // const medium0 = useSelector(selectMedium);
   };
   return { open };
 };
@@ -2719,14 +3033,14 @@ const CreatedTree = ({ onDateClick }) => {
     executeGet: executeGet,
   } = useAxiosGet(BUILD_API("deals/company/creation-list"), null);
   useEffect(() => {
-    if(opened){ 
-    executeGet();
+    if (opened) {
+      executeGet();
     }
   }, [opened]);
   useEffect(() => {
     let errorMsg = errorMessageGet;
     if (errorMsg) error(errorMsg);
-    if(succeededGet){
+    if (succeededGet) {
       console.log(dataGet, "dataGet");
     }
   }, [errorMessageGet, succeededGet]);
@@ -2739,9 +3053,9 @@ const CreatedTree = ({ onDateClick }) => {
         mr="lg"
         ml="lg"
         className={classesG.titleHrefDashed}
-        onClick={()=>{
+        onClick={() => {
           onDateClick(item.created_by_sec);
-          close()
+          close();
         }}
       >
         <Group justify="flex-start">{1}</Group>
@@ -2760,7 +3074,7 @@ const CreatedTree = ({ onDateClick }) => {
         position="right"
         zIndex={100000000000000}
       >
-        <Box pos="relative" style={{overflow:"auto"}} h={"700px"}>
+        <Box pos="relative" style={{ overflow: "auto" }} h={"700px"}>
           <LoadingOverlay
             visible={isLoadingGet}
             overlayProps={{ radius: "sm", blur: 2 }}
