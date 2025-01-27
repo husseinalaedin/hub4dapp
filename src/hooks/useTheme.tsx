@@ -1365,6 +1365,9 @@ export const AppGlobalStylProvider = ({ children }: any) => {
       ImageObjectPosition: {
         objectPosition: "top !important",
       },
+      drawerBody:{
+        height:'calc(100vh - 100px)'
+      }
     };
   });
   const value = {

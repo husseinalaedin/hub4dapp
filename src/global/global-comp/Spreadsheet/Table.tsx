@@ -33,13 +33,16 @@ import {
   Menu,
   Modal,
   Popover,
+  Table,
   Text,
+  Textarea,
   TextInput,
 } from "@mantine/core";
 import { getFilteredRowModel } from "@tanstack/react-table";
 import { useGlobalStyl } from "../../../hooks/useTheme";
 import { useTranslation } from "react-i18next";
 import {
+  IconAlertCircle,
   IconArrowBackUp,
   IconArrowForwardUp,
   IconBaselineDensityMedium,
@@ -63,7 +66,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useMessage } from "../../G";
-import { SplitHashtags } from "../Hashtags";
+import { HashtagsAlert, SplitHashtags } from "../Hashtags";
 
 import { useAppHeaderNdSide } from "../../../hooks/useAppHeaderNdSide";
 import { useDisclosure } from "@mantine/hooks";
@@ -147,16 +150,15 @@ export const AppTable = forwardRef((props: any, ref) => {
   const [saveMsg, setSaveMsg] = useState("");
   const [isError, setIsError] = useState(false);
   const [afterSaved, setAfterSaved] = useState("");
-  const [isHandlingPaste, setIsHandlingPaste] = useState(false); 
-  useEffect(() => {  
+  const [isHandlingPaste, setIsHandlingPaste] = useState(false);
+  useEffect(() => {
     let initD = JSON.parse(JSON.stringify(data));
-    setInitData(initD); 
+    setInitData(initD);
   }, [afterSaved]);
-  useEffect(() => { 
-  }, [initData]);
+  useEffect(() => {}, [initData]);
   const cancelChanges = () => {
     let initD = JSON.parse(JSON.stringify(initData));
-    setData(initD); 
+    setData(initD);
     setHistory([]);
     setRedoStack([]);
     setDeletedIds([]);
@@ -170,7 +172,7 @@ export const AppTable = forwardRef((props: any, ref) => {
 
     // setData(updatedData);
   };
-  const afterGotSucceededSaved = () => { 
+  const afterGotSucceededSaved = () => {
     setHistory([]);
     setRedoStack([]);
     setDeletedIds([]);
@@ -527,6 +529,7 @@ export const AppTable = forwardRef((props: any, ref) => {
   const handlePaste = (event: ClipboardEvent) => {
     if (editingCell) return;
     if (isHandlingPaste) return;
+    if (document.activeElement !== tableRef.current) return;
     try {
       setIsHandlingPaste(true);
       event.preventDefault();
@@ -595,6 +598,7 @@ export const AppTable = forwardRef((props: any, ref) => {
   }, [data, startCell, endCell, editingCell]);
   useEffect(() => {
     const handleKeyDown = (event) => {
+      if (document.activeElement !== tableRef.current) return;
       if (event.ctrlKey && event.key === "z") {
         event.preventDefault();
         undo();
@@ -622,6 +626,7 @@ export const AppTable = forwardRef((props: any, ref) => {
   };
   useEffect(() => {
     const handleKeyDown = (event) => {
+      if (document.activeElement !== tableRef.current) return;
       if (!editingCell && event.ctrlKey && event.key === "c") {
         event.preventDefault();
         copyToClipboard(false);
@@ -631,6 +636,7 @@ export const AppTable = forwardRef((props: any, ref) => {
       }
     };
     const touchMoveHandler = (event) => {
+      if (document.activeElement !== tableRef.current) return;
       event.preventDefault();
     };
 
@@ -887,6 +893,7 @@ export const AppTable = forwardRef((props: any, ref) => {
             <IconPlus stroke={1.5} size="1rem" />
           </ActionIcon> */}
           <Add t={t} add={add} />
+          <AddByPaste t={t} disabled={false} onConfirm={null} />
           <Divider orientation="vertical" size="sm" ml="2px" mr="2px" />
           <ActionIcon
             variant="light"
@@ -1403,3 +1410,231 @@ const handleRemoveText = (elementRef) => {
     selection.removeAllRanges();
   }
 };
+
+function AddByPaste({ t, onConfirm, disabled }) {
+  const { classes: classesG } = useGlobalStyl();
+  const [opened, { close, open }] = useDisclosure(false);
+
+  return (
+    <>
+      <Modal
+        opened={opened}
+        onClose={close}
+        size="auto"
+        withCloseButton={true}
+        title={t("adding_deals_by_paste", "Adding deals via paste...")}
+      >
+        <Box>
+        <Alert icon={<IconAlertCircle />} variant="light" color="red" title={t('guidlines_for_mass_adding_deals_via_paste','Guidelines for Mass Adding Deals via Paste')} mb="md">
+                          <Text size="md">
+                            {t(
+                              "paste_rule0",
+                              `The type must be either WTS or WTB.`
+                            )}
+                          </Text>
+                          <Text size="md">
+                            {t(
+                              "paste_rule1",
+                              `Ensure the fields follow the same order as shown in the example below.`
+                            )}
+                          </Text>
+                          <Text size="md" mt="2px">
+                            {t(
+                              "paste_rule2",
+                              `The values must be separated by a TAB, and each line must end with a \\n. In other words, copying directly from Excel or Google Sheets should work.`
+                            )}
+                          </Text>
+                          <Text size="md" mt="2px">
+                            {t(
+                              "paste_rule3",
+                              `Pasted hashtags must be separated by either the # symbol or commas.`
+                            )}
+                          </Text>
+                          <Text size="md" mt="2px">
+                            {t(
+                              "paste_rule5",
+                              `You can paste up to 15 deals at a time. Only the first 15 will be processed, and any additional deals will be ignored.`
+                            )}
+                          </Text>
+                        </Alert>
+          <table>
+            <thead>
+              <tr>
+                <th
+                  {...{
+                    className: `${classesG.actionSides}`,
+                  }}
+                >
+                  {t("type", "Type")}
+                </th>
+                <th
+                  {...{
+                    className: `${classesG.actionSides}`,
+                  }}
+                >
+                  {t("title", "Title")}
+                </th>
+                <th
+                  {...{
+                    className: `${classesG.actionSides}`,
+                  }}
+                >
+                  {t("quantity", "Quantity")}
+                </th>
+                <th
+                  {...{
+                    className: `${classesG.actionSides}`,
+                  }}
+                >
+                  {t("price", "Price")}
+                </th>
+                <th
+                  {...{
+                    className: `${classesG.actionSides}`,
+                  }}
+                >
+                  <Group justify="flex-start" gap={0}>
+                    <Box>{t("hashtags", "Hashtags")} </Box>
+
+                    <Popover
+                      width={500}
+                      position="bottom"
+                      withArrow
+                      shadow="md"
+                    >
+                      <Popover.Target>
+                        <ActionIcon variant="transparent">
+                          <IconHelp size={"1.2rem"} />
+                        </ActionIcon>
+                      </Popover.Target>
+                      <Popover.Dropdown>
+                        <Alert variant="light" color="blue">
+                          <Text size="md">
+                            {t(
+                              "hashtag_restrictions",
+                              `Hashtags cannot contain the # symbol or commas, but it can contains spaces.`
+                            )}
+                          </Text>
+
+                          <Text size="md" mt="xs">
+                            {t(
+                              "hashtag_allowence",
+                              `The pasted hashtags must be separated either by the # symbol or by commas.`
+                            )}
+                          </Text>
+                        </Alert>
+                        <Alert variant="light" color="teal" mt="xs">
+                          <Text size="md" mt="xs">
+                            {t(
+                              "hashtag_example",
+                              `e.g grade A,Grade B,iphone 15 promax,used`
+                            )}
+                          </Text>
+                          <Text size="md">
+                            {t(
+                              "hashtag_example2",
+                              `e.g grade A#Grade B#iphone 15 promax#used`
+                            )}
+                          </Text>
+                          <Text size="md" c="indigo">
+                            {t(
+                              "hashtag_example_result",
+                              `Either one will be converted to: [grade A] [Grade B] [iphone 15 promax] [used]`
+                            )}
+                          </Text>
+                        </Alert>
+                      </Popover.Dropdown>
+                    </Popover>
+                  </Group>
+                </th>
+                <th
+                  {...{
+                    className: `${classesG.actionSides}`,
+                  }}
+                >
+                  {t("description", "Description")}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td
+                  {...{
+                    className: `${classesG.actionSides}`,
+                  }}
+                >
+                  WTS
+                </td>
+                <td
+                  {...{
+                    className: `${classesG.actionSides}`,
+                  }}
+                >
+                  {"Iphone 15 pro max"}
+                </td>
+                <td
+                  {...{
+                    className: `${classesG.actionSides}`,
+                  }}
+                >
+                  100CS
+                </td>
+                <td
+                  {...{
+                    className: `${classesG.actionSides}`,
+                  }}
+                >
+                  400$
+                </td>
+                <td
+                  {...{
+                    className: `${classesG.actionSides}`,
+                  }}
+                >
+                  iPhone,Grade A/A-,used
+                </td>
+                <td
+                  {...{
+                    className: `${classesG.actionSides}`,
+                  }}
+                >
+                  mixed colors and items will be ready by Jan 20
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </Box>
+        <Textarea h={200} mt="lg" label={t('paste_deals','Paste deals')}  placeholder={t('paste_deals_here','Paste deals here')} />
+          
+
+        <Group mt="xl" justify="right" gap="md">
+          <Button variant="light" onClick={close}>
+            {t("no", "No")}
+          </Button>
+          <Button
+            variant="filled"
+            color="red"
+            onClick={() => {
+              // onConfirm();
+              close();
+            }}
+          >
+            {t("yes", "Yes")}
+          </Button>
+        </Group>
+      </Modal>
+      <Group justify="center">
+        <ActionIcon
+          // c="orange"
+          color="red"
+          variant="filled"
+          onClick={open}
+          title={t("restore", "Restore")}
+          disabled={disabled}
+        >
+          <IconRestore stroke={1.5} size="1rem" />
+        </ActionIcon>
+      </Group>
+    </>
+  );
+}

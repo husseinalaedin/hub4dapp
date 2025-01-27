@@ -51,6 +51,8 @@ import {
   IconTrashFilled,
   IconCircleChevronsLeft,
   IconStackPop,
+  IconOctagonPlus,
+  IconRefresh,
 } from "@tabler/icons-react";
 import {
   forwardRef,
@@ -244,7 +246,7 @@ export const CompanyDeals = () => {
   const { classes: classesG } = useGlobalStyl();
   const [objectUpdated, setObjectUpdated] = useState<any>({});
   const [showHiddenMsg, setShowHiddenMsg] = useState(true);
-   let { open: openAI } = useAiParser(()=>{}, false);
+  let { open: openAI } = useAiParser(() => {}, false);
   // const [isBusy,setIsBusy]=useState(false)
   useEffect(() => {
     dispatch(changeActive("mydeals"));
@@ -398,25 +400,14 @@ export const CompanyDeals = () => {
 
       <AppHeader title={t("my_deal_title", "My Deals")}>
         <Group justify="right" gap="xs">
-          <Button
-            variant="gradient"
-            gradient={{ from: "teal", to: "blue", deg: 60 }}
-            
-            type="button"
-            style={{ width: 100 }}
-            onClick={() => {
-              openAI();
-            }}
-          >
-            {t("ai_parse", "By AI")}
-          </Button>
           <Tooltip
-            label={t("share_by_default_channel", "Share by default channel.")}
+            label={t("share_by_default_chanel", "Share by default channel.")}
           >
             <Button
               variant="light"
               color={theme == "dark" || theme == "dim" ? "orange" : "orange"}
-              onClick={() => {//okokok
+              onClick={() => {
+                //okokok
                 setOpenas(SHARES_TYPE.SHARE_BY_DEFAULT);
                 setOnCloseM({
                   onclose: () => {
@@ -455,6 +446,21 @@ export const CompanyDeals = () => {
               <IconShare />
             </Button>
           </Tooltip>
+          <Tooltip label={t("add_new_deal_by_ai", "Add new deals by AI.")}>
+            <Button
+              variant="gradient"
+              gradient={{ from: "teal", to: "blue", deg: 60 }}
+              type="button"
+              style={{ width: 100 }}
+              onClick={() => {
+                openAI();
+              }}
+              leftSection={<IconOctagonPlus />}
+            >
+              {t("by_ai", "By AI")}
+            </Button>
+          </Tooltip>
+
           <Tooltip label={t("add_new_deal", "Add new deal.")}>
             <Button
               variant="filled"
@@ -1042,7 +1048,7 @@ export const AddEditDeal0 = () => {
     });
     console.log(data);
   };
-  let { open: openAI } = useAiParser(()=>{}, small || medium);
+  let { open: openAI } = useAiParser(() => {}, small || medium);
   const {
     data: dataGet,
     errorMessage: errorMessageGet,
@@ -1118,12 +1124,15 @@ export const AddEditDeal0 = () => {
     return dataa[itm];
   };
   useEffect(() => {
-    if (id != "new")
-      executeGet({ url_e: BUILD_API("deals/company") + "/" + id });
+    refresh()
     executeGetUOMS();
     executeGetCURR();
     executeGetWTSB();
   }, []);
+  const refresh=()=>{
+    if (id != "new")
+      executeGet({ url_e: BUILD_API("deals/company") + "/" + id });
+  }
   useEffect(() => {
     let errorMsg = errorMessageGet;
     if (errorMsg) error(errorMsg);
@@ -1255,22 +1264,17 @@ export const AddEditDeal0 = () => {
     ({ currentLocation, nextLocation }: any) =>
       !!form.isDirty() && currentLocation.pathname !== nextLocation.pathname
   );
-  const is_draft = () => {
-    return form.values.is_draft == "X";
-  };
-  const openAI2 = () => {
-    openAI();
-  };
+  
   return (
     <>
       <AppHeader
         title={t("deal_title_my_deals", "My Deals")}
         titleClicked={() => {
-          // navigate("../mydeals", { replace: true });
+          navigate("../mydeals", { replace: true });
         }}
       >
         <Group justify="right" gap="xs">
-          <Button
+          {/* <Button
             variant="gradient"
             gradient={{ from: "teal", to: "blue", deg: 60 }}
             disabled={disableSave}
@@ -1281,7 +1285,32 @@ export const AddEditDeal0 = () => {
             }}
           >
             {t("ai_parse", "By AI")}
+          </Button> */}
+          <Tooltip label={t('refresh','Refresh')}>
+            <Button
+            variant="default"
+            onClick={() => {
+              refresh();
+            }}
+          >
+            <IconRefresh />
           </Button>
+          </Tooltip>
+           
+          <Tooltip label={t("add_new_deal_by_ai", "Add new deals by AI.")}>
+            <Button
+              variant="gradient"
+              gradient={{ from: "teal", to: "blue", deg: 60 }}
+              type="button"
+              style={{ width: 100 }}
+              onClick={() => {
+                openAI();
+              }}
+              leftSection={<IconOctagonPlus />}
+            >
+              {t("by_ai", "By AI")}
+            </Button>
+            </Tooltip>
           <Button
             disabled={disableSave}
             type="button"
@@ -1759,6 +1788,7 @@ export const DealSearch = (props) => {
       period_days: G.ifNull(searchParams.get("period_days"), ""),
       hashtags_and: SplitHashtags(searchParams.get("hashtags_and")), // G.anyToArr(searchParams.get("hashtags_and")),
       hashtags_or: SplitHashtags(searchParams.get("hashtags_or")), //G.anyToArr(searchParams.get("hashtags_or")),
+      doc_status:G.ifNull(searchParams.get("doc_status"), "B"),
     },
   });
 
@@ -1781,13 +1811,15 @@ export const DealSearch = (props) => {
       search: searchParams.toString(),
     });
   };
-  const onDateClick = (dt) => {
+  const onDateClick = (dt,doc_status) => {
     form.reset();
     G.updateParamsFromForm(searchParams, form);
     searchParams.set("page", "1");
     searchParams.set("t", new Date().getTime().toString());
     searchParams.set("src", "date");
     searchParams.set("created_on", dt);
+    searchParams.set("doc_status", doc_status);
+    form.setValues({doc_status:doc_status})
     navigate({
       search: searchParams.toString(),
     });
@@ -1963,6 +1995,21 @@ export const DealSearch = (props) => {
         <Grid gutter={15}>
           <Grid.Col>
             <CreatedTree onDateClick={onDateClick} />
+          </Grid.Col>
+          <Grid.Col>
+          <AppSelect
+                {...form.getInputProps("doc_status")}
+                 
+                label={t("doc_status", "Document Status")}
+                placeholder={t("doc_status", "Document Status")}
+                limit={8}
+                maxDropdownHeight={500}
+                data={[
+                  {value:'B',label:'Both'},
+                  {value:'D',label:'Draft'},
+                  {value:'F',label:'Final'}
+                ]}
+              />
           </Grid.Col>
           <Grid.Col>
             {/* <MultiSelect
@@ -2537,7 +2584,7 @@ const ParseDeal = ({ onApply }) => {
   const [dataToPut, setDataToPut] = useState([]);
   const { error, succeed, info } = useMessage();
   const [searchParams, setSearchParams] = useSearchParams();
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   let { getCurrFromSymbol } = useDbData();
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -2560,15 +2607,12 @@ const ParseDeal = ({ onApply }) => {
     count: dealCount,
   });
   const {
-    data: dataDealCount,
-    isLoading: isLoadingDealCount,
-    errorMessage: errorMessageDealCount,
-    succeeded: succeededDealCount,
-    executeGet: executeGetDealCount,
-  } = useAxiosGet(BUILD_API("util/deal-count"), {
-    deal: value,
-    count: dealCount,
-  });
+    data: dataPlanInfo,
+    isLoading: isLoadingPlanInfo,
+    errorMessage: errorMessagePlanInfo,
+    succeeded: succeededPlanInfo,
+    executeGet: executeGetPlanInfo,
+  } = useAxiosGet(BUILD_API("util/plan-info-combined"), {});
   let {
     data: dataPut,
     isLoading: isLoadingPut,
@@ -2580,19 +2624,33 @@ const ParseDeal = ({ onApply }) => {
     deleted: [],
   });
   useEffect(() => {
-    executeGetDealCount();
+    executeGetPlanInfo();
   }, []);
+  const dataDealCount =
+    dataPlanInfo && dataPlanInfo.deal_count
+      ? dataPlanInfo && dataPlanInfo.deal_count
+      : 0;
+  const parseLeft =
+    dataPlanInfo && dataPlanInfo.ai_info && dataPlanInfo && dataPlanInfo.ai_info
+      ? dataPlanInfo.ai_info.parse_count_left
+      : 0;
+  const parsingAttemptCompleted =
+    dataPlanInfo && dataPlanInfo.ai_info && dataPlanInfo && dataPlanInfo.ai_info
+      ? dataPlanInfo.ai_info.parsing_attempts_completed
+      : 0;
   useEffect(() => {
-    if (succeededDealCount) {
+    console.log(dataPlanInfo, "dataPlanInfo");
+    if (errorMessagePlanInfo) error("Plan Info Error:" + errorMessagePlanInfo);
+    if (succeededPlanInfo) {
+      let cnt: any = [];
       if (dataDealCount && +dataDealCount > 0) {
-        let cnt: any = [];
         for (let i = 1; i <= +dataDealCount; i++) {
           cnt.push(i.toString());
         }
-        setDealDataCount(cnt);
       }
+      setDealDataCount(cnt);
     }
-  }, [succeededDealCount, errorMessageDealCount]);
+  }, [succeededPlanInfo, errorMessagePlanInfo]);
   const parse = () => {
     executePost();
   };
@@ -2603,6 +2661,7 @@ const ParseDeal = ({ onApply }) => {
       setDealCount(null);
       SetSelectAll0(true);
       selectAll(true);
+      executeGetPlanInfo();
     }
   }, [errorMessage, succeeded]);
   const selectAll = (val) => {
@@ -2624,13 +2683,11 @@ const ParseDeal = ({ onApply }) => {
   const recheckAllCheck = () => {
     let checked = 0;
     let notcheked = 0;
-     
-    for(let i=0;i<dataSet?.length;i++){
-      if (dataSet[i].selected) 
-          checked++;
-      else 
-        notcheked++;
-    } 
+
+    for (let i = 0; i < dataSet?.length; i++) {
+      if (dataSet[i].selected) checked++;
+      else notcheked++;
+    }
     if (checked > 0 && notcheked > 0) {
       setIntermidiate0(true);
       SetSelectAll0(false);
@@ -2638,8 +2695,7 @@ const ParseDeal = ({ onApply }) => {
       if (checked > 0 || notcheked == 0) {
         setIntermidiate0(false);
         SetSelectAll0(true);
-      }
-      else {
+      } else {
         setIntermidiate0(false);
         SetSelectAll0(false);
       }
@@ -2648,20 +2704,19 @@ const ParseDeal = ({ onApply }) => {
   useEffect(() => {
     recheckAllCheck();
   }, [dataSet]);
-  const anySelect=()=>{
-    for(let i=0;i<dataSet?.length;i++){
-      if (dataSet[i].selected) 
-          return true
-    } 
-    return false
-  }
-  const formulate_object = (item,is_draft) => { 
+  const anySelect = () => {
+    for (let i = 0; i < dataSet?.length; i++) {
+      if (dataSet[i].selected) return true;
+    }
+    return false;
+  };
+  const formulate_object = (item, is_draft) => {
     let quantity = G.parseNumberAndString(item.quantity);
     let price = G.parseNumberAndString(item.price);
-   
+
     return {
-      id: 'new',
-      main_pic: '',
+      id: "new",
+      main_pic: "",
       title: item.title,
       pictures: [],
       wtsb: item.type,
@@ -2671,32 +2726,31 @@ const ParseDeal = ({ onApply }) => {
       curr: getCurrFromSymbol(price.text),
       hashtags: item.hashtags,
       body: item.details,
-      ref: '',
-      is_draft:is_draft
+      ref: "",
+      is_draft: is_draft,
     };
   };
-  const createDraft=(is_draft)=>{
-    let dta:any=[]
-    for(let i=0;i<dataSet?.length;i++){
-      if (dataSet[i].selected) 
-          dta.push(formulate_object(dataSet[i],is_draft))
-    } 
-    setDataToPut(dta)
-    if(dta.length>0){
-      executePut()
+  const createDraft = (is_draft) => {
+    let dta: any = [];
+    for (let i = 0; i < dataSet?.length; i++) {
+      if (dataSet[i].selected) dta.push(formulate_object(dataSet[i], is_draft));
     }
-  }
-   useEffect(() => {
+    setDataToPut(dta);
+    if (dta.length > 0) {
+      executePut();
+    }
+  };
+  useEffect(() => {
     let errorMsg = errorMessagePut;
     if (errorMsg) error(errorMsg);
-    if(succeededPut){
+    if (succeededPut) {
       let created_on = dataPut?.info?.created_on;
-      goToSpread(created_on)
+      goToSpread(created_on);
     }
   }, [errorMessagePut, succeededPut]);
-  const goToSpread=(dt)=>{
+  const goToSpread = (dt) => {
     closeModal("ai_parser_pop_up");
-    navigate("../app/mydeals?created_on="+dt);
+    navigate("../app/mydeals?src=navigator&created_on=" + dt);
     // searchParams.set("page", "1");
     // searchParams.set("t", new Date().getTime().toString());
     // searchParams.set("src", "date");
@@ -2704,7 +2758,7 @@ const ParseDeal = ({ onApply }) => {
     // navigate({
     //   search: searchParams.toString(),
     // });
-  }
+  };
   const data = dataSet && dataSet.length > 0 ? dataSet : [];
   const rows = data.map((element, idx) => (
     <Table.Tr
@@ -2725,22 +2779,36 @@ const ParseDeal = ({ onApply }) => {
       </Table.Td>
       <Table.Td>{element.type}</Table.Td>
       <Table.Td>{element.title}</Table.Td>
-      <Table.Td>{element.hashtags && element.hashtags.length>0? element.hashtags.join(','):''}</Table.Td>
+      <Table.Td>
+        {element.hashtags && element.hashtags.length > 0
+          ? element.hashtags.join(",")
+          : ""}
+      </Table.Td>
       <Table.Td>{element.quantity}</Table.Td>
       <Table.Td>{element.price}</Table.Td>
     </Table.Tr>
   ));
+  const placeholderAI=t('type_or_paste_your_deals','Type or paste your deals e.g')+`
+  Fully Tested HSO BATTERY 80%+ 	
+Pack Boxes	
+	Ready
+	Grade A-
+  34pcs - 	13 128GB $310
+
+	Grade A/A-
+320pcs - 	XR 64GB $140
+	
+	Mon-Tue
+	Grade A-
+  40pcs - 	13 128GB $310
+`
   return (
     <Box>
       <LoadingOverlay
-        visible={isLoading || isLoadingDealCount ||isLoadingPut}
+        visible={isLoading || isLoadingPlanInfo || isLoadingPut}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-<Button onClick={()=>{
-  navigate("../app/mydeals?created_on=1737846563",{replace:false});
-}}>
-  goto
-</Button>
+
       <Box p="lg">
         <Tabs value={activeTab} onChange={setActiveTab}>
           <Tabs.List>
@@ -2792,48 +2860,86 @@ const ParseDeal = ({ onApply }) => {
 
             <Textarea
               ref={textareaRef}
-              placeholder={t("deals_to_parse", "Deal(s) To parse")}
+              placeholder={placeholderAI}
               value={value}
               onChange={(event) => setValue(event.currentTarget.value)}
-
+              label={
+                <Box fz="sm" c="orange">
+                  {t("you_still_have", "You still have") +
+                    " ~" +
+                    parseLeft +
+                    " " +
+                    t("our_of", "out of") +
+                    " " +
+                    (+parsingAttemptCompleted + parseLeft) +
+                    " " +
+                    t(
+                      "parsing_attempts_remaining",
+                      "parsing attempts remaining in your current cycle plan."
+                    )+"***"}
+                </Box>
+              }
               // mih={400}
             />
+            <Box opacity={0.9}>
+              <Box fz="sm" c="orange" mt="md">
+                {t(
+                  "ai_limitation_note1",
+                  `We use OpenAI (ChatGPT's owner) to convert the text into a list of deals. However, the parsing may not be entirely accurate. Please review the results and make any necessary changes before publishing.`
+                )}
+              </Box>
+              <Box fz="sm" c="orange">
+                {t(
+                  "ai_limitation_note2",
+                  `It is recommended to create a draft first, make any necessary changes, and then publish the deals.`
+                )}
+              </Box>
+              <Box fz="sm" c="red" mt="5px">
+                {t(
+                  "ai_limitation_note3",
+                  `You can only parse up to the limit of your 'active deals' plan.`
+                )}
+              </Box>
+              <Box fz="sm" c="red" mt="5px">
+                {"***" +
+                  t(
+                    "note_approximate_parse_left_value",
+                    `Note: This is an approximate value, as each attempt has its own cost..`
+                  )}
+              </Box>
+            </Box>
           </Tabs.Panel>
           <Tabs.Panel value="output" pt="lg">
             <Group justify="right" mb="xs">
-                <Button
-                  variant="light"
-                  onClick={() => {
-                    closeModal("ai_parser_pop_up");
-                  }}
-                >
-                  {t("close", "Close")}
-                </Button>
-                <Button
-                  disabled={
-                   !(dataSet && dataSet.length>0) || !anySelect()
-                  }
-                  onClick={()=>{
-                    createDraft('X')
-                  }}
-                  variant="gradient"
-                  gradient={{ from: "teal", to: "blue", deg: 60 }}
-                >
-                  {t("create_draft", "Create Draft")}
-                </Button>
-                <Button
-                  disabled={
-                   !(dataSet && dataSet.length>0) || !anySelect()
-                  }
-                  onClick={()=>{
-                    createDraft('')
-                  }}
-                  variant="gradient"
-                  gradient={{ from: "orange", to: "blue", deg: 60 }}
-                >
-                  {t("create_final", "Create Final")}
-                </Button>
-              </Group>
+              <Button
+                variant="light"
+                onClick={() => {
+                  closeModal("ai_parser_pop_up");
+                }}
+              >
+                {t("close", "Close")}
+              </Button>
+              <Button
+                disabled={!(dataSet && dataSet.length > 0) || !anySelect()}
+                onClick={() => {
+                  createDraft("X");
+                }}
+                variant="gradient"
+                gradient={{ from: "teal", to: "blue", deg: 60 }}
+              >
+                {t("create_draft", "Create Draft")}
+              </Button>
+              <Button
+                disabled={!(dataSet && dataSet.length > 0) || !anySelect()}
+                onClick={() => {
+                  createDraft("");
+                }}
+                variant="gradient"
+                gradient={{ from: "orange", to: "blue", deg: 60 }}
+              >
+                {t("create_final", "Create Final")}
+              </Button>
+            </Group>
             <Box style={{ overflow: "auto", maxWidth: "100%" }}>
               <Table className={`${"TableCss"} ${classesG.table}`}>
                 <Table.Thead>
@@ -3025,18 +3131,22 @@ const CreatedTree = ({ onDateClick }) => {
   const { error, succeed, info } = useMessage();
   const { t } = useTranslation("private", { keyPrefix: "deals" });
   const [opened, { open, close }] = useDisclosure(false);
+  const [value,setValue]=useState('B')
   const {
     data: dataGet,
     errorMessage: errorMessageGet,
     succeeded: succeededGet,
     isLoading: isLoadingGet,
     executeGet: executeGet,
-  } = useAxiosGet(BUILD_API("deals/company/creation-list"), null);
+  } = useAxiosGet(BUILD_API("deals/company/creation-list"), {doc_status:value});
   useEffect(() => {
     if (opened) {
       executeGet();
     }
-  }, [opened]);
+  }, [opened,value]);
+  // useEffect(()=>{
+
+  // },[value])
   useEffect(() => {
     let errorMsg = errorMessageGet;
     if (errorMsg) error(errorMsg);
@@ -3044,21 +3154,54 @@ const CreatedTree = ({ onDateClick }) => {
       console.log(dataGet, "dataGet");
     }
   }, [errorMessageGet, succeededGet]);
+  const header=<Group
+        
+  m="md"
+  p="xs"
+  mr="lg"
+  ml="lg" 
+  grow
+>
+  {/* <Group justify="flex-start" > */}
+    <Group justify="space-between" gap={2} >
+      <Box>{t('total','Total')}</Box>
+      <Divider size={1} orientation="vertical" />
+      <Box>{t('draft','Draft')}</Box>
+      <Divider size={1} orientation="vertical" />
+      <Box>{t('final','Final')}</Box>
+      <Divider size={1} orientation="vertical" />
+    </Group>
+  {/* </Group> */} 
+  <Group justify="center">
+  {t('created_on','Created On')}
+  </Group>
+</Group>
   const rows = dataGet.map((item) => {
     return (
       <Group
-        justify="space-between"
+        
         m="md"
         p="xs"
         mr="lg"
         ml="lg"
         className={classesG.titleHrefDashed}
         onClick={() => {
-          onDateClick(item.created_by_sec);
+          onDateClick(item.created_on_int,value);
           close();
         }}
+        grow
       >
-        <Group justify="flex-start">{1}</Group>
+        {/* <Group justify="flex-start" > */}
+          <Group justify="space-between" gap={2} >
+            <Box>{item.deals_count}</Box>
+            <Divider size={1} orientation="vertical" />
+            <Box>{item.draft_deals_count}</Box>
+            <Divider size={1} orientation="vertical" />
+            <Box>{item.final_deals_count}</Box>
+            <Divider size={1} orientation="vertical" />
+          </Group>
+        {/* </Group> */}
+
         <Group justify="flex-end">
           {D.utc_to_local_with_time(item.created_on)}
         </Group>
@@ -3073,12 +3216,31 @@ const CreatedTree = ({ onDateClick }) => {
         title={t("deal_creation_on_n_at", "Deal creation date and time.")}
         position="right"
         zIndex={100000000000000}
+        // classNames={{body:classesG.drawerBody}}
+        // styles={{body:{height: 'calc(100vh - 100px) !important'}}}
       >
-        <Box pos="relative" style={{ overflow: "auto" }} h={"700px"}>
+        <Box pos="relative" style={{ overflow: "auto" }}>
           <LoadingOverlay
             visible={isLoadingGet}
             overlayProps={{ radius: "sm", blur: 2 }}
           />
+          <AppSelect
+                  value={value}
+                  onChange={setValue}
+                 
+                
+                 
+                label={t("doc_status", "Document Status")}
+                placeholder={t("doc_status", "Document Status")}
+                limit={8}
+                maxDropdownHeight={500}
+                data={[
+                  {value:'B',label:'Both'},
+                  {value:'D',label:'Draft'},
+                  {value:'F',label:'Final'}
+                ]}
+              />
+          {header}
           {rows}
         </Box>
       </Drawer>

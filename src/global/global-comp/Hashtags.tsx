@@ -449,7 +449,7 @@ export const HashtagsAlert = ({ withinPortal }) => {
           <Text size="md" c="indigo">
             {t(
               "hashtag_example_result",
-              `[grade A] [Grade B] [iphone 15 promax] [used]`
+              `Either one will be converted to: [grade A] [Grade B] [iphone 15 promax] [used]`
             )}
           </Text>
         </Alert>
