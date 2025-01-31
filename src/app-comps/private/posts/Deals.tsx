@@ -2779,13 +2779,15 @@ const ParseDeal = ({ onApply }) => {
       </Table.Td>
       <Table.Td>{element.type}</Table.Td>
       <Table.Td>{element.title}</Table.Td>
+      
+      <Table.Td>{element.quantity}</Table.Td>
+      <Table.Td>{element.price}</Table.Td>
       <Table.Td>
-        {element.hashtags && element.hashtags.length > 0
+        {element.hashtags && element.hashtags.length > 0 && element.hashtags.join
           ? element.hashtags.join(",")
           : ""}
       </Table.Td>
-      <Table.Td>{element.quantity}</Table.Td>
-      <Table.Td>{element.price}</Table.Td>
+      <Table.Td>{element.description}</Table.Td>
     </Table.Tr>
   ));
   const placeholderAI=t('type_or_paste_your_deals','Type or paste your deals e.g')+`
@@ -2959,9 +2961,11 @@ Pack Boxes
                     </Table.Th>
                     <Table.Th>{t("deal_type", "Deal Type")}</Table.Th>
                     <Table.Th>{t("deal_title", "Title")}</Table.Th>
-                    <Table.Th>{t("hashtags", "Hashtags")}</Table.Th>
+                   
                     <Table.Th>{t("quantity", "Quantity")}</Table.Th>
                     <Table.Th>{t("price", "Price")}</Table.Th>
+                    <Table.Th>{t("hashtags", "Hashtags")}</Table.Th>
+                    <Table.Th>{t("description", "Description")}</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>{rows}</Table.Tbody>

@@ -28,6 +28,7 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   Divider,
   Group,
   Menu,
@@ -51,6 +52,7 @@ import {
   IconCircleDashedLetterD,
   IconCircleLetterFFilled,
   IconCircleXFilled,
+  IconClipboardListFilled,
   IconCopy,
   IconCopyPlus,
   IconDeselect,
@@ -70,6 +72,8 @@ import { HashtagsAlert, SplitHashtags } from "../Hashtags";
 
 import { useAppHeaderNdSide } from "../../../hooks/useAppHeaderNdSide";
 import { useDisclosure } from "@mantine/hooks";
+import { MassDealEntry } from "../../../app-comps/private/posts/DealsEntryMass";
+import { useNavigate } from "react-router";
 const MAX_HISTORY_SIZE = 40;
 
 declare module "@tanstack/react-table" {
@@ -1412,9 +1416,45 @@ const handleRemoveText = (elementRef) => {
 };
 
 function AddByPaste({ t, onConfirm, disabled }) {
+  const [tableData, setTableData] = useState<any>([]);
   const { classes: classesG } = useGlobalStyl();
   const [opened, { close, open }] = useDisclosure(false);
+  const [value,setValue]=useState('')
+  const navigate = useNavigate();
+  const [selectAll0, SetSelectAll0] = useState(false);
+  const [intermidiate0, setIntermidiate0] = useState(false);
+  const selectAll = (val) => {
+    setTableData((prevData) =>
+      prevData.map((item) => ({
+        ...item, // Keep other properties unchanged
+        selected: val, // Update the 'selected' field
+      }))
+    );
+  };
+  useEffect(()=>{
+    if(value=='') return
+    const pastedText = value; // Get pasted text
+    const rows = pastedText.split("\n").filter((row) => row.trim() !== ""); // Split by lines and filter empty rows
 
+    const parsedData = rows.map((row) => {
+      const [type, title, quantity, price, hashtags, description] =
+        row.split("\t"); // Split by tab
+      return {
+        type: type?.trim() || "",
+        title: title?.trim() || "",
+        quantity: quantity?.trim() || "",
+        price: price?.trim() || "",
+        hashtags: hashtags?.trim() || "",
+        description: description?.trim() || "",
+      };
+    });
+
+    setTableData(parsedData); // Update the state with parsed data
+    setValue('')
+    SetSelectAll0(true);
+      selectAll(true);
+  },[value])
+  
   return (
     <>
       <Modal
@@ -1604,35 +1644,49 @@ function AddByPaste({ t, onConfirm, disabled }) {
             </tbody>
           </table>
         </Box>
-        <Textarea h={200} mt="lg" label={t('paste_deals','Paste deals')}  placeholder={t('paste_deals_here','Paste deals here')} />
+        <Textarea
+        value={value}
+        onChange={(event) => setValue(event.currentTarget.value)} h={200} mt="lg" label={t('paste_deals','Paste deals')}  placeholder={t('paste_deals_here','Paste deals here')} />
           
-
+          <MassDealEntry dataSet={tableData} setData={setTableData} onClose={close} onSucceed={(dt)=>{
+             close()
+            navigate("../mydeals?src=navigator&created_on=" + dt);
+          }} 
+          selectAll0={selectAll0} 
+          SetSelectAll0={SetSelectAll0}
+          intermidiate0={intermidiate0} 
+          setIntermidiate0={setIntermidiate0}
+          selectAll={selectAll}
+          />
+                      <Box c="orange" mt="xs">
+                        {tableData?.length} {t("deals_extracted", "Deals extracted")}
+                      </Box>
         <Group mt="xl" justify="right" gap="md">
           <Button variant="light" onClick={close}>
-            {t("no", "No")}
+            {t("close", "Close")}
           </Button>
           <Button
             variant="filled"
-            color="red"
+            
             onClick={() => {
               // onConfirm();
               close();
             }}
           >
-            {t("yes", "Yes")}
+            {t("confirm", "Confirm")}
           </Button>
         </Group>
       </Modal>
       <Group justify="center">
         <ActionIcon
           // c="orange"
-          color="red"
+           
           variant="filled"
           onClick={open}
-          title={t("restore", "Restore")}
+          title={t("add_deals_by_pasting", "Add deals by pasting")}
           disabled={disabled}
         >
-          <IconRestore stroke={1.5} size="1rem" />
+          <IconClipboardListFilled stroke={1.5} size="1rem" />
         </ActionIcon>
       </Group>
     </>
