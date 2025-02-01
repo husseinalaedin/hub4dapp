@@ -192,6 +192,19 @@ export const StripePricingTable = () => {
           <Box mt="md">
             ***
             {t(
+              "ai_attemps_msg",
+              "The AI parser simplifies data entry for non-classified information."
+            )}
+          </Box>
+          <Box>
+            {t(
+              "ai_attemps_msg_2",
+              "However, it is generally recommended to add deals using the regular method or by pasting for bulk entry."
+            )}
+          </Box>
+          <Box mt="md">
+            ****
+            {t(
               "hidden_profile_msg",
               "You can hide your company profile, and only your deal list will be accessible through non-expired shared links."
             )}
@@ -361,6 +374,7 @@ const Plan = ({
   );
 };
 const PlanDetails = ({ data, t }) => {
+  const { classes: classesG, cx } = useGlobalStyl();
   return (
     <>
       {data && (
@@ -470,6 +484,25 @@ const PlanDetails = ({ data, t }) => {
                 </Group>
               </List.Item>
             )}
+
+            <List.Item>
+              <Group gap={"4px"}>
+                <Box opacity="0.75">{t("up_to", "Up to")}</Box>{" "}
+                <strong>
+                  <span className={classesG.violet}>~{`${data.parse_count}`}</span> {t("ai_post_attempts", "AI Attempts")}
+                </strong>{" "}
+                <Box opacity="0.75">
+                  {" "}
+                  {t(
+                    "can_be_used_to_create_deals",
+                    "can be used to create deals"
+                  )}
+                  {data.id === "FREE" && <span> {t('per_day','per day')}</span>}
+                   ***
+                </Box>
+              </Group>
+            </List.Item>
+
             <List.Item>
               <Group gap={"4px"}>
                 <strong>
@@ -505,8 +538,8 @@ const PlanDetails = ({ data, t }) => {
               <strong>
                 {t(
                   "hidden_prfl_n_prvt_access",
-                  "Hidden-profile and Private-Access ***"
-                )}
+                  "Hidden-profile and Private-Access"
+                )} ****
               </strong>
             </List.Item>
           </List>

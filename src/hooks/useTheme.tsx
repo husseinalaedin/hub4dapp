@@ -1367,6 +1367,9 @@ export const AppGlobalStylProvider = ({ children }: any) => {
       },
       drawerBody:{
         height:'calc(100vh - 100px)'
+      },
+      violet:{
+        color:theme.colors.violet[5]
       }
     };
   });
