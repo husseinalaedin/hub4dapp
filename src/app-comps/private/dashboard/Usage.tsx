@@ -27,7 +27,10 @@ import { useGlobalStyl } from "../../../hooks/useTheme";
 import { D } from "../../../global/Date";
 import { useAuth } from "../../../providers/AuthProvider";
 import { useNavigate } from "react-router";
-import { AppMultiSelect, useAppMultiSelectToAddMissedSearchVal } from "../../../global/global-comp/AppMultiSelect";
+import {
+  AppMultiSelect,
+  useAppMultiSelectToAddMissedSearchVal,
+} from "../../../global/global-comp/AppMultiSelect";
 import { AppSelect } from "../../../global/global-comp/AppSelect";
 import { useForm } from "@mantine/form";
 import { ArrayToAppSelect } from "../../../global/Hashtags";
@@ -53,7 +56,6 @@ export const Usage = () => {
   }, []);
   return (
     <>
-      <MultiTest />
       {isLoading && <Overlay opacity={1} color="#000" zIndex={5} />}
       {isLoading && (
         <LoadingOverlay
@@ -158,6 +160,54 @@ export const Usage = () => {
                 </Box>
               </Group>
             </Card>
+
+            <Card mt="lg" shadow="md" withBorder>
+              <Group
+                gap="4px"
+                justify="space-between"
+                style={{ width: "100%" }}
+              >
+                <Group gap="4px" justify="left">
+                  {/* <IconCircleCheck size="1rem" /> */}
+                  <Box opacity="0.75">
+                    {t("you_have_used", "You've used")}
+                  </Box>{" "}
+                  <Box c="orange">
+                    <strong>
+                      {`${data.parsing_attempts_completed}`}{" "}
+                      {t("post_by_ai", "Posts By AI")}
+                    </strong>{" "}
+                  </Box>
+                  <Box opacity="0.75"> {t("out_of", "out of")} </Box>
+                  <Box c="violet">
+                    <strong>
+                      ~{`${data.parse_count_left+data.parsing_attempts_completed}`} {t("post_by_ai", "Posts By Ai")}
+                    </strong>{" "}
+                  </Box>
+                </Group>
+                <Group justify="right" gap={2} maw="50px">
+                  <Box c="orange">
+                    <strong>{`${data.parsing_attempts_completed}`}</strong>
+                  </Box>
+                  <Box opacity="0.75"> {"/"} </Box>
+                  <Box c="violet">
+                    <strong>{`${data.parse_count_left+data.parsing_attempts_completed}`}</strong>
+                  </Box>
+                </Group>
+              </Group>
+              <Group justify="space-between">
+                <Box opacity="0.75">
+                  {t(
+                    "you_can_use_posts_by_ai",
+                    "You can still use posts by AI — up to"
+                  )}
+                </Box>
+                <Box c="violet">
+                  <strong>{`${data.parse_count_left}`}</strong>
+                </Box>
+              </Group>
+            </Card>
+
             <Card mt="lg" shadow="md" withBorder>
               <Group
                 gap="4px"
@@ -275,66 +325,6 @@ export const Usage = () => {
         )}
       </Box>
       {/* </Group> */}
-    </>
-  );
-};
-
-const MultiTest = () => {
-  const form = useForm({
-    initialValues: {
-      multi: [],
-    },
-
-    // functions will be used to validate values at corresponding key
-
-    validate: {
-      multi: (value) =>
-        value.length < 1 ? "please select at least one value" : null,
-    },
-  });
-  const [searchValue, setSearchValue] = useState<string>("");
-  const [read, setRead] = useState(true);
-  const [data22, setData22] = useState<any>([]);
-  let handlnotfound = useAppMultiSelectToAddMissedSearchVal<any>(setData22);
-  let data: any = [
-    {
-      value: 1,
-      label: "hash1",
-    },
-  ];
-  let data2: any = ["1"];
-  for (let i = 2; i < 20; i++) {
-    data.push({
-      value: i,
-      label: "hash" + i.toString(),
-    });
-    data2.push(i.toString());
-  }
-  useEffect(() => {
-    setData22(data);
-  }, []);
-  return (
-    <>
-       
-      <AppMultiSelect
-        required={true}
-        renderSelectedValue={(item) => {
-          return <Box c="red">{item.label}</Box>;
-        }}
-        maxDropdownHeight={300} 
-        data={data22} 
-        // {...form.getInputProps("multi")}
-        readOnly={false}
-        withAsterisk
-        label="Multi test"
-        description="pleas enter"
-        searchable
-        searchValue={searchValue}
-        onSearchChange={setSearchValue}
-        createOnNotFound={async (val) => {
-          return await handlnotfound({ value: val, label: val });
-        }}
-      /> 
     </>
   );
 };

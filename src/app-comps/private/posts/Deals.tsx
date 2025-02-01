@@ -145,6 +145,8 @@ import {
 import { ArrayToAppSelect } from "../../../global/Hashtags";
 import { DealsSpreadSheet } from "./DealsSpreadSheet";
 import { WtsbMulti } from "../../../global/global-comp/Wtsb";
+import { AddByPaste } from "../../../global/global-comp/Spreadsheet/Table";
+import { MassDealEntry } from "./DealsEntryMass";
 
 export const SHARES_TYPE = {
   SHARE_BY_DEFAULT: "share_by_default",
@@ -246,7 +248,7 @@ export const CompanyDeals = () => {
   const { classes: classesG } = useGlobalStyl();
   const [objectUpdated, setObjectUpdated] = useState<any>({});
   const [showHiddenMsg, setShowHiddenMsg] = useState(true);
-  let { open: openAI } = useAiParser(() => {}, false);
+  let { open: openAI } = useAiParser(() => {}, small || medium);
   // const [isBusy,setIsBusy]=useState(false)
   useEffect(() => {
     dispatch(changeActive("mydeals"));
@@ -399,7 +401,7 @@ export const CompanyDeals = () => {
       {/* {(isLoadingPut) && <LoadingOverlay visible={isLoading || isLoadingPut} overlayBlur={0.7} />} */}
 
       <AppHeader title={t("my_deal_title", "My Deals")}>
-        <Group justify="right" gap="xs">
+        <Group justify="right" gap={small || medium ? "2px" : "xs"}>
           <Tooltip
             label={t("share_by_default_chanel", "Share by default channel.")}
           >
@@ -446,18 +448,23 @@ export const CompanyDeals = () => {
               <IconShare />
             </Button>
           </Tooltip>
+
+          <AddByPaste isIcon={false} />
           <Tooltip label={t("add_new_deal_by_ai", "Add new deals by AI.")}>
             <Button
               variant="gradient"
               gradient={{ from: "teal", to: "blue", deg: 60 }}
               type="button"
-              style={{ width: 100 }}
+              style={{ width: small || medium ? "auto" : 120 }}
               onClick={() => {
                 openAI();
               }}
-              leftSection={<IconOctagonPlus />}
+              // leftSection={<IconOctagonPlus />}
             >
-              {t("by_ai", "By AI")}
+              <Group>
+                <IconOctagonPlus />
+                {!(small || medium) && <Box>{t("by_ai", "By AI")}</Box>}
+              </Group>
             </Button>
           </Tooltip>
 
@@ -545,10 +552,10 @@ export const CompanyDeals = () => {
             </Box>
           </Group>
           <Box>
-            {(!data || data.length <= 0) && (
+            {(!data || data.length <= 0)  && listDir != "spread" && (
               <NoDataFound title={t("no_deals_found", "No Deals Found!.")} />
             )}
-            {!(!data || data.length <= 0) && (
+            {(!(!data || data.length <= 0)  || listDir == "spread") && (
               <Box>
                 {(listDir == "grid_view" || listDir == "img_grid_view") && (
                   <SimpleGrid
@@ -1124,15 +1131,15 @@ export const AddEditDeal0 = () => {
     return dataa[itm];
   };
   useEffect(() => {
-    refresh()
+    refresh();
     executeGetUOMS();
     executeGetCURR();
     executeGetWTSB();
   }, []);
-  const refresh=()=>{
+  const refresh = () => {
     if (id != "new")
       executeGet({ url_e: BUILD_API("deals/company") + "/" + id });
-  }
+  };
   useEffect(() => {
     let errorMsg = errorMessageGet;
     if (errorMsg) error(errorMsg);
@@ -1264,7 +1271,7 @@ export const AddEditDeal0 = () => {
     ({ currentLocation, nextLocation }: any) =>
       !!form.isDirty() && currentLocation.pathname !== nextLocation.pathname
   );
-  
+
   return (
     <>
       <AppHeader
@@ -1286,17 +1293,17 @@ export const AddEditDeal0 = () => {
           >
             {t("ai_parse", "By AI")}
           </Button> */}
-          <Tooltip label={t('refresh','Refresh')}>
+          <Tooltip label={t("refresh", "Refresh")}>
             <Button
-            variant="default"
-            onClick={() => {
-              refresh();
-            }}
-          >
-            <IconRefresh />
-          </Button>
+              variant="default"
+              onClick={() => {
+                refresh();
+              }}
+            >
+              <IconRefresh />
+            </Button>
           </Tooltip>
-           
+
           <Tooltip label={t("add_new_deal_by_ai", "Add new deals by AI.")}>
             <Button
               variant="gradient"
@@ -1310,7 +1317,7 @@ export const AddEditDeal0 = () => {
             >
               {t("by_ai", "By AI")}
             </Button>
-            </Tooltip>
+          </Tooltip>
           <Button
             disabled={disableSave}
             type="button"
@@ -1788,7 +1795,7 @@ export const DealSearch = (props) => {
       period_days: G.ifNull(searchParams.get("period_days"), ""),
       hashtags_and: SplitHashtags(searchParams.get("hashtags_and")), // G.anyToArr(searchParams.get("hashtags_and")),
       hashtags_or: SplitHashtags(searchParams.get("hashtags_or")), //G.anyToArr(searchParams.get("hashtags_or")),
-      doc_status:G.ifNull(searchParams.get("doc_status"), "B"),
+      doc_status: G.ifNull(searchParams.get("doc_status"), "B"),
     },
   });
 
@@ -1811,7 +1818,7 @@ export const DealSearch = (props) => {
       search: searchParams.toString(),
     });
   };
-  const onDateClick = (dt,doc_status) => {
+  const onDateClick = (dt, doc_status) => {
     form.reset();
     G.updateParamsFromForm(searchParams, form);
     searchParams.set("page", "1");
@@ -1819,7 +1826,7 @@ export const DealSearch = (props) => {
     searchParams.set("src", "date");
     searchParams.set("created_on", dt);
     searchParams.set("doc_status", doc_status);
-    form.setValues({doc_status:doc_status})
+    form.setValues({ doc_status: doc_status });
     navigate({
       search: searchParams.toString(),
     });
@@ -1997,19 +2004,18 @@ export const DealSearch = (props) => {
             <CreatedTree onDateClick={onDateClick} />
           </Grid.Col>
           <Grid.Col>
-          <AppSelect
-                {...form.getInputProps("doc_status")}
-                 
-                label={t("doc_status", "Document Status")}
-                placeholder={t("doc_status", "Document Status")}
-                limit={8}
-                maxDropdownHeight={500}
-                data={[
-                  {value:'B',label:'Both'},
-                  {value:'D',label:'Draft'},
-                  {value:'F',label:'Final'}
-                ]}
-              />
+            <AppSelect
+              {...form.getInputProps("doc_status")}
+              label={t("doc_status", "Document Status")}
+              placeholder={t("doc_status", "Document Status")}
+              limit={8}
+              maxDropdownHeight={500}
+              data={[
+                { value: "B", label: "Both" },
+                { value: "D", label: "Draft" },
+                { value: "F", label: "Final" },
+              ]}
+            />
           </Grid.Col>
           <Grid.Col>
             {/* <MultiSelect
@@ -2091,28 +2097,31 @@ export const DealSearch = (props) => {
               readOnly={false}
             />
           </Grid.Col>
-          <Grid.Col>
-            <HoursRangeSelect
-              data={lastXHours}
-              {...form.getInputProps("expired_in_hours")}
-              label={t("share_expired_in_option", "Expired In")}
-              placeholder={t("share_expired_in_option", "Expired In")}
-            />
-          </Grid.Col>
-
-          <Grid.Col>
-            <ExpiredSelect
-              disabled={
-                form.values.expired_in_hours &&
-                form.values.expired_in_hours != ""
-              }
-              {...form.getInputProps("expired")}
-            />
-          </Grid.Col>
-
           {/* <Grid.Col>
-                        <TextInput autoComplete="off" label={t('searchterm', "Search")} placeholder={t('searchterm', "Search")} {...form.getInputProps('searchterm')} />
-                    </Grid.Col> */}
+            
+          </Grid.Col> */}
+
+          <Grid.Col>
+            <Group justify="space-between" gap={4}>
+              <Box  maw={"calc(50% - 4px)"}>
+                <HoursRangeSelect
+                  data={lastXHours}
+                  {...form.getInputProps("expired_in_hours")}
+                  label={t("share_expired_in_option", "Expired In")}
+                  placeholder={t("share_expired_in_option", "Expired In")}
+                />
+              </Box>
+              <Box maw={"calc(50% - 4px)"}>
+                <ExpiredSelect
+                  disabled={
+                    form.values.expired_in_hours &&
+                    form.values.expired_in_hours != ""
+                  }
+                  {...form.getInputProps("expired")}
+                />
+              </Box>
+            </Group>
+          </Grid.Col>
 
           <Grid.Col>
             <Group justify="space-between" gap={4}>
@@ -2571,19 +2580,16 @@ const DealMenu = ({
 };
 
 const ParseDeal = ({ onApply }) => {
-  const small = useSelector(selectSmall);
   const { t } = useTranslation("private", { keyPrefix: "deals" });
   const [value, setValue] = useState("");
   const [dealCount, setDealCount] = useState<string | null>("");
   const [dealDataCount, setDealDataCount] = useState([]);
-  const { classes: classesG } = useGlobalStyl();
   const [activeTab, setActiveTab] = useState<string | null>("input");
   const textareaRef: any = useRef(null);
   const [selectAll0, SetSelectAll0] = useState(false);
   const [intermidiate0, setIntermidiate0] = useState(false);
   const [dataToPut, setDataToPut] = useState([]);
   const { error, succeed, info } = useMessage();
-  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   let { getCurrFromSymbol } = useDbData();
   useEffect(() => {
@@ -2672,14 +2678,6 @@ const ParseDeal = ({ onApply }) => {
       }))
     );
   };
-  const changeSelect = (val, idx) => {
-    setData((prevData) =>
-      prevData.map((item, index) => ({
-        ...item, // Keep other properties unchanged
-        selected: index === idx ? val : item.selected, // Update 'selected' only for the matching index
-      }))
-    );
-  };
   const recheckAllCheck = () => {
     let checked = 0;
     let notcheked = 0;
@@ -2760,37 +2758,10 @@ const ParseDeal = ({ onApply }) => {
     // });
   };
   const data = dataSet && dataSet.length > 0 ? dataSet : [];
-  const rows = data.map((element, idx) => (
-    <Table.Tr
-      key={idx}
-      className={element.selected ? classesG.rowSelected : ""}
-    >
-      <Table.Td>
-        <Checkbox
-          checked={element.selected}
-          onChange={() => {
-            changeSelect(!element.selected, idx);
-            // setTimeout(() => {
-            //   recheckAllCheck();
-            // }, 5000);
-          }}
-          // onChange={(event) => setChecked(event.currentTarget.checked)}
-        />
-      </Table.Td>
-      <Table.Td>{element.type}</Table.Td>
-      <Table.Td>{element.title}</Table.Td>
-      
-      <Table.Td>{element.quantity}</Table.Td>
-      <Table.Td>{element.price}</Table.Td>
-      <Table.Td>
-        {element.hashtags && element.hashtags.length > 0 && element.hashtags.join
-          ? element.hashtags.join(",")
-          : ""}
-      </Table.Td>
-      <Table.Td>{element.description}</Table.Td>
-    </Table.Tr>
-  ));
-  const placeholderAI=t('type_or_paste_your_deals','Type or paste your deals e.g')+`
+
+  const placeholderAI =
+    t("type_or_paste_your_deals", "Type or paste your deals e.g") +
+    `
   Fully Tested HSO BATTERY 80%+ 	
 Pack Boxes	
 	Ready
@@ -2803,7 +2774,7 @@ Pack Boxes
 	Mon-Tue
 	Grade A-
   40pcs - 	13 128GB $310
-`
+`;
   return (
     <Box>
       <LoadingOverlay
@@ -2878,7 +2849,8 @@ Pack Boxes
                     t(
                       "parsing_attempts_remaining",
                       "parsing attempts remaining in your current cycle plan."
-                    )+"***"}
+                    ) +
+                    "***"}
                 </Box>
               }
               // mih={400}
@@ -2942,7 +2914,21 @@ Pack Boxes
                 {t("create_final", "Create Final")}
               </Button>
             </Group>
-            <Box style={{ overflow: "auto", maxWidth: "100%" }}>
+            <MassDealEntry
+              dataSet={data}
+              setData={setData}
+              onClose={close}
+              onSucceed={(dt) => {
+                close();
+                navigate("../mydeals?src=navigator&created_on=" + dt);
+              }}
+              selectAll0={selectAll0}
+              SetSelectAll0={SetSelectAll0}
+              intermidiate0={intermidiate0}
+              setIntermidiate0={setIntermidiate0}
+              selectAll={selectAll}
+            />
+            {/* <Box style={{ overflow: "auto", maxWidth: "100%" }}>
               <Table className={`${"TableCss"} ${classesG.table}`}>
                 <Table.Thead>
                   <Table.Tr>
@@ -2970,68 +2956,12 @@ Pack Boxes
                 </Table.Thead>
                 <Table.Tbody>{rows}</Table.Tbody>
               </Table>
-            </Box>
+            </Box> */}
             <Box c="orange" mt="xs">
               {data.length} {t("deals_extracted", "Deals extracted")}
             </Box>
           </Tabs.Panel>
         </Tabs>
-
-        {/* <Stack mt="xs">
-          <TextInput
-            label={t("deal_type", "Deal Type")}
-            placeholder={t("deal_type", "Deal Type")}
-            readOnly
-            value={
-              data?.type == "WTS"
-                ? t("wts", "Want to sale")
-                : data?.type == "WTB"
-                ? t("wtb", "Want to buy")
-                : t("wtbs_not_clear", "Want to sale/buy is not clear")
-            }
-          />
-          <TextInput
-            label={t("parsed_title", "Parsed Title")}
-            placeholder={t("parsed_title", "Parsed Title")}
-            readOnly
-            value={data?.title}
-          />
-          <Card radius="sm" p="0" pt="0" pl={5} pr={5} withBorder>
-            {data?.hashtags && (
-              <Box className={`${classesG.hashtagboardContainer2}`}>
-                {data.hashtags.map((hash) => {
-                  return (
-                    <Box
-                      className={`${"hash-parent"}  ${
-                        classesG.hashtagboardElem
-                      }`}
-                    >
-                      <HashValue4Boardd2 label={hash} />
-                    </Box>
-                  );
-                })}
-              </Box>
-            )}
-          </Card>
-          <Card radius="sm" p="md" pt="xs" withBorder>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: data?.details?.replace(/\n/g, "<br>"),
-              }}
-            ></div>
-          </Card>
-          <Group p="md" justify="right">
-            <Button
-              variant="filled"
-              onClick={() => {
-                if (onApply) onApply(data);
-                closeModal("ai_parser_pop_up");
-              }}
-            >
-              {t("apply", "Apply")}
-            </Button>
-          </Group>
-        </Stack> */}
       </Box>
     </Box>
   );
@@ -3135,19 +3065,21 @@ const CreatedTree = ({ onDateClick }) => {
   const { error, succeed, info } = useMessage();
   const { t } = useTranslation("private", { keyPrefix: "deals" });
   const [opened, { open, close }] = useDisclosure(false);
-  const [value,setValue]=useState('B')
+  const [value, setValue] = useState("B");
   const {
     data: dataGet,
     errorMessage: errorMessageGet,
     succeeded: succeededGet,
     isLoading: isLoadingGet,
     executeGet: executeGet,
-  } = useAxiosGet(BUILD_API("deals/company/creation-list"), {doc_status:value});
+  } = useAxiosGet(BUILD_API("deals/company/creation-list"), {
+    doc_status: value,
+  });
   useEffect(() => {
     if (opened) {
       executeGet();
     }
-  }, [opened,value]);
+  }, [opened, value]);
   // useEffect(()=>{
 
   // },[value])
@@ -3158,52 +3090,44 @@ const CreatedTree = ({ onDateClick }) => {
       console.log(dataGet, "dataGet");
     }
   }, [errorMessageGet, succeededGet]);
-  const header=<Group
-        
-  m="md"
-  p="xs"
-  mr="lg"
-  ml="lg" 
-  grow
->
-  {/* <Group justify="flex-start" > */}
-    <Group justify="space-between" gap={2} >
-      <Box>{t('total','Total')}</Box>
-      <Divider size={1} orientation="vertical" />
-      <Box>{t('draft','Draft')}</Box>
-      <Divider size={1} orientation="vertical" />
-      <Box>{t('final','Final')}</Box>
-      <Divider size={1} orientation="vertical" />
+  const header = (
+    <Group m="md" p="xs" mr="lg" ml="lg" grow>
+      {/* <Group justify="flex-start" > */}
+      <Group justify="space-between" gap={2}>
+        <Box>{t("total", "Total")}</Box>
+        <Divider size={1} orientation="vertical" />
+        <Box>{t("draft", "Draft")}</Box>
+        <Divider size={1} orientation="vertical" />
+        <Box>{t("final", "Final")}</Box>
+        <Divider size={1} orientation="vertical" />
+      </Group>
+      {/* </Group> */}
+      <Group justify="center">{t("created_on", "Created On")}</Group>
     </Group>
-  {/* </Group> */} 
-  <Group justify="center">
-  {t('created_on','Created On')}
-  </Group>
-</Group>
+  );
   const rows = dataGet.map((item) => {
     return (
       <Group
-        
         m="md"
         p="xs"
         mr="lg"
         ml="lg"
         className={classesG.titleHrefDashed}
         onClick={() => {
-          onDateClick(item.created_on_int,value);
+          onDateClick(item.created_on_int, value);
           close();
         }}
         grow
       >
         {/* <Group justify="flex-start" > */}
-          <Group justify="space-between" gap={2} >
-            <Box>{item.deals_count}</Box>
-            <Divider size={1} orientation="vertical" />
-            <Box>{item.draft_deals_count}</Box>
-            <Divider size={1} orientation="vertical" />
-            <Box>{item.final_deals_count}</Box>
-            <Divider size={1} orientation="vertical" />
-          </Group>
+        <Group justify="space-between" gap={2}>
+          <Box>{item.deals_count}</Box>
+          <Divider size={1} orientation="vertical" />
+          <Box>{item.draft_deals_count}</Box>
+          <Divider size={1} orientation="vertical" />
+          <Box>{item.final_deals_count}</Box>
+          <Divider size={1} orientation="vertical" />
+        </Group>
         {/* </Group> */}
 
         <Group justify="flex-end">
@@ -3229,21 +3153,18 @@ const CreatedTree = ({ onDateClick }) => {
             overlayProps={{ radius: "sm", blur: 2 }}
           />
           <AppSelect
-                  value={value}
-                  onChange={setValue}
-                 
-                
-                 
-                label={t("doc_status", "Document Status")}
-                placeholder={t("doc_status", "Document Status")}
-                limit={8}
-                maxDropdownHeight={500}
-                data={[
-                  {value:'B',label:'Both'},
-                  {value:'D',label:'Draft'},
-                  {value:'F',label:'Final'}
-                ]}
-              />
+            value={value}
+            onChange={setValue}
+            label={t("doc_status", "Document Status")}
+            placeholder={t("doc_status", "Document Status")}
+            limit={8}
+            maxDropdownHeight={500}
+            data={[
+              { value: "B", label: "Both" },
+              { value: "D", label: "Draft" },
+              { value: "F", label: "Final" },
+            ]}
+          />
           {header}
           {rows}
         </Box>

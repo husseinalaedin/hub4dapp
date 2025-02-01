@@ -682,8 +682,7 @@ const FreePlan = ({
   stripeInfo,
 }) => {
   const small = useSelector(selectSmall);
-  const medium = useSelector(selectMedium);
-  const { error, succeed, warning } = useMessage();
+  const medium = useSelector(selectMedium); 
   const { t } = useTranslation("public", { keyPrefix: "stripe" });
   const [extraCS, setExtraCS] = useState<any>("1");
   const [showCurrent, setShowCurrent] = useState(true);

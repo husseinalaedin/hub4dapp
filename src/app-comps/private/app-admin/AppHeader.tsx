@@ -39,7 +39,9 @@ export const AppHeader = (prop: any) => {
   let title = prop?.title;
   let titleClicked = prop?.titleClicked;
   const { setHeaderComponent }: any = useAppHeaderNdSide();
-
+  const small = useSelector(selectSmall);
+  const medium = useSelector(selectMedium);
+  const large = useSelector(selectLarge);
   const Header = () => {
     return <>{child}</>;
   };
@@ -71,7 +73,7 @@ export const AppHeader = (prop: any) => {
       };
     });
     return () => setHeaderComponent(null); // Cleanup on unmount
-  }, [setHeaderComponent]);
+  }, [setHeaderComponent,small,medium,large]);
   return <></>;
 };
 export const AppHeader0 = (prop: any) => {

@@ -38,6 +38,7 @@ import {
   Text,
   Textarea,
   TextInput,
+  Tooltip,
 } from "@mantine/core";
 import { getFilteredRowModel } from "@tanstack/react-table";
 import { useGlobalStyl } from "../../../hooks/useTheme";
@@ -53,6 +54,7 @@ import {
   IconCircleLetterFFilled,
   IconCircleXFilled,
   IconClipboardListFilled,
+  IconClipboardPlus,
   IconCopy,
   IconCopyPlus,
   IconDeselect,
@@ -74,6 +76,11 @@ import { useAppHeaderNdSide } from "../../../hooks/useAppHeaderNdSide";
 import { useDisclosure } from "@mantine/hooks";
 import { MassDealEntry } from "../../../app-comps/private/posts/DealsEntryMass";
 import { useNavigate } from "react-router";
+import {
+  selectMedium,
+  selectSmall,
+} from "../../../store/features/ScreenStatus";
+import { useSelector } from "react-redux";
 const MAX_HISTORY_SIZE = 40;
 
 declare module "@tanstack/react-table" {
@@ -897,7 +904,7 @@ export const AppTable = forwardRef((props: any, ref) => {
             <IconPlus stroke={1.5} size="1rem" />
           </ActionIcon> */}
           <Add t={t} add={add} />
-          <AddByPaste t={t} disabled={false} onConfirm={null} />
+          <AddByPaste isIcon={true} />
           <Divider orientation="vertical" size="sm" ml="2px" mr="2px" />
           <ActionIcon
             variant="light"
@@ -1415,14 +1422,19 @@ const handleRemoveText = (elementRef) => {
   }
 };
 
-function AddByPaste({ t, onConfirm, disabled }) {
+export const AddByPaste = ({ isIcon }) => {
+  const { t } = useTranslation("common", { keyPrefix: "table" });
   const [tableData, setTableData] = useState<any>([]);
   const { classes: classesG } = useGlobalStyl();
   const [opened, { close, open }] = useDisclosure(false);
-  const [value,setValue]=useState('')
+  const [value, setValue] = useState("");
   const navigate = useNavigate();
   const [selectAll0, SetSelectAll0] = useState(false);
   const [intermidiate0, setIntermidiate0] = useState(false);
+
+  const small = useSelector(selectSmall);
+  const medium = useSelector(selectMedium);
+
   const selectAll = (val) => {
     setTableData((prevData) =>
       prevData.map((item) => ({
@@ -1431,8 +1443,8 @@ function AddByPaste({ t, onConfirm, disabled }) {
       }))
     );
   };
-  useEffect(()=>{
-    if(value=='') return
+  useEffect(() => {
+    if (value == "") return;
     const pastedText = value; // Get pasted text
     const rows = pastedText.split("\n").filter((row) => row.trim() !== ""); // Split by lines and filter empty rows
 
@@ -1450,11 +1462,11 @@ function AddByPaste({ t, onConfirm, disabled }) {
     });
 
     setTableData(parsedData); // Update the state with parsed data
-    setValue('')
+    setValue("");
     SetSelectAll0(true);
-      selectAll(true);
-  },[value])
-  
+    selectAll(true);
+  }, [value]);
+
   return (
     <>
       <Modal
@@ -1462,41 +1474,48 @@ function AddByPaste({ t, onConfirm, disabled }) {
         onClose={close}
         size="auto"
         withCloseButton={true}
-        title={t("adding_deals_by_paste", "Adding deals via paste...")}
+        title={t("adding_deals_by_paste", "Adding deals via pasting...")}
+        fullScreen={small||medium}
       >
         <Box>
-        <Alert icon={<IconAlertCircle />} variant="light" color="red" title={t('guidlines_for_mass_adding_deals_via_paste','Guidelines for Mass Adding Deals via Paste')} mb="md">
-                          <Text size="md">
-                            {t(
-                              "paste_rule0",
-                              `The type must be either WTS or WTB.`
-                            )}
-                          </Text>
-                          <Text size="md">
-                            {t(
-                              "paste_rule1",
-                              `Ensure the fields follow the same order as shown in the example below.`
-                            )}
-                          </Text>
-                          <Text size="md" mt="2px">
-                            {t(
-                              "paste_rule2",
-                              `The values must be separated by a TAB, and each line must end with a \\n. In other words, copying directly from Excel or Google Sheets should work.`
-                            )}
-                          </Text>
-                          <Text size="md" mt="2px">
-                            {t(
-                              "paste_rule3",
-                              `Pasted hashtags must be separated by either the # symbol or commas.`
-                            )}
-                          </Text>
-                          <Text size="md" mt="2px">
-                            {t(
-                              "paste_rule5",
-                              `You can paste up to 15 deals at a time. Only the first 15 will be processed, and any additional deals will be ignored.`
-                            )}
-                          </Text>
-                        </Alert>
+          <Alert
+            icon={<IconAlertCircle />}
+            variant="light"
+            color="red"
+            title={t(
+              "guidlines_for_mass_adding_deals_via_paste",
+              "Guidelines for Mass Adding Deals via Paste"
+            )}
+            mb="md"
+          >
+            <Text size="md">
+              {t("paste_rule0", `The type must be either WTS or WTB.`)}
+            </Text>
+            <Text size="md">
+              {t(
+                "paste_rule1",
+                `Ensure the fields follow the same order as shown in the example below.`
+              )}
+            </Text>
+            <Text size="md" mt="2px">
+              {t(
+                "paste_rule2",
+                `The values must be separated by a TAB, and each line must end with a \\n. In other words, copying directly from Excel or Google Sheets should work.`
+              )}
+            </Text>
+            <Text size="md" mt="2px">
+              {t(
+                "paste_rule3",
+                `Pasted hashtags must be separated by either the # symbol or commas.`
+              )}
+            </Text>
+            <Text size="md" mt="2px">
+              {t(
+                "paste_rule5",
+                `You can paste up to 15 deals at a time. Only the first 15 will be processed, and any additional deals will be ignored.`
+              )}
+            </Text>
+          </Alert>
           <table>
             <thead>
               <tr>
@@ -1645,50 +1664,63 @@ function AddByPaste({ t, onConfirm, disabled }) {
           </table>
         </Box>
         <Textarea
-        value={value}
-        onChange={(event) => setValue(event.currentTarget.value)} h={200} mt="lg" label={t('paste_deals','Paste deals')}  placeholder={t('paste_deals_here','Paste deals here')} />
-          
-          <MassDealEntry dataSet={tableData} setData={setTableData} onClose={close} onSucceed={(dt)=>{
-             close()
+          value={value}
+          onChange={(event) => setValue(event.currentTarget.value)}
+          h={100}
+          mt="lg"
+          label={t("paste_deals", "Paste deals")}
+          placeholder={t("paste_deals_here", "Paste deals here")}
+        />
+
+        <MassDealEntry
+          dataSet={tableData}
+          setData={setTableData}
+          onClose={close}
+          onSucceed={(dt) => {
+            close();
             navigate("../mydeals?src=navigator&created_on=" + dt);
-          }} 
-          selectAll0={selectAll0} 
+          }}
+          selectAll0={selectAll0}
           SetSelectAll0={SetSelectAll0}
-          intermidiate0={intermidiate0} 
+          intermidiate0={intermidiate0}
           setIntermidiate0={setIntermidiate0}
           selectAll={selectAll}
-          />
-                      <Box c="orange" mt="xs">
-                        {tableData?.length} {t("deals_extracted", "Deals extracted")}
-                      </Box>
-        <Group mt="xl" justify="right" gap="md">
-          <Button variant="light" onClick={close}>
-            {t("close", "Close")}
-          </Button>
-          <Button
-            variant="filled"
-            
-            onClick={() => {
-              // onConfirm();
-              close();
-            }}
-          >
-            {t("confirm", "Confirm")}
-          </Button>
-        </Group>
+        />
+        <Box c="orange" mt="xs">
+          {tableData?.length} {t("deals_extracted", "Deals extracted")}
+        </Box>
       </Modal>
       <Group justify="center">
-        <ActionIcon
-          // c="orange"
-           
-          variant="filled"
-          onClick={open}
-          title={t("add_deals_by_pasting", "Add deals by pasting")}
-          disabled={disabled}
-        >
-          <IconClipboardListFilled stroke={1.5} size="1rem" />
-        </ActionIcon>
+        {isIcon && (
+          <ActionIcon
+            variant="filled"
+            onClick={open}
+            title={t("add_deals_by_pasting", "Add deals by pasting")}
+          >
+            <IconClipboardPlus stroke={1.5} size="1.7rem" />
+          </ActionIcon>
+        )}
+        {!isIcon && (
+          <Tooltip
+            label={t("add_new_deal_by_pasting", "Add new deals by pasting.")}
+          >
+            <Button
+              variant="gradient"
+              gradient={{ from: "lime", to: "indigo", deg: 60 }}
+              type="button"
+              style={{ width: small || medium ? 'auto' : 150 }}
+              onClick={open} 
+            >
+              <Group>
+                <IconClipboardPlus />
+                {!(small || medium) && (
+                  <Box>{t("by_pasting", "By Pasting")}</Box>
+                )}
+              </Group>
+            </Button>
+          </Tooltip>
+        )}
       </Group>
     </>
   );
-}
+};
