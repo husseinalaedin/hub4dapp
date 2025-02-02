@@ -70,6 +70,32 @@ export const AppHeader = (prop: any) => {
       return {
         Header: Header,
         Title: TitleC,
+        CoHeader:null
+      };
+    });
+    return () => setHeaderComponent(null); // Cleanup on unmount
+  }, [setHeaderComponent,small,medium,large]);
+  return <></>;
+};
+export const AppCoHeader = (prop: any) => {
+  let child = prop?.children;
+  
+  const { setHeaderComponent }: any = useAppHeaderNdSide();
+  const small = useSelector(selectSmall);
+  const medium = useSelector(selectMedium);
+  const large = useSelector(selectLarge);
+  const CoHeader = () => {
+    return <>{child}</>;
+  };
+  
+
+  useEffect(() => {
+    if (!setHeaderComponent) return;
+    setHeaderComponent(() => {
+      return {
+        Header: null,
+        Title: null,
+        CoHeader:CoHeader
       };
     });
     return () => setHeaderComponent(null); // Cleanup on unmount

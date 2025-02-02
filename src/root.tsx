@@ -16,6 +16,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <title>Hub4d</title>
         <Meta />
         <Links />
+        <link rel="icon" type="image/png" href="../public/favicon.ico" />
       </head>
       <body>
         {children}

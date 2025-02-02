@@ -114,7 +114,7 @@ import {
   selectMedium,
   selectSmall,
 } from "../../../store/features/ScreenStatus";
-import { AppHeader } from "../app-admin/AppHeader";
+import { AppCoHeader, AppHeader } from "../app-admin/AppHeader";
 
 import { WTSBTheme } from "./Deals";
 import { IconBrands } from "../../../global/IconBrands";
@@ -450,14 +450,20 @@ export const Trades = () => {
           )}
         </AppHeader>
       )}
-      {isTraderPage && (
+      {isTraderPage && coData && (
         <>
-          <TraderInfo coData={coData} />
-          <MessageToSend
-            coData={coData}
-            message={message}
-            clear_message={clear_message}
-          />
+          {!isLoading && (
+            <AppCoHeader>
+              <TraderInfo coData={coData} />
+            </AppCoHeader>
+          )}
+          <Box mb="lg">
+            <MessageToSend
+              coData={coData}
+              message={message}
+              clear_message={clear_message}
+            />
+          </Box>
         </>
       )}
       <Box style={{ width: "100%", position: "relative" }}>
@@ -1905,8 +1911,13 @@ export const TradeDetails = () => {
         visible={isLoading}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-      <TraderInfo coData={coData} />
-      <Box w="100%" className={`${classesG.cmpanyTradeLeftRigthPadding}`}>
+      {!isLoading && (
+        <AppCoHeader>
+          <TraderInfo coData={coData} />
+        </AppCoHeader>
+      )}
+      {/* <TraderInfo coData={coData} /> */}
+      <Box w="100%">
         <Grid gutter={small ? 5 : medium ? 10 : 15}>
           <Grid.Col span={{ base: 12 }}>
             <Card
@@ -2114,7 +2125,7 @@ const TraderInfo = ({ coData }) => {
                   onClick={() => {
                     if (source === "t")
                       navigate(
-                        "../trades/t" +
+                        "../app/trades/t" +
                           (hex && hex != ""
                             ? "/c/?hex=" + hex
                             : "/a/?t=" + new Date().getTime().toString()),
@@ -2122,7 +2133,7 @@ const TraderInfo = ({ coData }) => {
                       );
                     else
                       navigate(
-                        "../latest-trades" +
+                        "../app/latest-trades" +
                           (hex && hex != "" ? "/?hex=" + hex : ""),
                         { replace: true }
                       );
@@ -2276,7 +2287,7 @@ const MessageToSend = ({ coData, message, clear_message }) => {
     if (ref && ref.current) ref.current.innerHTML = message;
   }, [message]);
   return (
-    <Box w="100%" className={`${classesG.cmpanyTradeLeftRigthPadding}`}>
+    <Box w="100%">
       <Accordion
         // className={`${
         //   notFocusOn(FOCUS_OBJ.MESSAGE, focusOn) ? classesG.hideVisibility : ""

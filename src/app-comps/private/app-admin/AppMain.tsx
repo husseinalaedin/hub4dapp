@@ -250,57 +250,68 @@ export const AppMain = () => {
   const { HeaderComponent }: any = useAppHeaderNdSide();
   const small = useSelector(selectSmall);
   const medium = useSelector(selectMedium);
-  const padng = small ? "sm" : medium ? "md" : "lg";
+  const padng =  small ? "sm" : medium ? "md" : "lg";
   const { classes: classesG } = useGlobalStyl();
-  const { desktopFocus } :any= useAppHeaderNdSide();
+  const { desktopFocus }: any = useAppHeaderNdSide();
   return (
     <AppShell
-      header={{ height: small ? 60 : 66 }}
+      header={{
+        height:
+          HeaderComponent && !HeaderComponent.CoHeader
+            ? (small
+              ? 60
+              : 66
+            )
+            : 0,
+      }}
       navbar={{
-        width: 300,
+        width:  300,
         breakpoint: "sm",
         collapsed: { mobile: !opened, desktop: desktopFocus },
       }}
-      padding={padng}
+      padding={0}
     >
-      <AppShell.Header className={`${classesG.mainHeader}`}>
-        <Box style={{ display: "flex" }}>
-          <Group
-            justify="space-between"
-            style={{ flex: small ? (opened ? "1" : "0 0 auto") : "0 0 auto" }}
-          >
-            <Burger
-              opened={opened}
-              onClick={toggle}
-              hiddenFrom="sm"
-              size="sm"
-              // pl={padng}
-            />
-            {(opened || !small) && (
-              <Box w={small ? "" : "300px"} className={classesG.userBorder}>
-                <NavAcc />
-              </Box>
-            )}
-          </Group>
+      {HeaderComponent && !HeaderComponent.CoHeader && (
+        <AppShell.Header className={`${classesG.mainHeader}`}>
+          <Box style={{ display: "flex" }}>
+            <Group
+              justify="space-between"
+              style={{
+                flex: small ? (opened ? "1" : "0 0 auto") : "0 0 auto",
+              }}
+            >
+              <Burger
+                opened={opened}
+                onClick={toggle}
+                hiddenFrom="sm"
+                size="sm"
+              />
+              {(opened || !small) && (
+                <Box w={small ? "" : "300px"} className={classesG.userBorder}>
+                  <NavAcc />
+                </Box>
+              )}
+            </Group>
 
-          {(!opened || !small) && (
-            <Group justify="space-between" style={{ flex: "1" }}>
-              <Box style={{ flexShrink: 0 }} p="sm">
-                <Box visibleFrom="md">
-                  {HeaderComponent && HeaderComponent.Title && (
-                    <HeaderComponent.Title />
+            {(!opened || !small) && (
+              <Group justify="space-between" style={{ flex: "1" }}>
+                <Box style={{ flexShrink: 0 }} p="sm">
+                  <Box visibleFrom="md">
+                    {HeaderComponent && HeaderComponent.Title && (
+                      <HeaderComponent.Title />
+                    )}
+                  </Box>
+                </Box>
+                <Box p="sm" pr={padng}>
+                  {HeaderComponent && HeaderComponent.Header && (
+                    <HeaderComponent.Header />
                   )}
                 </Box>
-              </Box>
-              <Box p="sm" pr={padng}>
-                {HeaderComponent && HeaderComponent.Header && (
-                  <HeaderComponent.Header />
-                )}
-              </Box>
-            </Group>
-          )}
-        </Box>
-      </AppShell.Header>
+              </Group>
+            )}
+          </Box>
+        </AppShell.Header>
+      )}
 
       <AppShell.Navbar p="md">
         <Nav />
@@ -322,7 +333,15 @@ export const AppMain = () => {
           </Center>
         )}
         <Box pos="relative">
-          <Outlet />
+          {HeaderComponent && HeaderComponent.CoHeader && (
+            <Box>
+              <HeaderComponent.CoHeader />
+            </Box>
+          )}
+          <Box p={padng}>
+            <Outlet />
+          </Box>
+          
         </Box>
       </AppShell.Main>
     </AppShell>

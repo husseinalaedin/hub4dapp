@@ -933,7 +933,7 @@ export const CompanyDeals = () => {
                       t={t}
                     />
                   )}
-                {listDir == "spread" && (
+                {listDir == "spread" && !isLoading && (
                   <DealsSpreadSheet
                     data={data}
                     searchMyDeals={searchMyDeals}
@@ -1303,19 +1303,22 @@ export const AddEditDeal0 = () => {
               <IconRefresh />
             </Button>
           </Tooltip>
-
+          <AddByPaste isIcon={false} />
           <Tooltip label={t("add_new_deal_by_ai", "Add new deals by AI.")}>
             <Button
               variant="gradient"
               gradient={{ from: "teal", to: "blue", deg: 60 }}
               type="button"
-              style={{ width: 100 }}
+              style={{ width: small || medium ? "auto" : 120 }}
               onClick={() => {
                 openAI();
               }}
-              leftSection={<IconOctagonPlus />}
+              // leftSection={<IconOctagonPlus />}
             >
-              {t("by_ai", "By AI")}
+              <Group>
+                <IconOctagonPlus />
+                {!(small || medium) && <Box>{t("by_ai", "By AI")}</Box>}
+              </Group>
             </Button>
           </Tooltip>
           <Button

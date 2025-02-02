@@ -874,7 +874,7 @@ export const AddEditShare = () => {
                   <Box style={{ width: "40px" }}>
                     <CopyButton value={shareableLink}>
                       {({ copied, copy }) => (
-                        <ActionIcon
+                        <ActionIcon  variant="transparent"
                           onClick={() => {
                             copy();
                             succeed(t("link_copied", "Link copied!."));
@@ -935,13 +935,36 @@ export const AddEditShare = () => {
                 autoComplete="off"
                 label={t("shareable_deals", "Shareable Deals")}
                 placeholder={t("shareable_deals", "Shareable Deals")}
+                description={<Group justify="flex-start" gap={0}>
+                <Box>
+                  {t(
+                    "shareable_deals_msg",
+                    "You can still copy the content and paste it into the target channel."
+                  )}
+                </Box>
+                <CopyButton
+                      value={shareableDeals + "\n" + BUILD_URL(idhex)}
+                    >
+                      {({ copied, copy }) => (
+                        <ActionIcon variant="transparent"
+                          onClick={() => {
+                            copy();
+                            succeed(t("posts_copied", "Posts copied!."));
+                          }}
+                          color={copied ? "" : "gray.6"}
+                        >
+                          <IconCopy size={34} />
+                        </ActionIcon>
+                      )}
+                    </CopyButton>
+              </Group>}
                 rightSection={
                   <Box style={{ width: "40px", position: "absolute", top: 10 }}>
                     <CopyButton
                       value={shareableDeals + "\n" + BUILD_URL(idhex)}
                     >
                       {({ copied, copy }) => (
-                        <ActionIcon
+                        <ActionIcon variant="transparent"
                           onClick={() => {
                             copy();
                             succeed(t("posts_copied", "Posts copied!."));
@@ -1476,9 +1499,7 @@ export const ShareExpirationManip = ({ t, ids, expire, withinPortal }) => {
     }
   }, [succeededPut, errorMessagePut]);
   useEffect(() => {
-    setData(
-      shareExpirationPeriodList({ t, is_for: "share", expire: 1 })
-    );
+    setData(shareExpirationPeriodList({ t, is_for: "share", expire: 1 }));
   }, []);
   return (
     <Box pos="relative">
@@ -1486,7 +1507,7 @@ export const ShareExpirationManip = ({ t, ids, expire, withinPortal }) => {
         visible={isLoadingPut}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-      
+
       <AppSelect
         style={{ zIndex: 501 }}
         // comboboxProps={{withinPortal:true}}
@@ -1619,11 +1640,34 @@ export const DealsToShare = ({
         autoComplete="off"
         label={t("shareable_deals", "Shareable Deals")}
         placeholder={t("shareable_deals", "Shareable Deals")}
+        description={
+          <Group justify="flex-start" gap={0}>
+            <Box>
+              {t(
+                "shareable_deals_msg",
+                "You can still copy the content and paste it into the target channel."
+              )}
+            </Box>
+            <CopyButton  value={shareableDeals + "\n" + shareableLink()}>
+              {({ copied, copy }) => (
+                <ActionIcon variant="transparent"
+                  onClick={() => {
+                    copy();
+                    succeed(t("posts_copied", "Posts copied!."));
+                  }}
+                  color={copied ? "" : "gray.6"}
+                >
+                  <IconCopy size={34} />
+                </ActionIcon>
+              )}
+            </CopyButton>
+          </Group>
+        }
         rightSection={
           <Box style={{ width: "40px", position: "absolute", top: 10 }}>
             <CopyButton value={shareableDeals + "\n" + shareableLink()}>
               {({ copied, copy }) => (
-                <ActionIcon
+                <ActionIcon  variant="transparent"
                   onClick={() => {
                     copy();
                     succeed(t("posts_copied", "Posts copied!."));
@@ -1655,7 +1699,7 @@ export const DealsToShare = ({
           <Box style={{ width: "40px" }}>
             <CopyButton value={shareableLink()}>
               {({ copied, copy }) => (
-                <ActionIcon
+                <ActionIcon  variant="transparent"
                   onClick={() => {
                     copy();
                     succeed(t("link_copied", "Link copied!."));
