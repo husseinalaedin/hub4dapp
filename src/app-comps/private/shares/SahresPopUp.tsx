@@ -12,7 +12,7 @@ import {
   selectxLarger,
 } from "../../../store/features/ScreenStatus";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
-import { GridLayOut, openChannel } from "../../../global/Misc";
+import { GridLayOut, openChannel, openChannel2 } from "../../../global/Misc";
 import { useGlobalStyl } from "../../../hooks/useTheme";
 import { useAxiosGet, useAxiosPost } from "../../../hooks/Https";
 import {
@@ -321,6 +321,14 @@ const DealToShareCom = ({ t, openas, closeToShare }) => {
     setShareCompleted(false);
     setSharingChannel(null);
   };
+  const opengroupurl0 = (open) => {
+    return openChannel2(
+      isPhone,
+      sharingChannel.channel_group_id,
+      sharingChannel.channel_data,
+      open
+    );
+  };
   return (
     <>
       <Center mah={"calc(100vh - 20px)"} mt="10px" mb="10px">
@@ -388,22 +396,22 @@ const DealToShareCom = ({ t, openas, closeToShare }) => {
                   placeholder={t("channel_name", "Channel Name")}
                 />
                 <TextInput
-                  disabled={openChannel(isPhone, sharingChannel, false) === ""}
+                  disabled={opengroupurl0(false) === ""}
                   leftSection={
                     <IconBrands
                       brand={sharingChannel?.channel_group_id}
                       size={small ? 18 : medium ? 20 : 22}
                     />
                   }
-                  value={openChannel(isPhone, sharingChannel, false)}
+                  value={opengroupurl0(false)}
                   readOnly={true}
                   autoComplete="off"
                   label={t("channel_data", "Channel Data")}
                   placeholder={t("channel_data", "Channel Data")}
                   rightSection={
-                    openChannel(isPhone, sharingChannel, false) !== "" && (
+                    opengroupurl0(false) !== "" && (
                       <a
-                        href={openChannel(isPhone, sharingChannel, false)}
+                        href={opengroupurl0(false)}
                         target={sharingChannel?.channel_group_id}
                       >
                         <IconExternalLink
@@ -431,7 +439,7 @@ const DealToShareCom = ({ t, openas, closeToShare }) => {
                     <Box style={{ width: "40px" }}>
                       <CopyButton value={url()}>
                         {({ copied, copy }) => (
-                          <ActionIcon
+                          <ActionIcon variant="transparent"
                             onClick={() => {
                               copy();
                               succeed(t("link_copied", "Link copied!."));
@@ -566,6 +574,7 @@ const DealToShareCom = ({ t, openas, closeToShare }) => {
                   }}
                   copied={clipboard.copied}
                   onNew={newShare}
+                  channel_data={sharingChannel?.channel_data}
                 />
                 {/* <Box className={classesG.PopUpShareBg} p={small ? "xs" : "md"}>
                                     <ScrollArea.Autosize mah="60vh" mx="auto">

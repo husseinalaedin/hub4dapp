@@ -74,7 +74,7 @@ export const AppHeader = (prop: any) => {
       };
     });
     return () => setHeaderComponent(null); // Cleanup on unmount
-  }, [setHeaderComponent,small,medium,large]);
+  }, [setHeaderComponent,small,medium,large,child]);
   return <></>;
 };
 export const AppCoHeader = (prop: any) => {
@@ -99,7 +99,7 @@ export const AppCoHeader = (prop: any) => {
       };
     });
     return () => setHeaderComponent(null); // Cleanup on unmount
-  }, [setHeaderComponent,small,medium,large]);
+  }, [setHeaderComponent,small,medium,large,child]);
   return <></>;
 };
 export const AppHeader0 = (prop: any) => {

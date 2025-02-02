@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 
 import { useSelector } from "react-redux";
 import { selectOpened, selectSmall } from "../store/features/ScreenStatus";
+import { AppCopyButton } from "../hooks/useClipboard";
 
 export const ShareOrShareNOpen = ({
   disableShare,
@@ -31,7 +32,13 @@ export const ShareOrShareNOpen = ({
         gap="xs"
         style={{ display: small && opened ? "none" : "" }}
       >
-        <CopyButton value={shareableDeals}>
+        <AppCopyButton
+          value={shareableDeals}
+          timeout={500}
+          onCopied={() => {
+            onShareNOpen();
+          }}
+        >
           {({ copied, copy }) => (
             <Button
               disabled={disableShare || disablesharenopen}
@@ -39,7 +46,6 @@ export const ShareOrShareNOpen = ({
               type="button"
               onClick={() => {
                 copy();
-                onShareNOpen(copied);
               }}
             >
               {!copied && (
@@ -51,9 +57,15 @@ export const ShareOrShareNOpen = ({
               {copied && <Box mr="sm">{t("is_copying", "Copying..")}</Box>}
             </Button>
           )}
-        </CopyButton>
+        </AppCopyButton>
 
-        <CopyButton value={shareableDeals}>
+        <AppCopyButton
+          value={shareableDeals}
+          timeout={500}
+          onCopied={() => {
+            onShare();
+          }}
+        >
           {({ copied, copy }) => (
             <Button
               disabled={disableShare}
@@ -61,14 +73,13 @@ export const ShareOrShareNOpen = ({
               type="button"
               onClick={() => {
                 copy();
-                onShare(copied);
               }}
             >
               {!copied && <Box>{t("share", "Share")}</Box>}{" "}
               {copied && <Box mr="sm">{t("is_copying", "Copying..")}</Box>}
             </Button>
           )}
-        </CopyButton>
+        </AppCopyButton>
       </Group>
     </div>
   );

@@ -77,6 +77,7 @@ export const opengroupurl = (isPhone: any, channel_group_id: any, url: any) => {
 export const openChannel = (isPhone: any, channel: any, open: any) => {
   let url_ret = "";
   if (!channel) return "";
+  return openChannel2(isPhone,channel.channel_group_id,channel.channel_data,open)
   let url = channel.channel_data;
   if (channel.channel_group_id == BRANDS.WATS_APP) {
     if (!isPhone() && openWhatsappAsWeb()) {
@@ -90,7 +91,22 @@ export const openChannel = (isPhone: any, channel: any, open: any) => {
 
   return url_ret;
 };
+export const openChannel2 = (isPhone: any, channel_group_id: any,channel_data, open: any) => {
+  let url_ret = "";
+  let url = channel_data;
+  if(!channel_group_id || channel_group_id=='') return ''
+  if (channel_group_id == BRANDS.WATS_APP) {
+    if (!isPhone() && openWhatsappAsWeb()) {
+      url = "https://web.whatsapp.com";
+    } else url = "whatsapp://";
+  }
+  url_ret = url;
+  if (open && url != "" && channel_group_id != BRANDS.EMAIL) {
+    window.open(url, channel_group_id);
+  }
 
+  return url_ret;
+};
 export const hiddenProfile = () => {
   let hidden = userDataInit()["hidden"];
   if (hidden && hidden != "") return hidden;

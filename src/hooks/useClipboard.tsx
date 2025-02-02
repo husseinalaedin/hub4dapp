@@ -176,7 +176,7 @@ const ClipBoardPopCom = ({
       clearTimeout(tim);
     };
   }, []);
-  
+
   return (
     <Center mah={"calc(100vh - 20px)"} mt="10px" mb="10px">
       <Box
@@ -330,4 +330,20 @@ export const CopyAlert = ({ clipboard, t }) => {
       )}
     </>
   );
+};
+
+export const AppCopyButton = ({ timeout, value, onCopied, children }) => {
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(value);
+
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+      if (onCopied) onCopied();
+    }, timeout); // Reset after 2 seconds
+  };
+
+  return children({ copied, copy, onCopied });
 };

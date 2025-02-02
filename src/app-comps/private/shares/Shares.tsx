@@ -76,6 +76,7 @@ import { IconBrands } from "../../../global/IconBrands";
 import {
   decimalSep,
   GridLayOut,
+  openChannel2,
   openWhatsappAsWeb,
   shareExpirationPeriodList,
   thousandSep,
@@ -116,6 +117,7 @@ import { selectMenu, useSelection } from "../../../hooks/useSelection";
 import { useDbData } from "../../../global/DbData";
 import { IconShare } from "@tabler/icons-react";
 import { AppSelect } from "../../../global/global-comp/AppSelect";
+import { AppCopyButton } from "../../../hooks/useClipboard";
 
 export const Shares = () => {
   const grid_name = "SHARES";
@@ -674,16 +676,12 @@ export const AddEditShare = () => {
     if (errorMessagePost) error(errorMessagePost);
   }, [errorMessagePost, succeededPost]);
   const opengroupurl = () => {
-    if (channel.channel_group_id != "EMAIL" && isAlsoOpen) {
-      let url = channel.channel_data;
-      if (channel.channel_group_id == "WATS_APP") {
-        if (!isPhone() && openWhatsappAsWeb()) {
-          url = "https://wa.me/?text=" + encodeURIComponent(shareableDeals);
-        } else
-          url = "whatsapp://send?text=" + encodeURIComponent(shareableDeals);
-      }
-      window.open(url, channel.channel_group_id);
+    if (isAlsoOpen) {
+      opengroupurl0()
     }
+  };
+  const opengroupurl0 = () => {
+    openChannel2(isPhone,channel.channel_group_id,channel.channel_data,true)
   };
   const build = (channel_) => {
     if (!dataGet || !dataGet["deals"] || !channel_) return;
@@ -874,7 +872,8 @@ export const AddEditShare = () => {
                   <Box style={{ width: "40px" }}>
                     <CopyButton value={shareableLink}>
                       {({ copied, copy }) => (
-                        <ActionIcon  variant="transparent"
+                        <ActionIcon
+                          variant="transparent"
                           onClick={() => {
                             copy();
                             succeed(t("link_copied", "Link copied!."));
@@ -935,36 +934,97 @@ export const AddEditShare = () => {
                 autoComplete="off"
                 label={t("shareable_deals", "Shareable Deals")}
                 placeholder={t("shareable_deals", "Shareable Deals")}
-                description={<Group justify="flex-start" gap={0}>
-                <Box>
-                  {t(
-                    "shareable_deals_msg",
-                    "You can still copy the content and paste it into the target channel."
-                  )}
-                </Box>
-                <CopyButton
-                      value={shareableDeals + "\n" + BUILD_URL(idhex)}
-                    >
-                      {({ copied, copy }) => (
-                        <ActionIcon variant="transparent"
-                          onClick={() => {
-                            copy();
-                            succeed(t("posts_copied", "Posts copied!."));
+                description={
+                  <>
+                    {succeededGet && succeededPost && (
+                      <Group justify="flex-start" gap={0}>
+                        <Box>
+                          {t(
+                            "shareable_deals_msg",
+                            "You can still copy the content and paste it into the target channel."
+                          )}
+                        </Box>
+                        <AppCopyButton
+                          value={shareableDeals + "\n" + BUILD_URL(idhex)}
+                          timeout={500}
+                          onCopied={() => { //href={urlGroup} target={channel.channel_group_id}
+                            opengroupurl0();
                           }}
-                          color={copied ? "" : "gray.6"}
                         >
-                          <IconCopy size={34} />
-                        </ActionIcon>
-                      )}
-                    </CopyButton>
-              </Group>}
+                          {({ copied, copy }) => (
+                            <Button
+                              variant="subtle"
+                              size="compact-xs"
+                              type="button"
+                              onClick={() => {
+                                copy();
+                              }}
+                            >
+                              <Group justify="flex-start" gap={0}>
+                                {!copied && (
+                                  <IconCopy
+                                    size={small ? 18 : medium ? 20 : 22}
+                                  />
+                                )}
+                                {!copied && (
+                                  <IconExternalLink
+                                    size={small ? 18 : medium ? 20 : 22}
+                                  />
+                                )}
+                                {copied && (
+                                  <Box mr="sm">
+                                    {t("is_copying", "Copying..")}
+                                  </Box>
+                                )}
+                              </Group>
+                            </Button>
+                          )}
+                        </AppCopyButton>
+                        <Box>{t('or','Or')}</Box>
+                        <AppCopyButton
+                          value={shareableDeals + "\n" + BUILD_URL(idhex)}
+                          timeout={500}
+                          onCopied={() => { //href={urlGroup} target={channel.channel_group_id}
+                            
+                          }}
+                        >
+                          {({ copied, copy }) => (
+                            <Button
+                              variant="subtle"
+                              size="compact-xs"
+                              type="button"
+                              onClick={() => {
+                                copy();
+                              }}
+                            >
+                              <Group justify="flex-start" gap={0}>
+                                {!copied && (
+                                  <IconCopy
+                                    size={small ? 18 : medium ? 20 : 22}
+                                  />
+                                )}
+                               
+                                {copied && (
+                                  <Box mr="sm">
+                                    {t("is_copying", "Copying..")}
+                                  </Box>
+                                )}
+                              </Group>
+                            </Button>
+                          )}
+                        </AppCopyButton>
+                      </Group>
+                    )}
+                  </>
+                }
                 rightSection={
                   <Box style={{ width: "40px", position: "absolute", top: 10 }}>
                     <CopyButton
-                      value={shareableDeals + "\n" + BUILD_URL(idhex)}
+                      value={shareableDeals}
                     >
                       {({ copied, copy }) => (
-                        <ActionIcon variant="transparent"
+                        <ActionIcon
+                          variant="transparent"
                           onClick={() => {
                             copy();
                             succeed(t("posts_copied", "Posts copied!."));
@@ -1541,6 +1601,7 @@ export const DealsToShare = ({
   onShare,
   copied,
   onNew,
+  channel_data
 }) => {
   // const [url, setIdH] = useState(BUILD_URL(G.uid('s')))
   // const [idHx, setIdHx] = useState(BUILD_URL(G.uid('s')))
@@ -1606,7 +1667,20 @@ export const DealsToShare = ({
     onChange({ contain: posts_c, idHx: idHx });
     setshareableDeals(posts_c);
   };
-
+  const os = useOs();
+  const small = useSelector(selectSmall);
+  const medium = useSelector(selectMedium);
+  const isPhone = () => {
+    return os == "ios" || os == "android";
+  };
+  const opengroupurl0 = () => {
+    return openChannel2(
+      isPhone,
+      channel_group_id,
+      channel_data,
+      true
+    );
+  };
   return (
     <Stack gap="md">
       <Group justify="space-between" style={{ maxWidth: "500px" }} mt="md">
@@ -1641,33 +1715,94 @@ export const DealsToShare = ({
         label={t("shareable_deals", "Shareable Deals")}
         placeholder={t("shareable_deals", "Shareable Deals")}
         description={
-          <Group justify="flex-start" gap={0}>
-            <Box>
-              {t(
-                "shareable_deals_msg",
-                "You can still copy the content and paste it into the target channel."
-              )}
-            </Box>
-            <CopyButton  value={shareableDeals + "\n" + shareableLink()}>
-              {({ copied, copy }) => (
-                <ActionIcon variant="transparent"
-                  onClick={() => {
-                    copy();
-                    succeed(t("posts_copied", "Posts copied!."));
+          <>
+            {shareCompleted && (
+              <Group justify="flex-start" gap={0}>
+                <Box>
+                  {t(
+                    "shareable_deals_msg",
+                    "You can still copy the content and paste it into the target channel."
+                  )}
+                </Box>
+                <AppCopyButton
+                  value={shareableDeals + "\n" + shareableLink()}
+                  timeout={500}
+                  onCopied={() => { 
+                    opengroupurl0();
                   }}
-                  color={copied ? "" : "gray.6"}
                 >
-                  <IconCopy size={34} />
-                </ActionIcon>
-              )}
-            </CopyButton>
-          </Group>
+                  {({ copied, copy }) => (
+                    <Button
+                      variant="subtle"
+                      size="compact-xs"
+                      type="button"
+                      onClick={() => {
+                        copy();
+                      }}
+                    >
+                      <Group justify="flex-start" gap={0}>
+                        {!copied && (
+                          <IconCopy
+                            size={small ? 18 : medium ? 20 : 22}
+                          />
+                        )}
+                        {!copied && (
+                          <IconExternalLink
+                            size={small ? 18 : medium ? 20 : 22}
+                          />
+                        )}
+                        {copied && (
+                          <Box mr="sm">
+                            {t("is_copying", "Copying..")}
+                          </Box>
+                        )}
+                      </Group>
+                    </Button>
+                  )}
+                </AppCopyButton>
+                <Box>{t('or','Or')}</Box>
+                <AppCopyButton
+                  value={shareableDeals + "\n" + shareableLink()}
+                  timeout={500}
+                  onCopied={() => { //href={urlGroup} target={channel.channel_group_id}
+                    
+                  }}
+                >
+                  {({ copied, copy }) => (
+                    <Button
+                      variant="subtle"
+                      size="compact-xs"
+                      type="button"
+                      onClick={() => {
+                        copy();
+                      }}
+                    >
+                      <Group justify="flex-start" gap={0}>
+                        {!copied && (
+                          <IconCopy
+                            size={small ? 18 : medium ? 20 : 22}
+                          />
+                        )}
+                       
+                        {copied && (
+                          <Box mr="sm">
+                            {t("is_copying", "Copying..")}
+                          </Box>
+                        )}
+                      </Group>
+                    </Button>
+                  )}
+                </AppCopyButton>
+              </Group>
+            )}
+          </>
         }
         rightSection={
           <Box style={{ width: "40px", position: "absolute", top: 10 }}>
-            <CopyButton value={shareableDeals + "\n" + shareableLink()}>
+            <CopyButton value={shareableDeals }>
               {({ copied, copy }) => (
-                <ActionIcon  variant="transparent"
+                <ActionIcon
+                  variant="transparent"
                   onClick={() => {
                     copy();
                     succeed(t("posts_copied", "Posts copied!."));
@@ -1699,7 +1834,8 @@ export const DealsToShare = ({
           <Box style={{ width: "40px" }}>
             <CopyButton value={shareableLink()}>
               {({ copied, copy }) => (
-                <ActionIcon  variant="transparent"
+                <ActionIcon
+                  variant="transparent"
                   onClick={() => {
                     copy();
                     succeed(t("link_copied", "Link copied!."));
