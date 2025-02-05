@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BUILD_API } from "../../../global/G";
-import { useAxiosGet } from "../../../hooks/Https";
+import { useAxiosGet } from "../../../hooks/Https"; 
+
 import {
   Alert,
   Box,
@@ -13,6 +14,7 @@ import {
   LoadingOverlay,
   MultiSelect,
   Overlay,
+  Textarea,
 } from "@mantine/core";
 import { AppHeader } from "../app-admin/AppHeader";
 import {
@@ -54,8 +56,20 @@ export const Usage = () => {
   useEffect(() => {
     dispatch(changeActive("usage"));
   }, []);
+  const [value, setValue] = useState("");
+  const textareaProps = {
+    value: value,
+    onChange: (e) => setValue(e.target.value),
+    minRows: 3,
+    maxRows: 6,
+    placeholder: 'Type something...',
+    // autosize:true,
+    // trtr:"ok"
+  };
+  console.log('TextareaAutosize props:', textareaProps);
+
   return (
-    <>
+    <> 
       {isLoading && <Overlay opacity={1} color="#000" zIndex={5} />}
       {isLoading && (
         <LoadingOverlay
@@ -76,6 +90,21 @@ export const Usage = () => {
         </Group>
       </AppHeader>
       {/* <Group p="0px" m="0px" justify="center" w="100%"> */}
+      <Textarea
+        autosize={true}
+      // {...textareaProps}
+        // label="Autosize with 4 rows max"
+        // placeholder="Autosize with 4 rows max"
+      
+        minRows={5}
+        maxRows={10}
+        // styles={{ input: { overflow: "auto", height: "auto" } }}
+      />
+      <div>
+      
+
+      </div>
+
       <Box className={classesG.max400} pos="relative" w="100%">
         {data && !isLoading && succeeded && (
           <>
@@ -181,7 +210,11 @@ export const Usage = () => {
                   <Box opacity="0.75"> {t("out_of", "out of")} </Box>
                   <Box c="violet">
                     <strong>
-                      ~{`${data.parse_count_left+data.parsing_attempts_completed}`} {t("post_by_ai", "Posts By Ai")}
+                      ~
+                      {`${
+                        data.parse_count_left + data.parsing_attempts_completed
+                      }`}{" "}
+                      {t("post_by_ai", "Posts By Ai")}
                     </strong>{" "}
                   </Box>
                 </Group>
@@ -191,7 +224,9 @@ export const Usage = () => {
                   </Box>
                   <Box opacity="0.75"> {"/"} </Box>
                   <Box c="violet">
-                    <strong>{`${data.parse_count_left+data.parsing_attempts_completed}`}</strong>
+                    <strong>{`${
+                      data.parse_count_left + data.parsing_attempts_completed
+                    }`}</strong>
                   </Box>
                 </Group>
               </Group>

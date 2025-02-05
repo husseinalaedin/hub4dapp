@@ -539,6 +539,7 @@ export const Shares = () => {
                               <Text c="red.5" fz="sm">
                                 {D.utc_to_distance(
                                   element.expired_on,
+                                  t("never", "Never"),
                                   t("never", "Never")
                                 )}
                               </Text>
@@ -677,11 +678,11 @@ export const AddEditShare = () => {
   }, [errorMessagePost, succeededPost]);
   const opengroupurl = () => {
     if (isAlsoOpen) {
-      opengroupurl0()
+      opengroupurl0();
     }
   };
   const opengroupurl0 = () => {
-    openChannel2(isPhone,channel.channel_group_id,channel.channel_data,true)
+    openChannel2(isPhone, channel.channel_group_id, channel.channel_data, true);
   };
   const build = (channel_) => {
     if (!dataGet || !dataGet["deals"] || !channel_) return;
@@ -690,24 +691,24 @@ export const AddEditShare = () => {
     for (let i = 0; i < deals.length; i++) {
       let deal = deals[i];
       posts_c =
-        posts_c +
-        buildWTSB(channel_.channel_group_id, deal.wtsb) +
-        " " +
-        (withQuantity
-          ? (+deal.quantity).toFixed(0).toString() +
-            " " +
-            deal.uom.toString() +
-            " "
-          : "") +
-        deal.title +
-        (withPrice
-          ? " " +
-            (+deal.price).toFixed(0).toString() +
-            " " +
-            deal.curr_symbol.toString() +
-            " "
-          : "") +
-        "\n";
+        posts_c +buildShare(channel_.channel_group_id,deal,withQuantity,withPrice)
+        // buildWTSB(channel_.channel_group_id, deal.wtsb) +
+        // " " +
+        // (withQuantity
+        //   ? (+deal.quantity).toFixed(0).toString() +
+        //     " " +
+        //     deal.uom.toString() +
+        //     " "
+        //   : "") +
+        // deal.title +
+        // (withPrice
+        //   ? " " +
+        //     (+deal.price).toFixed(0).toString() +
+        //     " " +
+        //     deal.curr_symbol.toString() +
+        //     " "
+        //   : "") +
+        // "\n";
     }
     // posts_c = posts_c + '\n' + BUILD_URL(dataGet['idlink'])
     setshareableDeals(posts_c);
@@ -923,6 +924,7 @@ export const AddEditShare = () => {
 
             <Grid.Col span={{ base: 12 }}>
               <Textarea
+              autosize
                 readOnly={disableShare}
                 onChange={(e) => {
                   setshareableDeals(e.currentTarget.value);
@@ -930,7 +932,8 @@ export const AddEditShare = () => {
                 style={{ position: "relative" }}
                 defaultValue={shareableDeals}
                 value={shareableDeals}
-                minRows={10}
+                minRows={5}
+                maxRows={10}
                 autoComplete="off"
                 label={t("shareable_deals", "Shareable Deals")}
                 placeholder={t("shareable_deals", "Shareable Deals")}
@@ -947,7 +950,8 @@ export const AddEditShare = () => {
                         <AppCopyButton
                           value={shareableDeals + "\n" + BUILD_URL(idhex)}
                           timeout={500}
-                          onCopied={() => { //href={urlGroup} target={channel.channel_group_id}
+                          onCopied={() => {
+                            //href={urlGroup} target={channel.channel_group_id}
                             opengroupurl0();
                           }}
                         >
@@ -980,12 +984,12 @@ export const AddEditShare = () => {
                             </Button>
                           )}
                         </AppCopyButton>
-                        <Box>{t('or','Or')}</Box>
+                        <Box>{t("or", "Or")}</Box>
                         <AppCopyButton
                           value={shareableDeals + "\n" + BUILD_URL(idhex)}
                           timeout={500}
-                          onCopied={() => { //href={urlGroup} target={channel.channel_group_id}
-                            
+                          onCopied={() => {
+                            //href={urlGroup} target={channel.channel_group_id}
                           }}
                         >
                           {({ copied, copy }) => (
@@ -1003,7 +1007,7 @@ export const AddEditShare = () => {
                                     size={small ? 18 : medium ? 20 : 22}
                                   />
                                 )}
-                               
+
                                 {copied && (
                                   <Box mr="sm">
                                     {t("is_copying", "Copying..")}
@@ -1019,9 +1023,7 @@ export const AddEditShare = () => {
                 }
                 rightSection={
                   <Box style={{ width: "40px", position: "absolute", top: 10 }}>
-                    <CopyButton
-                      value={shareableDeals}
-                    >
+                    <CopyButton value={shareableDeals}>
                       {({ copied, copy }) => (
                         <ActionIcon
                           variant="transparent"
@@ -1277,65 +1279,7 @@ const SharesList = ({
           <Checkbox size="md" checked={item.isSelected} onChange={() => {}} />
         </Table.Td>
         <Table.Td>
-          <Box
-            className={`${classesG.cursorAsPointer}`}
-            onClick={() => {
-              opengroupurl(item.channel_group_id, item.channel_data);
-            }}
-          >
-            <IconBrands
-              brand={item.channel_group_id}
-              size={small ? 18 : medium ? 20 : 22}
-            />
-            <IconExternalLink size={small ? 18 : medium ? 20 : 22} />
-          </Box>
-        </Table.Td>
-        <Table.Td>
-          <Box
-            className={classesG.titleHref2}
-            onClick={() => {
-              navigate(`../channel/${item.id}`);
-            }}
-          >
-            <Text
-              style={{
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-                overflow: "hidden",
-              }}
-              td={item.expired == "X" ? "line-through" : ""}
-            >
-              {item.channel_name}
-            </Text>
-          </Box>
-        </Table.Td>
-        <Table.Td>
-          <Text style={{ fontSize: "0.8rem", color: "gray" }}>
-            {D.utc_to_distance(item.created_on)}
-          </Text>
-        </Table.Td>
-
-        <Table.Td>
-          <Text c="red.5">
-            {D.utc_to_distance(item.expired_on, t("never", "Never"))}
-          </Text>
-        </Table.Td>
-
-        <Table.Td>
-          <Group justify="right" gap={0} c="blue.5" fw="bolder">
-            <NumericFormat
-              decimalScale={0}
-              readOnly={true}
-              displayType="text"
-              value={`${item.nb_visited}`}
-              thousandSeparator={thousandSep()}
-              decimalSeparator={decimalSep()}
-            />
-            <Text>x</Text>
-          </Group>
-        </Table.Td>
-        <Table.Td>
-          <Group justify="right" gap={2}>
+          <Group justify="left" gap={2}>
             <PopShareVisitedStatInfo data={item}>
               <ActionIcon>
                 <IconFileAnalytics size={25} />
@@ -1409,6 +1353,69 @@ const SharesList = ({
             </Menu>
           </Group>
         </Table.Td>
+
+        <Table.Td>
+          <Box
+            className={`${classesG.cursorAsPointer}`}
+            onClick={() => {
+              opengroupurl(item.channel_group_id, item.channel_data);
+            }}
+          >
+            <IconBrands
+              brand={item.channel_group_id}
+              size={small ? 18 : medium ? 20 : 22}
+            />
+            <IconExternalLink size={small ? 18 : medium ? 20 : 22} />
+          </Box>
+        </Table.Td>
+        <Table.Td maw="150px">
+          <Box
+            className={classesG.titleHref2}
+            onClick={() => {
+              navigate(`../channel/${item.id}`);
+            }}
+          >
+            <Text
+              style={{
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+              }}
+              td={item.expired == "X" ? "line-through" : ""}
+            >
+              {item.channel_name}
+            </Text>
+          </Box>
+        </Table.Td>
+        <Table.Td>
+          <Text style={{ fontSize: "0.8rem", color: "gray" }}>
+            {D.utc_to_distance(item.created_on)}
+          </Text>
+        </Table.Td>
+
+        <Table.Td>
+          <Text c="red.5">
+            {D.utc_to_distance(
+              item.expired_on,
+              t("never", "Never"),
+              t("never", "Never")
+            )}
+          </Text>
+        </Table.Td>
+
+        <Table.Td>
+          <Group justify="right" gap={0} c="blue.5" fw="bolder">
+            <NumericFormat
+              decimalScale={0}
+              readOnly={true}
+              displayType="text"
+              value={`${item.nb_visited}`}
+              thousandSeparator={thousandSep()}
+              decimalSeparator={decimalSep()}
+            />
+            <Text>x</Text>
+          </Group>
+        </Table.Td>
       </Table.Tr>
     );
   });
@@ -1431,6 +1438,7 @@ const SharesList = ({
                 }}
               />
             </Table.Th>
+            <Table.Th></Table.Th>
             <Table.Th>{t("group", "Group")}</Table.Th>
             <Table.Th>{t("name", "Name")}</Table.Th>
 
@@ -1440,8 +1448,6 @@ const SharesList = ({
             <Table.Th style={{ textAlign: "right" }}>
               {t("nb_visited", "Visited")}
             </Table.Th>
-
-            <Table.Th></Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>
@@ -1601,7 +1607,7 @@ export const DealsToShare = ({
   onShare,
   copied,
   onNew,
-  channel_data
+  channel_data,
 }) => {
   // const [url, setIdH] = useState(BUILD_URL(G.uid('s')))
   // const [idHx, setIdHx] = useState(BUILD_URL(G.uid('s')))
@@ -1644,24 +1650,20 @@ export const DealsToShare = ({
     for (let i = 0; i < deals.length; i++) {
       let deal = deals[i];
       posts_c =
-        posts_c +
-        buildWTSB(channel_group(), deal.wtsb) +
-        " " +
-        (withQuantity
-          ? (+deal.quantity).toFixed(0).toString() +
-            " " +
-            deal.uom.toString() +
-            " "
-          : "") +
-        deal.title +
-        (withPrice
-          ? " " +
-            (+deal.price).toFixed(0).toString() +
-            " " +
-            deal.curr_symbol.toString() +
-            " "
-          : "") +
-        "\n";
+        posts_c +buildShare(channel_group(),deal,withQuantity,withPrice)
+        // buildWTSB(channel_group(), deal.wtsb) +
+        // (withQuantity
+        //   ? " " + (+deal.quantity).toFixed(0).toString() + deal.uom.toString()
+        //   : "") +
+        // (withPrice
+        //   ? (withQuantity ? " / " : " ") +
+        //     (+deal.price).toFixed(0).toString() +
+        //     "" +
+        //     deal.curr_symbol.toString()
+        //   : "") +
+        // (withQuantity || withPrice ? " - " : " ") +
+        // deal.title +
+        // "\n";
     }
     // posts_c = posts_c + '\n' + BUILD_URL(idHx)
     onChange({ contain: posts_c, idHx: idHx });
@@ -1674,12 +1676,7 @@ export const DealsToShare = ({
     return os == "ios" || os == "android";
   };
   const opengroupurl0 = () => {
-    return openChannel2(
-      isPhone,
-      channel_group_id,
-      channel_data,
-      true
-    );
+    return openChannel2(isPhone, channel_group_id, channel_data, true);
   };
   return (
     <Stack gap="md">
@@ -1709,8 +1706,8 @@ export const DealsToShare = ({
         style={{ position: "relative" }}
         defaultValue={shareableDeals}
         value={shareableDeals}
-        minRows={10}
-        maxRows={15}
+        minRows={5}
+        maxRows={10}
         autoComplete="off"
         label={t("shareable_deals", "Shareable Deals")}
         placeholder={t("shareable_deals", "Shareable Deals")}
@@ -1727,7 +1724,7 @@ export const DealsToShare = ({
                 <AppCopyButton
                   value={shareableDeals + "\n" + shareableLink()}
                   timeout={500}
-                  onCopied={() => { 
+                  onCopied={() => {
                     opengroupurl0();
                   }}
                 >
@@ -1742,9 +1739,7 @@ export const DealsToShare = ({
                     >
                       <Group justify="flex-start" gap={0}>
                         {!copied && (
-                          <IconCopy
-                            size={small ? 18 : medium ? 20 : 22}
-                          />
+                          <IconCopy size={small ? 18 : medium ? 20 : 22} />
                         )}
                         {!copied && (
                           <IconExternalLink
@@ -1752,20 +1747,18 @@ export const DealsToShare = ({
                           />
                         )}
                         {copied && (
-                          <Box mr="sm">
-                            {t("is_copying", "Copying..")}
-                          </Box>
+                          <Box mr="sm">{t("is_copying", "Copying..")}</Box>
                         )}
                       </Group>
                     </Button>
                   )}
                 </AppCopyButton>
-                <Box>{t('or','Or')}</Box>
+                <Box>{t("or", "Or")}</Box>
                 <AppCopyButton
                   value={shareableDeals + "\n" + shareableLink()}
                   timeout={500}
-                  onCopied={() => { //href={urlGroup} target={channel.channel_group_id}
-                    
+                  onCopied={() => {
+                    //href={urlGroup} target={channel.channel_group_id}
                   }}
                 >
                   {({ copied, copy }) => (
@@ -1779,15 +1772,11 @@ export const DealsToShare = ({
                     >
                       <Group justify="flex-start" gap={0}>
                         {!copied && (
-                          <IconCopy
-                            size={small ? 18 : medium ? 20 : 22}
-                          />
+                          <IconCopy size={small ? 18 : medium ? 20 : 22} />
                         )}
-                       
+
                         {copied && (
-                          <Box mr="sm">
-                            {t("is_copying", "Copying..")}
-                          </Box>
+                          <Box mr="sm">{t("is_copying", "Copying..")}</Box>
                         )}
                       </Group>
                     </Button>
@@ -1799,7 +1788,7 @@ export const DealsToShare = ({
         }
         rightSection={
           <Box style={{ width: "40px", position: "absolute", top: 10 }}>
-            <CopyButton value={shareableDeals }>
+            <CopyButton value={shareableDeals}>
               {({ copied, copy }) => (
                 <ActionIcon
                   variant="transparent"
@@ -1908,4 +1897,21 @@ export const disableSahreNOpen = (channelGroup, ChannelData) => {
 const buildWTSB = (channel_group, wtsb: string) => {
   if (channel_group == "WATS_APP") return `*${wtsb}*`;
   return wtsb;
+};
+const buildShare = (channel_group, deal, withQuantity, withPrice) => {
+  let line =
+    buildWTSB(channel_group, deal.wtsb) +
+    (withQuantity
+      ? " " + (+deal.quantity).toFixed(0).toString() + deal.uom.toString()
+      : "") +
+    (withPrice
+      ? (withQuantity ? " / " : " ") +
+        (+deal.price).toFixed(0).toString() +
+        "" +
+        deal.curr_symbol.toString()
+      : "") +
+    (withQuantity || withPrice ? " - " : " ") +
+    deal.title +
+    "\n";
+  return line;
 };

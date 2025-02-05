@@ -107,8 +107,7 @@ declare module "@tanstack/react-table" {
 function useSkipper() {
   const shouldSkipRef = useRef(true);
   const shouldSkip = shouldSkipRef.current;
-
-  // Wrap a function with this to skip a pagination reset temporarily
+ 
   const skip = useCallback(() => {
     shouldSkipRef.current = false;
   }, []);
@@ -136,7 +135,7 @@ export const AppTable = forwardRef((props: any, ref) => {
   const tableRef: any = useRef(null);
   const [forceCloseTm, setForceCloseTm] = useState("");
   const [lastTap, setLastTap] = useState(0);
-  const doubleTapDelay = 300; // Maximum delay between taps in milliseconds
+  const doubleTapDelay = 300;
 
   const { classes: classesG } = useGlobalStyl();
   const { desktopFocus, setDesktopfocus }: any = useAppHeaderNdSide();
@@ -150,8 +149,8 @@ export const AppTable = forwardRef((props: any, ref) => {
   const [history, setHistory] = useState<any>([]);
   const [redoStack, setRedoStack] = useState<any>([]);
   const [deletedIds, setDeletedIds] = useState<any>([]);
-  const [startCell, setStartCell] = useState<any>(null); // Starting cell coordinates
-  const [endCell, setEndCell] = useState<any>(null); // Ending cell coordinates
+  const [startCell, setStartCell] = useState<any>(null); 
+  const [endCell, setEndCell] = useState<any>(null);
   const [onEdit, setOnEdit] = useState(false);
   const [density, setDensity] = useState<boolean>(true);
   const [editingCell, setEditingCell] = useState<
@@ -165,8 +164,7 @@ export const AppTable = forwardRef((props: any, ref) => {
   useEffect(() => {
     let initD = JSON.parse(JSON.stringify(data));
     setInitData(initD);
-  }, [afterSaved]);
-  useEffect(() => {}, [initData]);
+  }, [afterSaved]); 
   const cancelChanges = () => {
     let initD = JSON.parse(JSON.stringify(initData));
     setData(initD);
@@ -177,11 +175,6 @@ export const AppTable = forwardRef((props: any, ref) => {
     setEndCell(null);
     setOnEdit(false);
     setEditingCell(null);
-    // const updatedData = data.map((item) => {
-    //   return { ...item, changed: false };
-    // });
-
-    // setData(updatedData);
   };
   const afterGotSucceededSaved = () => {
     setHistory([]);
@@ -206,7 +199,7 @@ export const AppTable = forwardRef((props: any, ref) => {
       changed: true,
       is_draft: is_draft,
     };
-    setData([...data, newItem]); // Add the new item to the array immutably
+    setData([...data, newItem]);
   };
   const cellInEdit = (
     rowIndex: number,
@@ -256,9 +249,7 @@ export const AppTable = forwardRef((props: any, ref) => {
       if (error) setIsError(true);
       else {
         const updatedData = data.map((item) => {
-          // Find a matching userData entry by ref
           const match = ids.find((userItem) => userItem.ref === item.ref);
-          // Update the name if a match is found
           return match
             ? { ...item, id: match.id, changed: false }
             : { ...item, changed: false };
@@ -283,7 +274,6 @@ export const AppTable = forwardRef((props: any, ref) => {
       return;
     }
     if (event.buttons === 1) {
-      // Left mouse button
       setStartCell({ row, col });
       setEndCell({ row, col });
     }
@@ -297,14 +287,14 @@ export const AppTable = forwardRef((props: any, ref) => {
   const handleTouchMove = (event) => {
     if (!startCell) return;
     handleRemoveText(tableRef);
-    const touch = event.touches[0]; // Get the first touch point
+    const touch = event.touches[0];
     const targetElement = document.elementFromPoint(
       touch.clientX,
       touch.clientY
     );
 
     if (targetElement) {
-      const row = targetElement.getAttribute("data-row"); // Use getAttribute for custom data attributes
+      const row = targetElement.getAttribute("data-row");
       const col = targetElement.getAttribute("data-col");
 
       if (row && col) {
@@ -328,16 +318,16 @@ export const AppTable = forwardRef((props: any, ref) => {
     if (col_ == 0)
       switch (event.key) {
         case "ArrowUp":
-          row_ = -1; // Move up
+          row_ = -1; 
           break;
         case "ArrowDown":
-          row_ = 1; // Move down
+          row_ = 1; 
           break;
         case "ArrowLeft":
-          col_ = -1; // Move left
+          col_ = -1;
           break;
         case "ArrowRight":
-          col_ = 1; // Move right
+          col_ = 1;
           break;
         default:
           return;
@@ -363,13 +353,12 @@ export const AppTable = forwardRef((props: any, ref) => {
   const activeCellByTyping = (event) => {
     if (editingCell) return;
     const isPrintableKey =
-      (event.key.length === 1 && // Ensure it's a single character
-        !event.ctrlKey && // Exclude Ctrl key combinations
-        !event.metaKey && // Exclude Meta/Command key combinations
+      (event.key.length === 1 &&
+        !event.ctrlKey && 
+        !event.metaKey &&
         !event.altKey) ||
       event.key == "Enter" ||
       event.key == "Backspace";
-    // Include Backspace;
     if (!isPrintableKey || (editingCell && editingCell[0] >= 0) || !startCell)
       return;
 
@@ -380,9 +369,7 @@ export const AppTable = forwardRef((props: any, ref) => {
     setEditingCell([startCell.row, startCell.col, targetColId, event.key]);
   };
 
-  useEffect(() => {
-    console.log(editingCell);
-  }, [editingCell]);
+  
   const [columnResizeMode, setColumnResizeMode] =
     useState<ColumnResizeMode>("onChange");
 
@@ -414,58 +401,49 @@ export const AppTable = forwardRef((props: any, ref) => {
         setIsShiftPressed(false);
       }
     };
-
-    // Attach event listeners
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
-
-    // Cleanup event listeners
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
   }, []);
   const undo = () => {
-    if (history.length === 0) return; // No history to undo
+    if (history.length === 0) return;
 
     const lastState = history[history.length - 1];
     const newRedoStack = [data, ...redoStack];
     if (newRedoStack.length > MAX_HISTORY_SIZE) {
-      newRedoStack.pop(); // Remove the oldest redo state if exceeding max size
+      newRedoStack.pop(); 
     }
 
     setRedoStack(newRedoStack);
-    setHistory((prev) => prev.slice(0, -1)); // Remove the last state from history
+    setHistory((prev) => prev.slice(0, -1));
     setData(lastState);
-    // rerender()
   };
-
-  // Redo the last undone action
   const redo = () => {
-    if (redoStack.length === 0) return; // No redo actions available
+    if (redoStack.length === 0) return;
 
     const nextState = redoStack[0];
     const newHistory = [...history, data];
     if (newHistory.length > MAX_HISTORY_SIZE) {
-      newHistory.shift(); // Remove the oldest state if exceeding max size
+      newHistory.shift();
     }
     setHistory(newHistory);
-    setRedoStack((prev) => prev.slice(1)); // Remove the redone state from redo stack
+    setRedoStack((prev) => prev.slice(1))
     setData(nextState);
   };
   const saveToHistory = () => {
     let currentData = JSON.parse(JSON.stringify(data));
     setHistory((prevHistory) => {
       const newHistory = [...prevHistory, currentData];
-      if (newHistory.length > MAX_HISTORY_SIZE) newHistory.shift(); // Limit history size
+      if (newHistory.length > MAX_HISTORY_SIZE) newHistory.shift();
       return newHistory;
     });
-    setRedoStack([]); // Clear redo stack on new operation
+    setRedoStack([]);
   };
   const copyToClipboard = (withheader) => {
-    if (!startCell || !endCell) return; // Ensure start and end cells are selected
-
-    // Calculate the range of cells from startCell to endCell
+    if (!startCell || !endCell) return;
     const rows = Math.min(startCell.row, endCell.row);
     const cols = Math.min(startCell.col, endCell.col);
 
@@ -526,13 +504,13 @@ export const AppTable = forwardRef((props: any, ref) => {
       });
   };
   const getTopLeftCell = () => {
-    if (!startCell || !endCell) return startCell; // Use startCell if endCell is null
+    if (!startCell || !endCell) return startCell;
     const topRow = Math.min(startCell.row, endCell.row);
     const leftCol = Math.min(startCell.col, endCell.col);
     return { row: topRow, col: leftCol };
   };
   const getBottomRightCell = () => {
-    if (!startCell || !endCell) return startCell; // Use startCell if endCell is null
+    if (!startCell || !endCell) return startCell;
     const bottomRow = Math.max(startCell.row, endCell.row);
     const rightCol = Math.max(startCell.col, endCell.col);
     return { row: bottomRow, col: rightCol };
@@ -549,8 +527,8 @@ export const AppTable = forwardRef((props: any, ref) => {
 
       const rows = clipboardText
         .split("\n")
-        .filter((row) => row.trim() !== "") // Ignore empty rows
-        .map((row) => row.split("\t")); // Split by tabs
+        .filter((row) => row.trim() !== "")
+        .map((row) => row.split("\t"));
 
       const topLeftCell = getTopLeftCell();
       const bottomRightCell = getBottomRightCell();
@@ -661,7 +639,6 @@ export const AppTable = forwardRef((props: any, ref) => {
     };
   }, [data, startCell, endCell, editingCell]);
   const goToNext = (row, col, colid) => {
-    // return; //come back later to this
     if (row < 0 || (col < 0 && colid == "")) return;
     if (col < 0 && colid != "") {
       let colsmn = table.getAllColumns();
@@ -697,12 +674,6 @@ export const AppTable = forwardRef((props: any, ref) => {
     meta: {
       updateData: (rowIndex, columnId, value, beforEditingValue) => {
         skipAutoResetPageIndex();
-        // let row = -1;
-        // let col = -1;
-        // if (editingCell) {
-        //   row = editingCell[0];
-        //   col = editingCell[1];
-        // }
         goToNext(rowIndex, -1, columnId);
         setEditingCell(null);
 
@@ -765,10 +736,10 @@ export const AppTable = forwardRef((props: any, ref) => {
       deleteRow: (rowIndex) => {
         saveToHistory();
         let id = data[rowIndex]["id"];
-        const updatedItems = [...data]; // Make a copy of the array
+        const updatedItems = [...data];
 
-        updatedItems.splice(rowIndex, 1); // Remove item at the index
-        setData(updatedItems); // Update state with the modified array
+        updatedItems.splice(rowIndex, 1);
+        setData(updatedItems);
         if (id !== "new") {
           const deletedIds_n = [...deletedIds];
           deletedIds_n.push(id);
@@ -785,9 +756,6 @@ export const AppTable = forwardRef((props: any, ref) => {
     state: {
       pagination,
     },
-    // debugTable: true,
-    // debugHeaders: true,
-    // debugColumns: true,
   });
   useEffect(() => {
     if (!editingCell) enforceTabIndex();
@@ -810,25 +778,17 @@ export const AppTable = forwardRef((props: any, ref) => {
   const adjustHeight = () => {
     try {
       if (contentRef.current) {
-        window.scrollTo(0, 0);
-        // Get the top offset of the div relative to the viewport
+        window.scrollTo(0, 0); 
         const topOffset = contentRef.current.getBoundingClientRect().top;
-
-        // Calculate the maximum height
         const availableHeight = window.innerHeight - topOffset - 20;
-
-        // Set the calculated height
         setMaxHeight(`${availableHeight}px`);
       }
     } catch (error) {}
   };
 
   useEffect(() => {
-    // Adjust height on mount and resize
     adjustHeight();
     window.addEventListener("resize", adjustHeight);
-
-    // Cleanup event listener on unmount
     return () => {
       window.removeEventListener("resize", adjustHeight);
     };
@@ -1271,7 +1231,7 @@ export function getDivContentWithLineBreaks(divElement) {
 }
 function CheckSave({ t, onSave, disabled, editingCell }) {
   const [opened, { close, open }] = useDisclosure(false);
-  useEffect(() => {});
+  
   return (
     <>
       <Modal
@@ -1456,11 +1416,11 @@ export const AddByPaste = ({ isIcon }) => {
         title: title?.trim() || "",
         quantity: quantity?.trim() || "",
         price: price?.trim() || "",
-        hashtags: hashtags?.trim() || "",
+        hashtags: SplitHashtags(hashtags?.trim() || ""),
         description: description?.trim() || "",
       };
     });
-
+    parsedData.sort((a, b) => a?.title.localeCompare(b?.title));
     setTableData(parsedData); // Update the state with parsed data
     setValue("");
     SetSelectAll0(true);
@@ -1664,12 +1624,16 @@ export const AddByPaste = ({ isIcon }) => {
           </table>
         </Box>
         <Textarea
+        autosize
           value={value}
           onChange={(event) => setValue(event.currentTarget.value)}
-          h={100}
+          // h={100}
           mt="lg"
           label={t("paste_deals", "Paste deals")}
           placeholder={t("paste_deals_here", "Paste deals here")}
+          minRows={4}
+          maxRows={4}
+          mb="xs"
         />
 
         <MassDealEntry
@@ -1678,7 +1642,7 @@ export const AddByPaste = ({ isIcon }) => {
           onClose={close}
           onSucceed={(dt) => {
             close();
-            navigate("../mydeals?src=navigator&created_on=" + dt);
+            navigate("../app/mydeals?src=navigator&created_on=" + dt);
           }}
           selectAll0={selectAll0}
           SetSelectAll0={SetSelectAll0}

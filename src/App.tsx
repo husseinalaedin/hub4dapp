@@ -22,8 +22,7 @@ import { I18nextProvider } from "react-i18next";
 import { AppRoutes } from "./global/AppRoutes";
 import i18n from "./locales/I18next";
 import { HeaderNdSideProvider } from "./hooks/useAppHeaderNdSide";
-import { BrowserRouter } from "react-router";
-
+ 
 export default function AppMain() {
   return (
     <React.StrictMode>
@@ -34,16 +33,15 @@ export default function AppMain() {
               <AppGlobalStylProvider>
                 <ModalsProvider>
                   <HeaderNdSideProvider>
-                    {/* <BrowserRouter> */}
+                    
                     <AppRoutes />
-                    {/* </BrowserRouter> */}
                   </HeaderNdSideProvider>
                 </ModalsProvider>
               </AppGlobalStylProvider>
             </AuthProvider>
           </AppThemeProvider>
         </I18nextProvider>
-      </Provider>
-    </React.StrictMode>
+      </Provider> 
+     </React.StrictMode>
   );
 }

@@ -503,7 +503,7 @@ export const Channels = () => {
                                 <Text c="red.5" fz="sm">
                                   {D.utc_to_distance(
                                     element.last_share_expired_on,
-                                    t("never", "Never")
+                                    t("never", "Never"), t("never", "Never")
                                   )}
                                 </Text>
                               </Stack>
@@ -1584,7 +1584,7 @@ const ChannelsList = ({
         </Table.Td>
         <Table.Td>
           <Text c="red.5">
-            {D.utc_to_distance(item.last_share_expired_on, t("never", "Never"))}
+            {D.utc_to_distance(item.last_share_expired_on, t("never", "Never"), t("never", "Never"))}
           </Text>
         </Table.Td>
 

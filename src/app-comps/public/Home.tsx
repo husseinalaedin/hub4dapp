@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../../providers/AuthProvider";
 import { LanguageSelect } from "../../global/Language";
 import { useRef } from "react";
+// import TextareaAutosize from "react-textarea-autosize";
+import TextareaAutosize from 'react-textarea-autosize';
 
 const Home = () => {
   const { islogged } = useAuth();
@@ -12,23 +14,39 @@ const Home = () => {
   const { t } = useTranslation("public");
 const textareaRef:any = useRef(null);
 
-const handleChange = (event) => {
-  const textarea = textareaRef.current;
-  if (textarea) {
-    textarea.style.height = "auto"; // Reset height
-    textarea.style.height = `${textarea.scrollHeight}px`; // Adjust height
+// const handleChange = (event) => {
+//   const textarea = textareaRef.current;
+//   if (textarea) {
+//     textarea.style.height = "auto"; // Reset height
+//     textarea.style.height = `${textarea.scrollHeight}px`; // Adjust height
+    
+//   }
+// };
+const handleEvent = () => {
+  if (textareaRef.current) {
+    console.log("Textarea DOM node:", textareaRef.current);
     
   }
 };
   return (
     <>
       <Stack>
+      <TextareaAutosize
+  // key={value.length} // Forces re-render when text changes
+  // value={value}
+  // onChange={(e) => setValue(e.target.value)}
+  onHeightChange={(height) => console.log("Height changed:", height)}
+  minRows={3}
+  
+/>
+
         <Textarea
           ref={textareaRef}
           placeholder="Autosize with no rows limit"
           minRows={5}
           maxRows={20}
-          onChange={handleChange}
+          onClick={handleEvent} 
+          // onChange={handleChange}
         />
         <h1>{t(`welcome`, "Welcome")}</h1>
         <h1>Home Screen</h1>

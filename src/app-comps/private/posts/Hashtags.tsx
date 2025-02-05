@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { BUILD_API, useMessage } from "../../../global/G";
 import { useAxiosGet } from "../../../hooks/Https";
-import { HashValue4Boardd } from "../../../global/global-comp/Hashtags";
+import {
+  HashtagsAlert,
+  HashTagsInput,
+  HashValue4Boardd,
+} from "../../../global/global-comp/Hashtags";
 import {
   ActionIcon,
   Box,
@@ -38,7 +42,10 @@ import {
   selectSmall,
 } from "../../../store/features/ScreenStatus";
 import { useSelector } from "react-redux";
-import { renderWtsWtbDropVOption, WtsWtbDropV } from "../../../global/WtsWtbDropV";
+import {
+  renderWtsWtbDropVOption,
+  WtsWtbDropV,
+} from "../../../global/WtsWtbDropV";
 import { useForm } from "@mantine/form";
 import { IconAdjustmentsOff } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -115,7 +122,7 @@ export const TradeHashTags = ({ close, src }) => {
     return [];
   });
   const form = useForm({
-    initialValues: { wtsb: [], searchterm: "", showhash: "both" },
+    initialValues: { wtsb: [], hashtags: [], showhash: "both" },
   });
   const {
     data: dataWTSB,
@@ -132,7 +139,7 @@ export const TradeHashTags = ({ close, src }) => {
     executeGet: executeHashGet,
   } = useAxiosGet(BUILD_API("active-trades-hashtags"), {
     wtsb: form.getInputProps("wtsb").value,
-    searchterm: hashValue && hashValue.length > 0 ? hashValue.join(",") : "",
+    hashtags: form.getInputProps("hashtags").value,//hashValue && hashValue.length > 0 ? hashValue.join(",") : "",
     showhash: form.getInputProps("showhash").value,
   });
   useEffect(() => {
@@ -144,23 +151,8 @@ export const TradeHashTags = ({ close, src }) => {
     if (errorMsg) error(errorMsg);
     if (succeededHashGet && hashGet) {
       let dta: any = [];
-      generate(dta, "", 10);
-      // generate(dta, 'b', 20)
-      // generate(dta, 'c', 30)
-      // generate(dta, 'd', 100)
-      // generate(dta, 'e', 20)
-
-      // let dflt_dta: any = []
-      // hashGet.forEach((itemS) => {
-      //     dta.push({
-      //         value: itemS.hashtag,
-      //         label: itemS.hashcount,
-      //         hashcount: itemS.hashcount,
-      //     })
-      //     dflt_dta.push(itemS.hashtag)
-      // })
-      setData(dta);
-      // setDefault(dflt_dta)
+      generate(dta, "", 10); 
+      setData(dta); 
     }
   }, [errorMessageHashGet, succeededHashGet]);
   const generate = (data_a, postfix, v) => {
@@ -175,7 +167,7 @@ export const TradeHashTags = ({ close, src }) => {
     executeHashGet();
   };
   const clearsearch = () => {
-    form.setValues({ wtsb: [], searchterm: "", showhash: "both" });
+    form.setValues({ wtsb: [], hashtags: [], showhash: "both" });
     setHashValue([]);
     setHashData([]);
     executeHashGet();
@@ -235,7 +227,23 @@ export const TradeHashTags = ({ close, src }) => {
             />
           </Grid.Col>
           <Grid.Col span={small ? 12 : large || medium ? 9 : 6}>
-            <MultiSelect
+            <HashTagsInput
+              // zIndex={30000000}
+              addOnNotFound={true}
+              withAsterisk={false}
+              // label={
+              //   <Group justify="flex-start" gap={0}>
+              //     <Box>{t("hashtag_all", "Hashtag(All)#")}</Box>
+              //     <HashtagsAlert withinPortal={false} />
+              //   </Group>
+              // }
+              {...form.getInputProps("hashtags")}
+              withinPortal={true}
+              placeholder={"e.g iphone grade a or ipho grade"}
+              w="100%"
+              readOnly={false}
+            />
+            {/* <MultiSelect
               label={t("hash_tag", "Hash Tags")}
               fz="lg"
               size="lg"
@@ -271,18 +279,14 @@ export const TradeHashTags = ({ close, src }) => {
               }}
               value={hashValue}
               data={hashData}
-              // label={t('search_hashtag_4_max', 'Search Hashtags(4 Max)')}
-              placeholder={"e.g iphone grade_a or ipho grade"}
+              placeholder={"e.g iphone grade a or ipho grade"}
               searchable
               searchValue={searchValue}
               onSearchChange={(event) => {
                 return onSearchChange(event);
               }}
               clearable
-              // creatable
               maxDropdownHeight={250}
-              // valueComponent={HashValue4BoardSearch}
-              // itemComponent={HashItem}
               limit={20}
               maxValues={5}
               rightSection={
@@ -301,7 +305,7 @@ export const TradeHashTags = ({ close, src }) => {
                   />
                 )
               }
-            />
+            /> */}
           </Grid.Col>
           <Grid.Col span={small ? 4 : large || medium ? 3 : 2}>
             <AppSelect

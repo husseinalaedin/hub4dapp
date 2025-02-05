@@ -882,8 +882,8 @@ export const SharesResponsesCounts = ({
     >
       <Box>
         {/* <NumericFormat displayType="text" value={totals} thousandSeparator={thousandSep()} decimalSeparator={decimalSep()} /> */}
-        <Text>{FN(totals)}</Text>
-        <Text mt={-35}>{label}</Text>
+        <Text fz={45}>{FN(totals)}</Text>
+        <Text fz={45} mt={-15}>{label}</Text>
       </Box>
     </Group>
     // <Stack align="center" justify="center"  h={300} sx={(theme) => ({ backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] })}>

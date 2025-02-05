@@ -87,7 +87,7 @@ export const UserCard = ({ usr }) => {
             </Text>
             <CopyButton value={usr.email}>
               {({ copied, copy }) => (
-                <ActionIcon
+                <ActionIcon variant="transparent"
                   onClick={() => {
                     copy();
                     succeed(t("email_copied", "Email copied!."));
@@ -141,7 +141,7 @@ export const UserCard = ({ usr }) => {
               )}
               <CopyButton value={usr.cell}>
                 {({ copied, copy }) => (
-                  <ActionIcon
+                  <ActionIcon variant="transparent"
                     onClick={() => {
                       copy();
                       succeed(t("cell_copied", "Cell number copied!."));

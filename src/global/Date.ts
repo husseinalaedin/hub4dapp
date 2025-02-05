@@ -63,12 +63,16 @@ export class D {
         }
         return ''
     }
-    static utc_to_distance(utc: any, ifnull?) {
+    static utc_to_distance(utc: any, ifnull?,ifbig?) {
         if (!utc || utc == '')
             return ifnull
         try {
             const date1 = new Date();
             const date2 = new Date(utc)
+            const yearDiff = date2.getFullYear()-date1.getFullYear();
+            if(ifbig && yearDiff>10){
+                return ifbig
+            }
             return FormatDistance(date2, date1)
         } catch (error) {
         }

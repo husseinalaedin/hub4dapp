@@ -287,10 +287,6 @@ export const CompanyDeals = () => {
   }, [errorMessagePut, succeededPut]);
 
   const renew_or_terminate = (id, action) => {
-    // console.log('@@',objectUpdated)
-    // setObjectUpdated(() => {
-    //     return { tm: (new Date()).getTime().toString()+'-'+id, id, action: 'processing' }
-    // })
     updated2(id, "processing");
     axios_put(
       BUILD_API("deals/company/") + id + "/" + action,
@@ -318,9 +314,8 @@ export const CompanyDeals = () => {
   }, [small, medium, large, xlarge, xlarger]);
   const fit_data_grid_view = () => {
     if (small || medium) {
-      // searchParams.set('listdir', 'grid_view')
       setListDir((prev) => {
-        if (prev == "img_grid_view") return prev;
+        if (prev == "img_grid_view" || prev=='spread') return prev;
         return "grid_view";
       });
     } else {
@@ -361,7 +356,6 @@ export const CompanyDeals = () => {
   };
   useEffect(() => {
     if (!objectUpdated.id || objectUpdated.id == "") return;
-    console.log("UPDATED:", objectUpdated.id, objectUpdated.action);
     updated(objectUpdated.id, objectUpdated.action);
   }, [objectUpdated.tm]);
   // const imageShoHideGo = () => {
@@ -458,8 +452,7 @@ export const CompanyDeals = () => {
               style={{ width: small || medium ? "auto" : 120 }}
               onClick={() => {
                 openAI();
-              }}
-              // leftSection={<IconOctagonPlus />}
+              }} 
             >
               <Group>
                 <IconOctagonPlus />
@@ -1053,7 +1046,6 @@ export const AddEditDeal0 = () => {
     setHashData(() => {
       return hastags;
     });
-    console.log(data);
   };
   let { open: openAI } = useAiParser(() => {}, small || medium);
   const {
@@ -1281,18 +1273,7 @@ export const AddEditDeal0 = () => {
         }}
       >
         <Group justify="right" gap="xs">
-          {/* <Button
-            variant="gradient"
-            gradient={{ from: "teal", to: "blue", deg: 60 }}
-            disabled={disableSave}
-            type="button"
-            style={{ width: 100 }}
-            onClick={() => {
-              openAI2();
-            }}
-          >
-            {t("ai_parse", "By AI")}
-          </Button> */}
+           
           <Tooltip label={t("refresh", "Refresh")}>
             <Button
               variant="default"
@@ -1303,7 +1284,7 @@ export const AddEditDeal0 = () => {
               <IconRefresh />
             </Button>
           </Tooltip>
-          <AddByPaste isIcon={false} />
+          {/* <AddByPaste isIcon={false} />
           <Tooltip label={t("add_new_deal_by_ai", "Add new deals by AI.")}>
             <Button
               variant="gradient"
@@ -1312,15 +1293,14 @@ export const AddEditDeal0 = () => {
               style={{ width: small || medium ? "auto" : 120 }}
               onClick={() => {
                 openAI();
-              }}
-              // leftSection={<IconOctagonPlus />}
+              }} 
             >
               <Group>
                 <IconOctagonPlus />
                 {!(small || medium) && <Box>{t("by_ai", "By AI")}</Box>}
               </Group>
             </Button>
-          </Tooltip>
+          </Tooltip> */}
           <Button
             disabled={disableSave}
             type="button"
@@ -1807,10 +1787,6 @@ export const DealSearch = (props) => {
     if (trm != form.values.searchterm) form.setValues({ searchterm: trm });
   }, [searchParams]);
   const search = () => {
-    // console.log(
-    //   searchParams.get("hashtags_and"),
-    //   'searchParams.get("hashtags_and")'
-    // );
     G.updateParamsFromForm(searchParams, form);
     searchParams.set("page", "1");
     searchParams.set("t", new Date().getTime().toString());
@@ -2069,6 +2045,7 @@ export const DealSearch = (props) => {
           <Grid.Col>
             <HashTagsInput
               // zIndex={30000000}
+              addOnNotFound={false}
               withAsterisk={false}
               label={
                 <Group justify="flex-start" gap={0}>
@@ -2086,6 +2063,7 @@ export const DealSearch = (props) => {
           <Grid.Col>
             <HashTagsInput
               // zIndex={30000000}
+              addOnNotFound={false}
               withAsterisk={false}
               label={
                 <Group justify="flex-start" gap={0}>
@@ -2588,22 +2566,14 @@ const ParseDeal = ({ onApply }) => {
   const [dealCount, setDealCount] = useState<string | null>("");
   const [dealDataCount, setDealDataCount] = useState([]);
   const [activeTab, setActiveTab] = useState<string | null>("input");
-  const textareaRef: any = useRef(null);
+  
   const [selectAll0, SetSelectAll0] = useState(false);
   const [intermidiate0, setIntermidiate0] = useState(false);
   const [dataToPut, setDataToPut] = useState([]);
   const { error, succeed, info } = useMessage();
   const navigate = useNavigate();
   let { getCurrFromSymbol } = useDbData();
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = "auto"; // Reset height
-      textarea.style.height = `${
-        textarea.scrollHeight >= 500 ? 500 : textarea.scrollHeight
-      }px`; // Adjust height
-    }
-  }, [value]);
+   
   const {
     data: dataSet,
     isLoading,
@@ -2648,7 +2618,6 @@ const ParseDeal = ({ onApply }) => {
       ? dataPlanInfo.ai_info.parsing_attempts_completed
       : 0;
   useEffect(() => {
-    console.log(dataPlanInfo, "dataPlanInfo");
     if (errorMessagePlanInfo) error("Plan Info Error:" + errorMessagePlanInfo);
     if (succeededPlanInfo) {
       let cnt: any = [];
@@ -2761,7 +2730,9 @@ const ParseDeal = ({ onApply }) => {
     // });
   };
   const data = dataSet && dataSet.length > 0 ? dataSet : [];
-
+  const close=()=>{
+    closeModal("ai_parser_pop_up");
+  }
   const placeholderAI =
     t("type_or_paste_your_deals", "Type or paste your deals e.g") +
     `
@@ -2835,7 +2806,7 @@ Pack Boxes
             </Group>
 
             <Textarea
-              ref={textareaRef}
+             autosize={true}
               placeholder={placeholderAI}
               value={value}
               onChange={(event) => setValue(event.currentTarget.value)}
@@ -2856,7 +2827,8 @@ Pack Boxes
                     "***"}
                 </Box>
               }
-              // mih={400}
+             minRows={15}
+             maxRows={15}
             />
             <Box opacity={0.9}>
               <Box fz="sm" c="orange" mt="md">
@@ -2887,7 +2859,7 @@ Pack Boxes
             </Box>
           </Tabs.Panel>
           <Tabs.Panel value="output" pt="lg">
-            <Group justify="right" mb="xs">
+            {/* <Group justify="right" mb="xs">
               <Button
                 variant="light"
                 onClick={() => {
@@ -2916,50 +2888,21 @@ Pack Boxes
               >
                 {t("create_final", "Create Final")}
               </Button>
-            </Group>
+            </Group> */}
             <MassDealEntry
               dataSet={data}
               setData={setData}
               onClose={close}
               onSucceed={(dt) => {
                 close();
-                navigate("../mydeals?src=navigator&created_on=" + dt);
+                navigate("../app/mydeals?src=navigator&created_on=" + dt);
               }}
               selectAll0={selectAll0}
               SetSelectAll0={SetSelectAll0}
               intermidiate0={intermidiate0}
               setIntermidiate0={setIntermidiate0}
               selectAll={selectAll}
-            />
-            {/* <Box style={{ overflow: "auto", maxWidth: "100%" }}>
-              <Table className={`${"TableCss"} ${classesG.table}`}>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>
-                      {" "}
-                      <Checkbox
-                        checked={selectAll0}
-                        indeterminate={intermidiate0}
-                        onChange={(event) => {
-                          SetSelectAll0(event.currentTarget.checked);
-                          selectAll(event.currentTarget.checked);
-                        }}
-
-                        // onChange={(event) => setChecked(event.currentTarget.checked)}
-                      />
-                    </Table.Th>
-                    <Table.Th>{t("deal_type", "Deal Type")}</Table.Th>
-                    <Table.Th>{t("deal_title", "Title")}</Table.Th>
-                   
-                    <Table.Th>{t("quantity", "Quantity")}</Table.Th>
-                    <Table.Th>{t("price", "Price")}</Table.Th>
-                    <Table.Th>{t("hashtags", "Hashtags")}</Table.Th>
-                    <Table.Th>{t("description", "Description")}</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{rows}</Table.Tbody>
-              </Table>
-            </Box> */}
+            /> 
             <Box c="orange" mt="xs">
               {data.length} {t("deals_extracted", "Deals extracted")}
             </Box>
@@ -3090,7 +3033,6 @@ const CreatedTree = ({ onDateClick }) => {
     let errorMsg = errorMessageGet;
     if (errorMsg) error(errorMsg);
     if (succeededGet) {
-      console.log(dataGet, "dataGet");
     }
   }, [errorMessageGet, succeededGet]);
   const header = (

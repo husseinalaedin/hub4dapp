@@ -313,22 +313,37 @@ a {
     position: sticky;
     left: 0;
     z-index: 2;
-    width: 70px;
-    min-width: 70px;
-    max-width: 70px;
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
 }
 
 .TableCss-Shares th:nth-child(2),
 .TableCss-Shares td:nth-child(2) {
     position: sticky;
-    left: 70px;
+    left: 60px;
     z-index: 1;
-    max-width: 250px;
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+.TableCss-Shares th:nth-child(3),
+.TableCss-Shares td:nth-child(3) {
+    position: sticky;
+    left: 140px;
+    z-index: 1;
+    width: 75px;
+    min-width: 75px;
+    max-width: 75px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* 
 .TableCss-Shares th:last-child,
 .TableCss-Shares td:last-child {
 
@@ -338,7 +353,7 @@ a {
     max-width: 100px;
     min-width: 100px;
     right: 0;
-}
+} */
 
 .TableCss-Companies th:first-child,
 .TableCss-Companies td:first-child {

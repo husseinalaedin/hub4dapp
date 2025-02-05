@@ -306,7 +306,7 @@ export function Wtsb4BoardSearch({
 }
 
 export const HashTagsInput = forwardRef<any, any>(
-  ({ readOnly, ...others }, ref) => {
+  ({ readOnly,addOnNotFound, ...others }, ref) => {
     let {initSearchValue}:any = { ...others };
     const { error, succeed, info } = useMessage();
     const [searchValue, onSearchChange] = useState(initSearchValue);
@@ -351,6 +351,7 @@ export const HashTagsInput = forwardRef<any, any>(
     }, [errorMessageHashGet, succeededHashGet]);
     return (
       <AppMultiSelect
+      addOnNotFound={addOnNotFound}
         charsNotAllowed={HASHTAGS_SEP}
         ref={ref}
         readOnly={readOnly}

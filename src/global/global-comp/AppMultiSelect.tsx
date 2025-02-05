@@ -47,6 +47,7 @@ interface AppMultiSelectProps
   ref?: any;
   charsNotAllowed?: string[];
   onEmptyEnter?:any;
+  addOnNotFound?:any
 }
 export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
   (
@@ -82,6 +83,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       rightSection,
       charsNotAllowed,
       onEmptyEnter,
+      addOnNotFound,
       ...others
     }: AppMultiSelectProps,
     ref // Receive the ref as the second argument
@@ -150,7 +152,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
         handleValueSelect(item.label);
         return;
       }
-      if (createOnNotFound) {
+      if (createOnNotFound && addOnNotFound) {
         let result = await createOnNotFound(searchValue);
         if (result.added) {
           handleValueSelect(String(searchValue));

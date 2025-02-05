@@ -530,7 +530,7 @@ const CardAnalytic = ({ title, children, onModal, miw }) => {
           <Group justify="space-between">
             <Text fw="bold">{title}</Text>
             {
-              <ActionIcon
+              <ActionIcon variant="subtle"
                 onClick={open}
                 style={{ color: hovered ? "" : "transparent" }}
               >

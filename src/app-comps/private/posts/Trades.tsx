@@ -123,12 +123,18 @@ import { Cell } from "../../../global/Cell";
 import { UserCard } from "../../../global/UserCard";
 import { AppDiv } from "../../../global/AppDiv";
 import { IconBuilding } from "@tabler/icons-react";
-import { HashValue4Boardd2 } from "../../../global/global-comp/Hashtags";
+import {
+  HashtagsAlert,
+  HashTagsInput,
+  HashValue4Boardd2,
+  SplitHashtags,
+} from "../../../global/global-comp/Hashtags";
 import { TradeHashTagsPop } from "./Hashtags";
 import { GENERIC_TRADE_IMAGE, ImagesZoneTrades } from "./ImagesZoneTrades";
 import { IconList } from "@tabler/icons-react";
 import { IconTallymark3 } from "@tabler/icons-react";
 import { ClearButton1 } from "../../../global/ClearButton";
+import { WtsbMulti } from "../../../global/global-comp/Wtsb";
 const ITEM_ACTIONS = {
   CLEAR: "CLEAR",
   SWITCH: "SWITCH",
@@ -676,8 +682,8 @@ export const TradesSearch = ({ action, grid, src }) => {
       wtsb: G.anyToArr(searchParams.get("wtsb")),
       searchterm: G.ifNull(searchParams.get("searchterm"), ""),
       company_name: G.ifNull(searchParams.get("company_name"), ""),
-      hashtags_and: G.anyToArr(searchParams.get("hashtags_and")),
-      hashtags_or: G.anyToArr(searchParams.get("hashtags_or")),
+      hashtags_and: SplitHashtags(searchParams.get("hashtags_and")),
+      hashtags_or: SplitHashtags(searchParams.get("hashtags_or")),
     },
   });
   useEffect(() => {
@@ -837,22 +843,7 @@ export const TradesSearch = ({ action, grid, src }) => {
       >
         <Grid gutter={15}>
           <Grid.Col>
-            {"create multiselect"}
-            {/* <MultiSelect
-              itemComponent={WtsWtbDropV}
-              {...form.getInputProps("wtsb")}
-              searchable
-              clearable
-              label={t("deal_type", "Deal Type")}
-              placeholder={t("deal_type", "Deal Type")}
-              data={dataWTSB?.map((itm) => {
-                return {
-                  value: itm.wtsb,
-                  label: itm.wtsb_desc,
-                  dir: itm.dir,
-                };
-              })}
-            /> */}
+            <WtsbMulti {...form.getInputProps("wtsb")} />
           </Grid.Col>
           <Grid.Col>
             <TextInput
@@ -863,66 +854,40 @@ export const TradesSearch = ({ action, grid, src }) => {
             />
           </Grid.Col>
           <Grid.Col>
-            {"create multi select"}
-            {/* <MultiSelect
+            <HashTagsInput
+              // zIndex={30000000}
+              addOnNotFound={false}
+              withAsterisk={false}
+              label={
+                <Group justify="flex-start" gap={0}>
+                  <Box>{t("hashtag_all", "Hashtag(All)#")}</Box>
+                  <HashtagsAlert withinPortal={false} />
+                </Group>
+              }
               {...form.getInputProps("hashtags_and")}
-              onKeyDown={(event) => {
-                if (event.code === "Space") {
-                  event.preventDefault();
-                }
-              }}
-              required
-              data={hashData}
-              label="Hashtag(All)#"
-              placeholder="#"
-              searchable
-              searchValue={searchValue}
-              onSearchChange={(event) => {
-                executeHashGet();
-                return onSearchChange(event);
-              }}
-              clearable 
-              maxDropdownHeight={250}
-              valueComponent={HashValue}
-              itemComponent={HashItem}
-              limit={20} 
-              onCreate={(query) => {
-                const item = { value: query, label: query };
-                setHashData((current) => [...current, item]);
-                return item;
-              }}
-            /> */}
+              withinPortal={true}
+              placeholder={t("enter_hashtags", "Please Enter#")}
+              w="100%"
+              readOnly={false}
+            />
           </Grid.Col>
           <Grid.Col>
-            {"create multi select"}
-            {/* <MultiSelect
+          <HashTagsInput
+              // zIndex={30000000}
+              addOnNotFound={false}
+              withAsterisk={false}
+              label={
+                <Group justify="flex-start" gap={0}>
+                  <Box>{t("hashtag_any", "Hashtag(Any)#")}</Box>
+                  <HashtagsAlert withinPortal={false} />
+                </Group>
+              }
               {...form.getInputProps("hashtags_or")}
-              onKeyDown={(event) => {
-                if (event.code === "Space") {
-                  event.preventDefault();
-                }
-              }}
-              required
-              data={hashData2}
-              label="Hashtag(Any)#"
-              placeholder="#"
-              searchable
-              searchValue={searchValue2}
-              onSearchChange={(event) => {
-                executeHashGet2();
-                return onSearch2Change(event);
-              }}
-              clearable 
-              maxDropdownHeight={250}
-              valueComponent={HashValue}
-              itemComponent={HashItem}
-              limit={20} 
-              onCreate={(query) => {
-                const item = { value: query, label: query };
-                setHash2Data((current) => [...current, item]);
-                return item;
-              }}
-            /> */}
+              withinPortal={true}
+              placeholder={t("enter_hashtags", "Please Enter#")}
+              w="100%"
+              readOnly={false}
+            />
           </Grid.Col>
           <Grid.Col>
             <TextInput
@@ -1085,6 +1050,7 @@ const CoInfo = ({ data, message, clear_message, focusOn }) => {
               </Accordion.Control>
               <Accordion.Panel className={classesG.accordionPannel}>
                 <Textarea
+                  autosize
                   ref={ref}
                   minRows={5}
                   maxRows={5}
@@ -1428,7 +1394,7 @@ const Trade = ({
                   type="auto"
                   style={{ lineHeight: 2 }}
                 >
-                  {element.hashtags.split(" ").map((hash) => {
+                  {element.hashtags.split(",").map((hash) => {
                     return (
                       <Box
                         style={{ display: "inline-block", marginRight: "5px" }}
@@ -1438,7 +1404,7 @@ const Trade = ({
                           close();
                           let src = "TRADES";
                           let url =
-                            src == "TRADES" ? "trades/t" : "latest-trades";
+                            src == "TRADES" ? "trades/t/a" : "latest-trades";
                           navigate(
                             `../${url}?hashtags_and=` +
                               hash0 +
@@ -1967,7 +1933,7 @@ export const TradeDetails = () => {
               <Card radius="sm" p="0" pt="0" pl={5} pr={5} withBorder>
                 {data.hashtags && data.hashtags != "" && (
                   <Box className={`${classesG.hashtagboardContainer2}`}>
-                    {data.hashtags.split(" ").map((hash) => {
+                    {data.hashtags.split(",").map((hash) => {
                       return (
                         <Box
                           className={`${"hash-parent"}  ${
@@ -1978,7 +1944,7 @@ export const TradeDetails = () => {
                             close();
                             let src = "TRADES";
                             let url =
-                              src == "TRADES" ? "trades/t" : "latest-trades";
+                              src == "TRADES" ? "trades/t/a" : "latest-trades";
                             navigate(
                               `../${url}?hashtags_and=` +
                                 hash0 +
@@ -2319,6 +2285,7 @@ const MessageToSend = ({ coData, message, clear_message }) => {
           </Accordion.Control>
           <Accordion.Panel className={classesG.accordionPannel}>
             <Textarea
+            autosize
               ref={ref}
               minRows={5}
               maxRows={5}

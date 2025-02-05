@@ -1,13 +1,27 @@
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
-import "./appAdmin.css"; 
-import "./Editor.css"; 
+import { useEffect, useState } from "react";
+import {
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+} from "react-router";
+import "./appAdmin.css";
+import "./Editor.css";
 import "@mantine/tiptap/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/carousel/styles.css";
 import "@mantine/dates/styles.css";
-import "./TableStyles.css"; // Create a CSS file to style the table
+import "./TableStyles.css"; 
+// var TextareaAutosize = require('react-textarea-autosize').default;
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const [isClient, setIsClient] = useState(false);
+
+       useEffect(() => {
+           setIsClient(true);
+       }, []);
   return (
     <html lang="en">
       <head>
@@ -19,6 +33,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <link rel="icon" type="image/png" href="../public/favicon.ico" />
       </head>
       <body>
+       
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -32,8 +47,7 @@ export default function Root() {
   return <Outlet />;
 }
 
-
-export function ErrorBoundary({ error }:any) {
+export function ErrorBoundary({ error }: any) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";
   let stack: string | undefined;
