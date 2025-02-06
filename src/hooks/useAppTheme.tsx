@@ -1,6 +1,9 @@
 import {
   
   MantineProvider,
+  PillGroup,
+  PillsInput,
+  PillsInputField,
   useMantineColorScheme,
 } from "@mantine/core";
 import { useViewportSize } from "@mantine/hooks";
@@ -119,6 +122,11 @@ export const AppThemeProvider = ({ children }:any) => {
     size: "md",
     mt: "0",
   };
+  let default_size_pills_input = {
+    size: "md",
+    mt: "0",
+  };
+  // 
   let default_size_text_calendar = {
     size: "md",
     mt: "0",
@@ -163,6 +171,10 @@ let default_loader={
     //     h6: { fontSize: 8 },
     // }
     default_size_text_input = {
+      size: "md",
+      mt: "0",
+    };
+    default_size_pills_input = {
       size: "md",
       mt: "0",
     };
@@ -212,6 +224,10 @@ let default_loader={
       size: "sm",
       mt: "0",
     };
+    default_size_pills_input = {
+      size: "sm",
+      mt: "0",
+    };
     default_size_text_calendar = {
       size: "sm",
       mt: "0",
@@ -248,6 +264,9 @@ let default_loader={
     TextInput: {
       defaultProps: default_size_text_input,
     },
+    PillsInput:{
+      defaultProps: default_size_pills_input,
+    },
     DatePickerInput: {
       defaultProps: default_size_text_calendar,
     },
@@ -275,6 +294,9 @@ let default_loader={
     AppSelect: { defaultProps: default_size_select },
     Combobox: { defaultProps: default_size_select },
     InputBase: { defaultProps: default_size_select },
+    AppMultiSelect: { defaultProps: default_size_select },
+    PillsInputField: { defaultProps: default_size_select },
+    PillGroup: { defaultProps: default_size_select },
     Table: {
       defaultProps: {
         verticalSpacing: "md",

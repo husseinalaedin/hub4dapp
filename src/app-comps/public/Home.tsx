@@ -6,7 +6,6 @@ import { useAuth } from "../../providers/AuthProvider";
 import { LanguageSelect } from "../../global/Language";
 import { useRef } from "react";
 // import TextareaAutosize from "react-textarea-autosize";
-import TextareaAutosize from 'react-textarea-autosize';
 
 const Home = () => {
   const { islogged } = useAuth();
@@ -31,14 +30,7 @@ const handleEvent = () => {
   return (
     <>
       <Stack>
-      <TextareaAutosize
-  // key={value.length} // Forces re-render when text changes
-  // value={value}
-  // onChange={(e) => setValue(e.target.value)}
-  onHeightChange={(height) => console.log("Height changed:", height)}
-  minRows={3}
-  
-/>
+    
 
         <Textarea
           ref={textareaRef}

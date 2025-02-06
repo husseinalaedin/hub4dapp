@@ -541,7 +541,7 @@ export const Trades = () => {
                 fontWeight: "bold",
               }}
             >
-              <Group justify={expendedIDs.length > 0 ? "apart" : "right"}>
+              <Group justify={expendedIDs.length > 0 ? "space-between" : "right"}>
                 {expendedIDs.length > 0 && (
                   <ActionIcon
                     ml={"5px"}

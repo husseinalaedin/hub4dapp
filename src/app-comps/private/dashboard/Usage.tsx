@@ -36,6 +36,7 @@ import {
 import { AppSelect } from "../../../global/global-comp/AppSelect";
 import { useForm } from "@mantine/form";
 import { ArrayToAppSelect } from "../../../global/Hashtags";
+import { Calendar, DatePicker, DatePickerInput } from "@mantine/dates";
 export const Usage = () => {
   const { t } = useTranslation("private", { keyPrefix: "usage" });
   const { hidden } = useAuth();
@@ -56,17 +57,8 @@ export const Usage = () => {
   useEffect(() => {
     dispatch(changeActive("usage"));
   }, []);
-  const [value, setValue] = useState("");
-  const textareaProps = {
-    value: value,
-    onChange: (e) => setValue(e.target.value),
-    minRows: 3,
-    maxRows: 6,
-    placeholder: 'Type something...',
-    // autosize:true,
-    // trtr:"ok"
-  };
-  console.log('TextareaAutosize props:', textareaProps);
+  const [value, setValue] = useState<Date | null>(null);
+
 
   return (
     <> 
@@ -90,20 +82,8 @@ export const Usage = () => {
         </Group>
       </AppHeader>
       {/* <Group p="0px" m="0px" justify="center" w="100%"> */}
-      <Textarea
-        autosize={true}
-      // {...textareaProps}
-        // label="Autosize with 4 rows max"
-        // placeholder="Autosize with 4 rows max"
-      
-        minRows={5}
-        maxRows={10}
-        // styles={{ input: { overflow: "auto", height: "auto" } }}
-      />
-      <div>
-      
-
-      </div>
+      <Calendar />
+       <DatePicker value={value} onChange={setValue} />;
 
       <Box className={classesG.max400} pos="relative" w="100%">
         {data && !isLoading && succeeded && (

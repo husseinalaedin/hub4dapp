@@ -3,6 +3,7 @@ import { BUILD_API, useMessage } from "../../../global/G";
 import { useAxiosGet } from "../../../hooks/Https";
 import {
   HashtagsAlert,
+  HashtagSearchShowOptionAlert,
   HashTagsInput,
   HashValue4Boardd,
 } from "../../../global/global-comp/Hashtags";
@@ -139,7 +140,7 @@ export const TradeHashTags = ({ close, src }) => {
     executeGet: executeHashGet,
   } = useAxiosGet(BUILD_API("active-trades-hashtags"), {
     wtsb: form.getInputProps("wtsb").value,
-    hashtags: form.getInputProps("hashtags").value,//hashValue && hashValue.length > 0 ? hashValue.join(",") : "",
+    hashtags: form.getInputProps("hashtags").value, //hashValue && hashValue.length > 0 ? hashValue.join(",") : "",
     showhash: form.getInputProps("showhash").value,
   });
   useEffect(() => {
@@ -151,15 +152,15 @@ export const TradeHashTags = ({ close, src }) => {
     if (errorMsg) error(errorMsg);
     if (succeededHashGet && hashGet) {
       let dta: any = [];
-      generate(dta, "", 10); 
-      setData(dta); 
+      generate(dta, "", "");
+      setData(dta);
     }
   }, [errorMessageHashGet, succeededHashGet]);
   const generate = (data_a, postfix, v) => {
     hashGet.forEach((itemS) => {
       data_a.push({
         hashtag: itemS.hashtag, //+ "_" + postfix,
-        postcount: itemS.postcount + v,
+        dealcount: itemS.dealcount + v,
       });
     });
   };
@@ -219,7 +220,7 @@ export const TradeHashTags = ({ close, src }) => {
               {...form.getInputProps("wtsb")}
               defaultValue={""}
               fz="lg"
-              size="lg"
+              size="md"
               placeholder={t("e_g_All", "e.g All")}
               data={wtsbOpt()}
               renderOption={renderWtsWtbDropVOption}
@@ -227,102 +228,44 @@ export const TradeHashTags = ({ close, src }) => {
             />
           </Grid.Col>
           <Grid.Col span={small ? 12 : large || medium ? 9 : 6}>
-            <HashTagsInput
-              // zIndex={30000000}
-              addOnNotFound={true}
-              withAsterisk={false}
-              // label={
-              //   <Group justify="flex-start" gap={0}>
-              //     <Box>{t("hashtag_all", "Hashtag(All)#")}</Box>
-              //     <HashtagsAlert withinPortal={false} />
-              //   </Group>
-              // }
-              {...form.getInputProps("hashtags")}
-              withinPortal={true}
-              placeholder={"e.g iphone grade a or ipho grade"}
-              w="100%"
-              readOnly={false}
-            />
-            {/* <MultiSelect
-              label={t("hash_tag", "Hash Tags")}
-              fz="lg"
-              size="lg"
-              onKeyDown={(event) => {
-                if (event.code === "Space" || event.code === "Enter") {
-                  if (event.code === "Space") event.preventDefault();
-                  if (searchValue && searchValue != "") {
-                    const item = {
-                      value: searchValue,
-                      label: searchValue,
-                      onRemove2: onRemove2,
-                    };
-                    setHashData((current) => [...current, item]);
-                    setHashValue((current) => [...current, searchValue]);
-                    onSearchChange("");
-                  }
-                }
-                if (
-                  event.code === "Backspace" &&
-                  (!searchValue || searchValue === "") &&
-                  hashValue.length > 0
-                ) {
-                  event.preventDefault();
-                  let lastV = hashValue[hashValue.length - 1];
-                  setHashValue((prevItems) =>
-                    prevItems.filter((item) => item !== lastV)
-                  );
-                  setHashData((prevItems) =>
-                    prevItems.filter((item) => item.value !== lastV)
-                  );
-                  onSearchChange(lastV);
-                }
-              }}
-              value={hashValue}
-              data={hashData}
-              placeholder={"e.g iphone grade a or ipho grade"}
-              searchable
-              searchValue={searchValue}
-              onSearchChange={(event) => {
-                return onSearchChange(event);
-              }}
-              clearable
-              maxDropdownHeight={250}
-              limit={20}
-              maxValues={5}
-              rightSection={
-                hashValue &&
-                hashValue.length > 0 && (
-                  <CloseButton
-                    onMouseDown={() => {
-                      setHashValue([]);
-                      setHashData([]);
-                      onSearchChange("");
-                    }}
-                    variant="transparent"
-                    size={24}
-                    iconSize={32}
-                    tabIndex={-1}
-                  />
-                )
-              }
-            /> */}
+            <Box mt="4px">
+              <HashTagsInput
+                size="md"
+                label={t("hash_tag", "Hashtags")}
+                addOnNotFound={true}
+                withAsterisk={false}
+                {...form.getInputProps("hashtags")}
+                withinPortal={true}
+                placeholder={"e.g iphone grade a or ipho or grad or grade a"}
+                w="100%"
+                readOnly={false}
+              />
+            </Box>
           </Grid.Col>
-          <Grid.Col span={small ? 4 : large || medium ? 3 : 2}>
-            <AppSelect
-              label={t("show_hash", "Show Hash")}
-              {...form.getInputProps("showhash")}
-              defaultValue={"both"}
-              fz="lg"
-              size="lg"
-              placeholder={t("e_g_both", "e.g Both")}
-              data={hashOpt()}
-              maxDropdownHeight={500}
-            />
+          <Grid.Col span={small ? 5 : large || medium ? 3 : 2}>
+            <Group gap={0} justify="left">
+               
+              <AppSelect
+              maw={"85%"}
+                label={t("show_hash", "Show Hash")}
+                {...form.getInputProps("showhash")}
+                defaultValue={"both"}
+                fz="lg"
+                size="md"
+                placeholder={t("e_g_both", "e.g Both")}
+                data={hashOpt()}
+                maxDropdownHeight={500}
+              />
+              <Box maw={"15%"}>
+                
+              <HashtagSearchShowOptionAlert withinPortal={true} />
+              </Box>
+            </Group>
           </Grid.Col>
-          <Grid.Col span={small ? 8 : large || medium ? 9 : 2}>
-            <Group gap={3} justify="left" mt="xl">
+          <Grid.Col span={small ? 7 : large || medium ? 9 : 2}>
+            <Group gap={3} justify="left" mt="25px">
               <Tooltip label={t("search", "Search")} withinPortal>
-                <Button onClick={search} size="lg">
+                <Button onClick={search} size="md">
                   <IconSearch />
                   {/* {t('search','Search')} */}
                 </Button>
@@ -331,7 +274,7 @@ export const TradeHashTags = ({ close, src }) => {
                 <Button
                   color="red"
                   onClick={clearsearch}
-                  size="lg"
+                  size="md"
                   variant="outline"
                 >
                   <IconAdjustmentsOff />
@@ -367,9 +310,9 @@ export const TradeHashTags = ({ close, src }) => {
                   onClick={() => {
                     let hash0 = encodeURIComponent(hash.hashtag.split(" & "));
                     close();
-                    let url = src == "TRADES" ? "trades/t" : "latest-trades";
+                    let url = src == "TRADES" ? "trades/t/a" : "latest-trades";
                     navigate(
-                      `../${url}?hashtags_and=` +
+                      `../app/${url}?hashtags_and=` +
                         hash0 +
                         `&t=` +
                         new Date().getTime().toString()
@@ -378,7 +321,7 @@ export const TradeHashTags = ({ close, src }) => {
                 >
                   <HashValue4Boardd
                     label={hash.hashtag}
-                    postcount={hash.postcount}
+                    postcount={hash.dealcount}
                   />
                 </Box>
               );

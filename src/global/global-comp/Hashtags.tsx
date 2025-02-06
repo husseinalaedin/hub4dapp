@@ -458,3 +458,65 @@ export const HashtagsAlert = ({ withinPortal }) => {
     </Popover>
   );
 };
+export const HashtagSearchShowOptionAlert = ({ withinPortal }) => {
+  const { t } = useTranslation("common", { keyPrefix: "table" });
+  return (
+    <Popover
+      width={400}
+      position="bottom"
+      withArrow
+      shadow="md"
+      withinPortal={withinPortal}
+      zIndex={200000000000000000}
+    >
+      <Popover.Target>
+        <ActionIcon c="orange" variant="transparent">
+          <IconQuestionMark stroke={1.5} size="1.2rem" />
+        </ActionIcon>
+      </Popover.Target>
+      <Popover.Dropdown p="xs">
+        <Alert variant="light" color="blue">
+          <Text size="md" mt="xs">
+            {t(
+              "hashtag_show_single",
+              `Show Hash Single:it means that one hash will show as entered per deal.`
+            )}
+          </Text>
+          <Text size="md" mt="xs">
+            {t(
+              "hashtag_show_double",
+              `Show Hash Double:it combines all the hashes per deal 2 by 2.`
+            )}
+          </Text>
+          <Text size="md" mt="xs">
+            {t(
+              "hashtag_show_both",
+              `Both:It shows both single and double.`
+            )}
+          </Text>
+           
+        </Alert>
+        <Alert variant="light" color="teal" mt="xs">
+          <Text size="md" mt="xs">
+            {t("hashtag_show_option_example", `e.g deal with 2 hashtags iphone & used`)}
+          </Text>
+          <Text size="md" mt="xs">
+            {t("hashtag_show_option_example_result", `The result will show as following:`)}
+          </Text>
+          <Text size="md" mt="xs">
+            {t("hashtag_show_single", `Single:[iphone] [used]`)}
+          </Text>
+          <Text size="md"mt="xs">
+            {t("hashtag_show_double", `Double: [iphone & used]`)}
+          </Text>
+          <Text size="md"mt="xs" ml="xl">
+            {t("hashtag_show_double2", `Clicking this will show deals that include both hashtags: "iphone" and "used."`)}
+          </Text>
+          <Text size="md"mt="xs">
+            {t("hashtag_show_both", `Both:[iphone] [used] [iphone & used]`)}
+          </Text>
+        </Alert>
+      </Popover.Dropdown>
+    </Popover>
+  );
+};

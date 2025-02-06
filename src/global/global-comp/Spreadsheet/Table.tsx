@@ -997,6 +997,7 @@ export const AppTable = forwardRef((props: any, ref) => {
         >
           {/* <ScrollArea maw={"100%"} mx="auto" type="auto"> */}
           <table
+          className="table-container"
             ref={tableRef}
             {...{
               style: {

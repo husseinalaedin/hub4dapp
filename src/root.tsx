@@ -16,6 +16,7 @@ import "@mantine/dates/styles.css";
 import "./TableStyles.css"; 
 // var TextareaAutosize = require('react-textarea-autosize').default;
 
+import '@mantine/dates/styles.css';
 export function Layout({ children }: { children: React.ReactNode }) {
   const [isClient, setIsClient] = useState(false);
 

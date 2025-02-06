@@ -1,16 +1,16 @@
-table,
+/* table,
 .divTable {
   border: 1px solid lightgray;
   width: fit-content;
   table-layout: fixed;
-  border-collapse: collapse; /* Ensures borders collapse and touch each other */
-  border-spacing: 0; /* Removes any default spacing between cells */
+  border-collapse: collapse;
+  border-spacing: 0;
   width: 100%;
 }
 
 .tr {
   display: flex;
-  gap: 0; /* Removes any spacing between flex items */
+  gap: 0;
 }
 
 tr,
@@ -23,24 +23,67 @@ th,
 td,
 .td {
   box-shadow: inset 0 0 0 0px lightgray;
-  padding: 0; /* Removes padding inside cells */
+  padding: 0;
 }
 
 th,
 .th {
-  border: 1.5px solid lightgray; /* Adds border to table header */
+  border: 1.5px solid lightgray;
   position: relative;
   font-weight: bold;
   text-align: center;
-  background-color: #f8f9fa; /* Optional: Light background for the header */
+  background-color: #f8f9fa;
   word-wrap:break-word;
   overflow: hidden;
 }
 
 td,
 .td {
-  border: 1px solid lightgray; /* Ensures table cells have a consistent border */
+  border: 1px solid lightgray;
   word-wrap:break-word;
+} */
+.table-container {
+  border: 1px solid lightgray;
+  width: fit-content;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.table-container .tr {
+  display: flex;
+  gap: 0;
+}
+
+.table-container tr,
+.table-container .tr {
+  width: fit-content;
+}
+
+.table-container th,
+.table-container .th,
+.table-container td,
+.table-container .td {
+  box-shadow: inset 0 0 0 0px lightgray;
+  padding: 0;
+}
+
+.table-container th,
+.table-container .th {
+  border: 1.5px solid lightgray;
+  position: relative;
+  font-weight: bold;
+  text-align: center;
+  background-color: #f8f9fa;
+  word-wrap: break-word;
+  overflow: hidden;
+}
+
+.table-container td,
+.table-container .td {
+  border: 1px solid lightgray;
+  word-wrap: break-word;
 }
 
 .resizer {
