@@ -45,8 +45,7 @@ import { UseProfileMenu } from "../acc/UserProfile";
 import { ActiveTheme, Themes } from "../../../hooks/useTheme";
 
 import { changeActive } from "../../../store/features/ActiveNav";
-
-const NavAccItems = (props: any) => {
+export const NavAccItems=()=>{
   const { t } = useTranslation("common", { keyPrefix: "navigator" });
   const navAccItems = [
     {
@@ -55,6 +54,7 @@ const NavAccItems = (props: any) => {
       private: "P",
       icon: IconUserCircle,
       label: <div className="acc-nav-item">{t("profile", "Profile")}</div>,
+      description:t('profile_desc','Your profile.'),
     },
     {
       key: "company",
@@ -64,6 +64,7 @@ const NavAccItems = (props: any) => {
       label: (
         <div className="acc-nav-item">{t("co_profile", "Company Profile")}</div>
       ),
+      description:t('co_profile_desc','Your company profile.'),
     },
 
     {
@@ -72,6 +73,7 @@ const NavAccItems = (props: any) => {
       private: "P",
       icon: IconUsers,
       label: <div className="acc-nav-item">{t("co_team", "Company Team")}</div>,
+      description:t('co_team_desc','Your company team.'),
     },
     {
       key: "settings",
@@ -79,18 +81,21 @@ const NavAccItems = (props: any) => {
       private: "P",
       icon: IconSettings,
       label: <div className="acc-nav-item">{t("settings", "Settings")}</div>,
+      description:t('settings_desc','Your settings.')
     },
 
     {
       key: "plans",
       to: "plans",
       private: "P",
+      iconcolor: "violet.5",
       icon: IconCurrencyDollarSingapore,
       label: (
         <div className="acc-nav-item">
           {t("plans_and_pricing", "Plans & Pricing")}
         </div>
       ),
+      description:t('plans_and_pricing_desc','Your plan and Plans & Pricing.'),
     },
 
     {
@@ -98,7 +103,9 @@ const NavAccItems = (props: any) => {
       to: "sign-out",
       private: "P",
       icon: IconLogout,
+      iconcolor: "red.5",
       label: <div className="acc-nav-item">{t("sign_out", "Sign Out")}</div>,
+      description:t('sign_out_desc','Sign Out.'),
     },
     {
       key: "line",
@@ -143,6 +150,7 @@ const NavAccItems = (props: any) => {
       icon: ActiveTheme(),
       label: <Themes />,
       keepDrawerOpen: true,
+      description:t('theme_desc','Theme.')
     },
     {
       key: "lang",
@@ -151,8 +159,14 @@ const NavAccItems = (props: any) => {
       icon: IconLanguage,
       label: <LanguageSelect />,
       keepDrawerOpen: true,
+      description:t('language_desc','Language.')
     },
   ];
+  return navAccItems
+}
+const NavAccItemsComp = (props: any) => {
+  const { t } = useTranslation("common", { keyPrefix: "navigator" });
+  const navAccItems = NavAccItems()
   const dispatch = useDispatch();
   const opened2 = useSelector(selectOpened);
   const small2 = useSelector(selectSmall);
@@ -322,7 +336,7 @@ export const NavAcc = (props: any) => {
             {<IconArrowLeft size={30} />}
           </ActionIcon>
         </Group>
-        <NavAccItems
+        <NavAccItemsComp
           andCloseDrawer={() => {
             if (props && props.state_changed) props.state_changed(false);
             setOpened(false);

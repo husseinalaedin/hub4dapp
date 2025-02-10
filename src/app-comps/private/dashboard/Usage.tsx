@@ -35,8 +35,7 @@ import {
 } from "../../../global/global-comp/AppMultiSelect";
 import { AppSelect } from "../../../global/global-comp/AppSelect";
 import { useForm } from "@mantine/form";
-import { ArrayToAppSelect } from "../../../global/Hashtags";
-import { Calendar, DatePicker, DatePickerInput } from "@mantine/dates";
+
 export const Usage = () => {
   const { t } = useTranslation("private", { keyPrefix: "usage" });
   const { hidden } = useAuth();
@@ -56,9 +55,7 @@ export const Usage = () => {
   }, []);
   useEffect(() => {
     dispatch(changeActive("usage"));
-  }, []);
-  const [value, setValue] = useState<Date | null>(null);
-
+  }, []); 
 
   return (
     <> 
@@ -80,11 +77,7 @@ export const Usage = () => {
             <IconRefresh />
           </Button>
         </Group>
-      </AppHeader>
-      {/* <Group p="0px" m="0px" justify="center" w="100%"> */}
-      <Calendar />
-       <DatePicker value={value} onChange={setValue} />;
-
+      </AppHeader> 
       <Box className={classesG.max400} pos="relative" w="100%">
         {data && !isLoading && succeeded && (
           <>

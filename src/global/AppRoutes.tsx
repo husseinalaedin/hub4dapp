@@ -34,11 +34,13 @@ import { Usage } from "../app-comps/private/dashboard/Usage";
 import { Route, Routes } from "react-router";
 import { Box } from "@mantine/core";
 import Home2 from "../app-comps/public/Home";
+import { QuickAccess } from "../app-comps/private/app-admin/QuickAccess";
 
 export const AppRoutes = () => (
   <>
     <Routes>
       <Route path="" element={<Home2 />} />
+
       <Route path="/:shareidhex" element={<Main />} />
       <Route path="/pub" element={<Home2 />}>
         <Route path="sign-up" element={<SignUp />} />
@@ -51,7 +53,9 @@ export const AppRoutes = () => (
         <Route path="out-response/:purpose" element={<OutResponse />} />
       </Route>
       <Route path="/app" element={<AppMain />}>
-        <Route path="" element={<Usage />} />
+        <Route path="quickaccess" element={<QuickAccess />} />
+        <Route path="usage" element={<Usage />} />
+
         <Route path="shareresponse/:shareidhex" element={<AppEntry />} />
         <Route
           path="decision-noted/:short_link"

@@ -22,7 +22,6 @@ import { I18nextProvider } from "react-i18next";
 import { AppRoutes } from "./global/AppRoutes";
 import i18n from "./locales/I18next";
 import { HeaderNdSideProvider } from "./hooks/useAppHeaderNdSide";
-import { DatesProvider } from "@mantine/dates";
  
 export default function AppMain() {
   return (
@@ -34,9 +33,7 @@ export default function AppMain() {
               <AppGlobalStylProvider>
                 <ModalsProvider>
                   <HeaderNdSideProvider>
-                    <DatesProvider settings={{}}>
-                       <AppRoutes />
-                    </DatesProvider>
+                  <AppRoutes />
                    
                   </HeaderNdSideProvider>
                 </ModalsProvider>

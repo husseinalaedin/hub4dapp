@@ -102,11 +102,13 @@ export const useDealToShareMain = () => {
       const searchParams1 = new URLSearchParams(location.search);
       const params1 = {};
       let ignore = false;
+      let hash =window.location.hash.substring(1);
       for (let [key, value] of searchParams1.entries()) {
         params1[key] = value;
         if (key == "src" && value == "navigator") ignore = true;
       }
-      console.log(params1, "params1");
+      if (!ignore && (hash == "bypasting"||hash == "byai")) ignore = true;
+      
       if (!ignore) {
         const searchParams = new URLSearchParams(queryParams).toString();
         navigate(`?${searchParams}`, { replace: true });
@@ -439,7 +441,8 @@ const DealToShareCom = ({ t, openas, closeToShare }) => {
                     <Box style={{ width: "40px" }}>
                       <CopyButton value={url()}>
                         {({ copied, copy }) => (
-                          <ActionIcon variant="transparent"
+                          <ActionIcon
+                            variant="transparent"
                             onClick={() => {
                               copy();
                               succeed(t("link_copied", "Link copied!."));

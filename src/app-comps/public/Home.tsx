@@ -30,16 +30,7 @@ const handleEvent = () => {
   return (
     <>
       <Stack>
-    
-
-        <Textarea
-          ref={textareaRef}
-          placeholder="Autosize with no rows limit"
-          minRows={5}
-          maxRows={20}
-          onClick={handleEvent} 
-          // onChange={handleChange}
-        />
+     
         <h1>{t(`welcome`, "Welcome")}</h1>
         <h1>Home Screen</h1>
         <LanguageSelect />

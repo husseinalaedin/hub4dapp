@@ -86,6 +86,7 @@ export const LanguageSelect = () => {
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       <AppSelect
+        withinPortal={true}
         value={selected}
         // defaultValue={selected}
         label={t("select_language", "Select Language")}

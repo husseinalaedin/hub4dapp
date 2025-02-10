@@ -864,7 +864,7 @@ export const AppTable = forwardRef((props: any, ref) => {
             <IconPlus stroke={1.5} size="1rem" />
           </ActionIcon> */}
           <Add t={t} add={add} />
-          <AddByPaste isIcon={true} />
+          <AddByPaste isIcon={true} init={false} />
           <Divider orientation="vertical" size="sm" ml="2px" mr="2px" />
           <ActionIcon
             variant="light"
@@ -1383,10 +1383,11 @@ const handleRemoveText = (elementRef) => {
   }
 };
 
-export const AddByPaste = ({ isIcon }) => {
+export const AddByPaste = ({ isIcon,init }) => {
   const { t } = useTranslation("common", { keyPrefix: "table" });
   const [tableData, setTableData] = useState<any>([]);
   const { classes: classesG } = useGlobalStyl();
+  const hash = window.location.hash.substring(1);
   const [opened, { close, open }] = useDisclosure(false);
   const [value, setValue] = useState("");
   const navigate = useNavigate();
@@ -1408,7 +1409,7 @@ export const AddByPaste = ({ isIcon }) => {
     if (value == "") return;
     const pastedText = value; // Get pasted text
     const rows = pastedText.split("\n").filter((row) => row.trim() !== ""); // Split by lines and filter empty rows
-
+   
     const parsedData = rows.map((row) => {
       const [type, title, quantity, price, hashtags, description] =
         row.split("\t"); // Split by tab
@@ -1427,12 +1428,20 @@ export const AddByPaste = ({ isIcon }) => {
     SetSelectAll0(true);
     selectAll(true);
   }, [value]);
-
+  
+  useEffect(()=>{
+      if (hash == "bypasting" && !opened && init) {
+        open();
+      }
+  },[hash,opened])
   return (
     <>
       <Modal
         opened={opened}
-        onClose={close}
+        onClose={()=>{
+          window.location.hash = "";
+          close() 
+        }}
         size="auto"
         withCloseButton={true}
         title={t("adding_deals_by_paste", "Adding deals via pasting...")}
@@ -1640,8 +1649,12 @@ export const AddByPaste = ({ isIcon }) => {
         <MassDealEntry
           dataSet={tableData}
           setData={setTableData}
-          onClose={close}
+          onClose={()=>{
+            window.location.hash = "";
+            close() 
+          }}
           onSucceed={(dt) => {
+            window.location.hash = ""; 
             close();
             navigate("../app/mydeals?src=navigator&created_on=" + dt);
           }}
@@ -1659,7 +1672,9 @@ export const AddByPaste = ({ isIcon }) => {
         {isIcon && (
           <ActionIcon
             variant="filled"
-            onClick={open}
+            onClick={()=>{
+              window.location.hash = "bypasting"; 
+            }}
             title={t("add_deals_by_pasting", "Add deals by pasting")}
           >
             <IconClipboardPlus stroke={1.5} size="1.7rem" />
@@ -1674,7 +1689,10 @@ export const AddByPaste = ({ isIcon }) => {
               gradient={{ from: "lime", to: "indigo", deg: 60 }}
               type="button"
               style={{ width: small || medium ? 'auto' : 150 }}
-              onClick={open} 
+              // onClick={open} 
+              onClick={()=>{
+                window.location.hash = "bypasting"; 
+              }}
             >
               <Group>
                 <IconClipboardPlus />

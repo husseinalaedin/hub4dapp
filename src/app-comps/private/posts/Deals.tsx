@@ -216,6 +216,7 @@ export const CompanyDeals = () => {
   let { theme } = useAppTheme();
   const [popUpObj, setPopUpObj] = useState<any>("");
   const [forceOpenLinkInfo, setForceOpenLinkInfo] = useState<any>("");
+
   const {
     data,
     setData: setDataGet,
@@ -248,7 +249,7 @@ export const CompanyDeals = () => {
   const { classes: classesG } = useGlobalStyl();
   const [objectUpdated, setObjectUpdated] = useState<any>({});
   const [showHiddenMsg, setShowHiddenMsg] = useState(true);
-  let { open: openAI } = useAiParser(() => {}, small || medium);
+  let { open: openAI } = useAiParser(() => {}, small || medium, true);
   // const [isBusy,setIsBusy]=useState(false)
   useEffect(() => {
     dispatch(changeActive("mydeals"));
@@ -315,7 +316,7 @@ export const CompanyDeals = () => {
   const fit_data_grid_view = () => {
     if (small || medium) {
       setListDir((prev) => {
-        if (prev == "img_grid_view" || prev=='spread') return prev;
+        if (prev == "img_grid_view" || prev == "spread") return prev;
         return "grid_view";
       });
     } else {
@@ -443,7 +444,7 @@ export const CompanyDeals = () => {
             </Button>
           </Tooltip>
 
-          <AddByPaste isIcon={false} />
+          {!isLoading && <AddByPaste isIcon={false} init={true} />}
           <Tooltip label={t("add_new_deal_by_ai", "Add new deals by AI.")}>
             <Button
               variant="gradient"
@@ -451,8 +452,8 @@ export const CompanyDeals = () => {
               type="button"
               style={{ width: small || medium ? "auto" : 120 }}
               onClick={() => {
-                openAI();
-              }} 
+                window.location.hash = "byai";
+              }}
             >
               <Group>
                 <IconOctagonPlus />
@@ -545,10 +546,10 @@ export const CompanyDeals = () => {
             </Box>
           </Group>
           <Box>
-            {(!data || data.length <= 0)  && listDir != "spread" && (
+            {(!data || data.length <= 0) && listDir != "spread" && (
               <NoDataFound title={t("no_deals_found", "No Deals Found!.")} />
             )}
-            {(!(!data || data.length <= 0)  || listDir == "spread") && (
+            {(!(!data || data.length <= 0) || listDir == "spread") && (
               <Box>
                 {(listDir == "grid_view" || listDir == "img_grid_view") && (
                   <SimpleGrid
@@ -1047,7 +1048,6 @@ export const AddEditDeal0 = () => {
       return hastags;
     });
   };
-  let { open: openAI } = useAiParser(() => {}, small || medium);
   const {
     data: dataGet,
     errorMessage: errorMessageGet,
@@ -1273,7 +1273,6 @@ export const AddEditDeal0 = () => {
         }}
       >
         <Group justify="right" gap="xs">
-           
           <Tooltip label={t("refresh", "Refresh")}>
             <Button
               variant="default"
@@ -2084,7 +2083,7 @@ export const DealSearch = (props) => {
 
           <Grid.Col>
             <Group justify="space-between" gap={4}>
-              <Box  maw={"calc(50% - 4px)"}>
+              <Box maw={"calc(50% - 4px)"}>
                 <HoursRangeSelect
                   data={lastXHours}
                   {...form.getInputProps("expired_in_hours")}
@@ -2565,15 +2564,16 @@ const ParseDeal = ({ onApply }) => {
   const [value, setValue] = useState("");
   const [dealCount, setDealCount] = useState<string | null>("");
   const [dealDataCount, setDealDataCount] = useState([]);
+  const [aiModel,setAiModel]= useState<string | null>("");
   const [activeTab, setActiveTab] = useState<string | null>("input");
-  
+
   const [selectAll0, SetSelectAll0] = useState(false);
   const [intermidiate0, setIntermidiate0] = useState(false);
   const [dataToPut, setDataToPut] = useState([]);
   const { error, succeed, info } = useMessage();
   const navigate = useNavigate();
   let { getCurrFromSymbol } = useDbData();
-   
+
   const {
     data: dataSet,
     isLoading,
@@ -2584,6 +2584,7 @@ const ParseDeal = ({ onApply }) => {
   } = useAxiosPost(BUILD_API("ai-parse-deal"), {
     deal: value,
     count: dealCount,
+    ai_model:aiModel
   });
   const {
     data: dataPlanInfo,
@@ -2605,21 +2606,28 @@ const ParseDeal = ({ onApply }) => {
   useEffect(() => {
     executeGetPlanInfo();
   }, []);
-  const dataDealCount =
-    dataPlanInfo && dataPlanInfo.deal_count
-      ? dataPlanInfo && dataPlanInfo.deal_count
-      : 0;
+  const dataDealCount = dataPlanInfo && dataPlanInfo.deal_count ? 15 : 0;
   const parseLeft =
-    dataPlanInfo && dataPlanInfo.ai_info && dataPlanInfo && dataPlanInfo.ai_info
+    dataPlanInfo && dataPlanInfo.ai_info
       ? dataPlanInfo.ai_info.parse_count_left
       : 0;
   const parsingAttemptCompleted =
-    dataPlanInfo && dataPlanInfo.ai_info && dataPlanInfo && dataPlanInfo.ai_info
+    dataPlanInfo && dataPlanInfo.ai_info
       ? dataPlanInfo.ai_info.parsing_attempts_completed
       : 0;
+  const ai_model_info =
+    dataPlanInfo && dataPlanInfo.ai_model_info
+      ? dataPlanInfo.ai_model_info
+      : [];
+
   useEffect(() => {
     if (errorMessagePlanInfo) error("Plan Info Error:" + errorMessagePlanInfo);
     if (succeededPlanInfo) {
+      setAiModel(()=>{
+        if(ai_model_info.length==1)
+            return ai_model_info[0]['model_name']
+          return null
+      })
       let cnt: any = [];
       if (dataDealCount && +dataDealCount > 0) {
         for (let i = 1; i <= +dataDealCount; i++) {
@@ -2637,6 +2645,11 @@ const ParseDeal = ({ onApply }) => {
     if (succeeded) {
       setActiveTab("output");
       setDealCount(null);
+      setAiModel(()=>{
+        if(ai_model_info.length==1)
+            return ai_model_info[0]['model_name']
+          return null
+      })
       SetSelectAll0(true);
       selectAll(true);
       executeGetPlanInfo();
@@ -2730,9 +2743,9 @@ const ParseDeal = ({ onApply }) => {
     // });
   };
   const data = dataSet && dataSet.length > 0 ? dataSet : [];
-  const close=()=>{
+  const close = () => {
     closeModal("ai_parser_pop_up");
-  }
+  };
   const placeholderAI =
     t("type_or_paste_your_deals", "Type or paste your deals e.g") +
     `
@@ -2770,17 +2783,38 @@ Pack Boxes
               <Select
                 withAsterisk
                 maw={350}
+                value={aiModel}
+                onChange={setAiModel}
+                label={t(
+                  "ai_model_used",
+                  "AI model used to extract the deals"
+                )}
+                placeholder={t("select_ai_model", "Select AI Model") }
+                data={ai_model_info?.map((itm) => {
+                  return {
+                    value: itm.model_name,
+                    label: itm.model_name+` - ${itm.parse_count_left} `,
+                  };
+                })}
+                description={t(
+                  "ai_model_used",
+                  "Each model shows how many attempts left to use****."
+                )}
+              />
+              <Select
+                withAsterisk
+                maw={350}
                 value={dealCount}
                 onChange={setDealCount}
                 label={t(
                   "nb_deal_to_extract",
                   "The number of deals that can be pulled from the text"
                 )}
-                placeholder={t("select_value", "Select Value")}
+                placeholder={t("select_value", "Select Value") + " 1-15"}
                 data={dealDataCount}
                 description={t(
                   "that_helps_ai",
-                  "That helps AI to generate a better results."
+                  "That helps AI to generate a better result."
                 )}
               />
               <Group justify="right">
@@ -2794,7 +2828,7 @@ Pack Boxes
                 </Button>
                 <Button
                   disabled={
-                    !value || value == "" || !dealCount || dealCount == ""
+                    !value || value == "" || !dealCount || dealCount == "" || !aiModel||aiModel==''
                   }
                   onClick={parse}
                   variant="gradient"
@@ -2806,7 +2840,7 @@ Pack Boxes
             </Group>
 
             <Textarea
-             autosize={true}
+              autosize={true}
               placeholder={placeholderAI}
               value={value}
               onChange={(event) => setValue(event.currentTarget.value)}
@@ -2827,8 +2861,8 @@ Pack Boxes
                     "***"}
                 </Box>
               }
-             minRows={15}
-             maxRows={15}
+              minRows={15}
+              maxRows={15}
             />
             <Box opacity={0.9}>
               <Box fz="sm" c="orange" mt="md">
@@ -2853,7 +2887,14 @@ Pack Boxes
                 {"***" +
                   t(
                     "note_approximate_parse_left_value",
-                    `Note: This is an approximate value, as each attempt has its own cost..`
+                    `Note: This is an estimated value, as each attempt has a different cost.`
+                  )}
+              </Box>
+              <Box fz="sm" c="red">
+                {"****" +
+                  t(
+                    "note_approximate_parse_left_value_per_model",
+                    `However, In the model list, the value represents the number of attempts remaining per model, assuming it is the only model used until the end of the plan cycle.`
                   )}
               </Box>
             </Box>
@@ -2902,7 +2943,7 @@ Pack Boxes
               intermidiate0={intermidiate0}
               setIntermidiate0={setIntermidiate0}
               selectAll={selectAll}
-            /> 
+            />
             <Box c="orange" mt="xs">
               {data.length} {t("deals_extracted", "Deals extracted")}
             </Box>
@@ -2913,18 +2954,16 @@ Pack Boxes
   );
 };
 
-const useAiParser = (onApply, isFull) => {
-  // const small0 = useSelector(selectSmall);
-  // const medium0 = useSelector(selectMedium);
-  //  const [isFull,setIsFull]=useState(isFull0)
+const useAiParser = (onApply, isFull, init) => {
+  const hash = window.location.hash.substring(1);
+  useEffect(() => {
+    if (hash == "byai" && init) {
+      open();
+    }
+  }, [hash]);
   const [forceOpen, setForceOpen] = useState("");
-  // useEffect(()=>{
-  //   alert(isFull0+'00')
-  // setIsFull(isFull0)
-  // },[isFull0])
   useEffect(() => {
     if (forceOpen == "") return;
-    // alert(isFull)
     modals.open({
       keepMounted: false,
       padding: 0,
@@ -2938,18 +2977,14 @@ const useAiParser = (onApply, isFull) => {
       withinPortal: true,
       size: isFull ? "100%" : "65vw",
       onClose: () => {
+        window.location.hash = "";
         closeModal("ai_parser_pop_up");
       },
       children: <ParseDeal onApply={onApply} />,
     });
   }, [forceOpen]);
-  // useEffect(()=>{
-  // setIsFull(small0||medium0)
-  // },[small0,medium0])
   const open = () => {
     setForceOpen(new Date().getTime().toString());
-    //  const small0 = useSelector(selectSmall);
-    // const medium0 = useSelector(selectMedium);
   };
   return { open };
 };

@@ -22,6 +22,9 @@ import {
   IconTerminal2,
   IconLogout2,
   IconClock24,
+  IconGridDots,
+  IconOctagonPlus,
+  IconClipboardPlus,
 } from "@tabler/icons-react";
 import { Box, Group, NavLink } from "@mantine/core";
 import { Link, matchPath, useLocation, useSearchParams } from "react-router";
@@ -37,13 +40,8 @@ import {
 } from "../../../store/features/ScreenStatus";
 import { BUILD_PORTAL_URL, G } from "../../../global/G";
 import { NavAcc } from "./NavAcc";
-
-export const Nav = () => {
+export const NavItems=(hex_q)=>{
   const { t } = useTranslation("common", { keyPrefix: "navigator" });
-  const { userData, islogged, iscoadmin } = useAuth();
-  const [searchParams, setSearchParams] = useSearchParams();
-  let hex = G.ifNull(searchParams.get("hex"), "");
-  const hex_q = hex && hex != "" && !islogged ? "/?hex=" + hex : "";
   const nav_items = [
     {
       key: "hub4d",
@@ -53,6 +51,7 @@ export const Nav = () => {
       icon_class: "",
       iconcolor: "red.5",
       label: <div className="acc-nav-item">{t("hub4d", "Hub4d")}</div>,
+      description:''
     },
     {
       key: "home",
@@ -62,6 +61,17 @@ export const Nav = () => {
       icon_class: "",
       iconcolor: "",
       label: <div className="acc-nav-item">{t("home", "Home")}</div>,
+      description:''
+    },
+    {
+      key: "quickaccess",
+      to: "quickaccess?src=links",
+      private: "N",
+      icon: IconGridDots,
+      icon_class: "",
+      iconcolor: "pink.5",
+      label: <div className="acc-nav-item">{t("quick_access", "Quick Access")}</div>,
+      description:''
     },
     // { key: 'ai', to: "ai", private: 'N', icon: IconTerminal2, icon_class: "rotating-ai-icon", iconcolor: "orange.9", label: <div className='acc-nav-item'>{t('ai', 'AI')}</div> },
     {
@@ -75,6 +85,10 @@ export const Nav = () => {
           {t("trading_floor", "Trading Floor")}
         </div>
       ),
+      description:t(
+        "trading_floor_desc",
+        "Browse all active deals and trades available on the Hub4d platform."
+      )
     },
     {
       key: "latest-trades",
@@ -85,6 +99,10 @@ export const Nav = () => {
       label: (
         <div className="acc-nav-item">{t("latesttrades", "Latest Trades")}</div>
       ),
+      description:t(
+        "latesttrades_desc",
+        "Explore all available deals and trades on the Hub4d platform, sorted by the most recently added."
+      )
     },
 
     {
@@ -98,6 +116,10 @@ export const Nav = () => {
           {t("company_directory", "Company Directory")}
         </div>
       ),
+      description:t(
+        "company_directory_desc",
+        "Explore all businesses on the Hub4d platform, view their profiles, and connect with potential trade partners."
+      )
     },
 
     {
@@ -107,6 +129,10 @@ export const Nav = () => {
       icon: IconDeviceAnalytics,
       iconcolor: "",
       label: <div className="acc-nav-item">{t("dashboard", "Dashboard")}</div>,
+      description:t(
+        "dashboard_desc",
+        "Dashboard."
+      ),
       links: [
         {
           key: "analytic",
@@ -119,6 +145,10 @@ export const Nav = () => {
               {t("dashboard_analytic", "Analytic")}
             </div>
           ),
+          description:t(
+            "analytic_desc",
+            "Your central hub for monitoring all shares and responses, featuring real-time charts and insights."
+          )
         },
         {
           key: "usage",
@@ -127,19 +157,11 @@ export const Nav = () => {
           icon: IconClock24,
           iconcolor: "",
           label: <div className="acc-nav-item">{t("usage", "Usage")}</div>,
-        },
-        // {
-        //   key: "emailsStat",
-        //   to: "board/emailsStat/co/-1",
-        //   private: "P",
-        //   icon: IconMail,
-        //   iconcolor: "",
-        //   label: (
-        //     <div className="acc-nav-item">
-        //       {t("dashboard_emails_stts", "Email Share Status")}
-        //     </div>
-        //   ),
-        // },
+          description:t(
+            "usage_desc",
+            "Your central hub for tracking the usage of your current plan, including key metrics and insights."
+          )
+        }, 
       ],
     },
     {
@@ -151,6 +173,34 @@ export const Nav = () => {
       label: (
         <div className="acc-nav-item">{t("my_company_deals", "My Deals")}</div>
       ),
+      description:t(
+        "my_company_deals_desc",
+        "Browse and manage all your deals on the Hub4d platform."
+      ),
+      linkstocreate:[{
+        to: "mydeals#bypasting",
+        icon: IconClipboardPlus,
+        iconcolor: "indigo.5",
+        label: (
+          <div className="acc-nav-item">{t("my_company_deals_create_by_pasting", "Create Deals with Pasting")}</div>
+        ),
+        description:t(
+          "my_company_deals_create_by_pasting_desc",
+          "Quickly add multiple deals by pasting data from your Excel or Google Sheet in a specific order."
+        ),
+      },
+      {
+        to: "mydeals#byai",
+        icon: IconOctagonPlus,
+        iconcolor: "indigo.5",
+        label: (
+          <div className="acc-nav-item">{t("my_company_deals_create_by_ai", "Create Deals with AI")}</div>
+        ),
+        description:t(
+          "my_company_deals_create_by_ai_desc",
+          "Easily add multiple deals by pasting data into the AI parser, which will automatically extract and organize the deals for you."
+        ),
+      }]
     },
     {
       key: "channels",
@@ -161,6 +211,10 @@ export const Nav = () => {
       label: (
         <div className="acc-nav-item">{t("my_channels", "My Channels")}</div>
       ),
+      description:t(
+        "my_channels_desc",
+        "Browse and manage all your channels on the Hub4d platform. A channel refers to any social media that can be accessed through a link, such as WhatsApp, Facebook, LinkedIn groups, and more."
+      )
     },
 
     {
@@ -170,6 +224,10 @@ export const Nav = () => {
       icon: IconTopologyStar3,
       iconcolor: "",
       label: <div className="acc-nav-item">{t("my_shares", "My Shares")}</div>,
+      description:t(
+        "my_shares_desc",
+        "Browse and manage all your shares across channels. Easily update expiration dates, make adjustments, and track key metrics and insights."
+      ),
     },
 
     {
@@ -193,6 +251,10 @@ export const Nav = () => {
       label: (
         <div className="acc-nav-item">{t("report_to_us", "Report To Us")}</div>
       ),
+      description:t(
+        "report_to_us_desc",
+        "Report any technical issues or concerns, and we'll assist you promptly."
+      ),
     },
 
     {
@@ -211,7 +273,16 @@ export const Nav = () => {
       iconcolor: "",
       label: <div className="acc-nav-item">{t("co-admin", "Co-Admin")}</div>,
     },
-  ];
+  ]; 
+  return nav_items
+}
+export const Nav = () => {
+  const { t } = useTranslation("common", { keyPrefix: "navigator" });
+  const { userData, islogged, iscoadmin } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  let hex = G.ifNull(searchParams.get("hex"), "");
+  const hex_q = hex && hex != "" && !islogged ? "/?hex=" + hex : "";
+  const nav_items = NavItems(hex_q)
   const { hidden } = useAuth();
 
   // const [active, setActive] = useState(0);
