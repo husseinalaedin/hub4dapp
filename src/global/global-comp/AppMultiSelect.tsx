@@ -1,20 +1,28 @@
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import {
+  ActionIcon,
   Box,
   CloseButton,
   Combobox,
+  FocusTrap,
+  Group,
   InputBase,
+  List,
   MantineSize,
   MantineStyleProp,
   MantineStyleProps,
+  Modal,
   Pill,
   PillsInput,
   ScrollArea,
   useCombobox,
 } from "@mantine/core";
 import { useGlobalStyl } from "../../hooks/useTheme";
-import { useUncontrolled } from "@mantine/hooks";
+import { useDisclosure, useUncontrolled } from "@mantine/hooks";
 import { G } from "../G";
+import { IconX } from "@tabler/icons-react";
+import { selectMedium, selectSmall } from "../../store/features/ScreenStatus";
+import { useSelector } from "react-redux";
 interface AppMultiSelectProps
   extends Omit<React.ComponentPropsWithoutRef<"div">, "onChange">,
     MantineStyleProps {
@@ -46,8 +54,8 @@ interface AppMultiSelectProps
   rightSection?: any;
   ref?: any;
   charsNotAllowed?: string[];
-  onEmptyEnter?:any;
-  addOnNotFound?:any
+  onEmptyEnter?: any;
+  addOnNotFound?: any;
 }
 export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
   (
@@ -89,6 +97,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
     ref // Receive the ref as the second argument
   ) => {
     const { classes: classesG } = useGlobalStyl();
+
     searchable = !!searchable;
     clearable = !!clearable;
     disabled = !!disabled;
@@ -98,6 +107,8 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
     required = !!required;
     limit = limit && limit > 0 ? limit : 1000000;
     // value = !!value ? value : [];
+    const small = useSelector(selectSmall);
+    const medium = useSelector(selectMedium);
     const [charNotAllowed, setCharNotAllowed] = useState("");
     const [enterClicked, setEnterClicked] = useState("");
     const [defaulted, setDefaulted] = useState(false);
@@ -145,7 +156,6 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       });
     };
     const handleValueByEnter = async () => {
-       
       if (!searchValue || searchValue == "") return;
       let item: any = current_object(searchValue);
       if (!(!item || !item.value)) {
@@ -163,7 +173,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       setValue((current) => current.filter((v) => v !== val));
 
     const _data = data && data.length > 0 ? data : [];
-    const shouldFilterOptions = 
+    const shouldFilterOptions =
       _searchValue &&
       _searchValue !== "" &&
       _data.every(
@@ -201,7 +211,10 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       return item.label;
     };
     const options = filteredOptions
-      ?.filter((item) => !_value?.includes(item?.label) && !_value?.includes(item?.value))
+      ?.filter(
+        (item) =>
+          !_value?.includes(item?.label) && !_value?.includes(item?.value)
+      )
       ?.map((item) => (
         <Combobox.Option
           value={item.value}
@@ -213,19 +226,35 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
           {_renderOption(item)}
         </Combobox.Option>
       ));
-
-    const values = _value && _value?.map && _value?.map((val) => {
-      if (!val || val == "") return <></>;
-      return (
-        <Pill
-          key={val}
-          withRemoveButton={!readOnly}
-          onRemove={() => handleValueRemove(val)}
+    const optionsPup = filteredOptions
+      ?.filter(
+        (item) =>
+          !_value?.includes(item?.label) && !_value?.includes(item?.value)
+      )
+      ?.map((item) => (
+        <List.Item
+          style={{ cursor: "pointer" }}
+          value={item.value}
+          key={item.value}
         >
-          {_renderSelectedValue(val)}
-        </Pill>
-      );
-    });
+          {_renderOption(item)}
+        </List.Item>
+      ));
+    const values =
+      _value &&
+      _value?.map &&
+      _value?.map((val) => {
+        if (!val || val == "") return <></>;
+        return (
+          <Pill
+            key={val}
+            withRemoveButton={!readOnly}
+            onRemove={() => handleValueRemove(val)}
+          >
+            {_renderSelectedValue(val)}
+          </Pill>
+        );
+      });
     const getAllowedValue = (val) => {
       if (charsNotAllowed && charsNotAllowed.length > 0) {
         for (let i = 0; i < charsNotAllowed.length; i++) {
@@ -234,114 +263,144 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       }
       return val;
     };
-    useEffect(() => { 
-      if (enterClicked == "" || !searchValue || searchValue?.trim()=='') return;
-       handleValueByEnter();
+    useEffect(() => {
+      if (enterClicked == "" || !searchValue || searchValue?.trim() == "")
+        return;
+      handleValueByEnter();
     }, [enterClicked]);
-     
+    const showAsPop = true; // small;
     return (
-      <Combobox
-        store={combobox}
-        withinPortal={withinPortal}
-        onOptionSubmit={handleValueSelect}
-        readOnly={readOnly}
-        offset={2}
-        zIndex={1000000000000000}
-      >
-        <Combobox.DropdownTarget>
-          <PillsInput
-            onClick={() => {
-              if (readOnly) return;
-              combobox.openDropdown();
-            }}
+      <>
+        {!showAsPop && (
+          <Combobox
+            store={combobox}
+            withinPortal={withinPortal}
+            onOptionSubmit={handleValueSelect}
+            readOnly={readOnly}
+            offset={2}
+            zIndex={1000000000000000}
+          >
+            <Combobox.DropdownTarget>
+              <PillsInput
+                onClick={() => {
+                  if (readOnly) return;
+                  combobox.openDropdown();
+                }}
+                error={error}
+                onBlur={(e) => {
+                  if (readOnly) return;
+                  combobox.closeDropdown();
+                  if (onBlur) onBlur(e);
+                }}
+                description={description}
+                required={required}
+                label={label}
+                style={style}
+                rightSection={rightSection}
+                w="100%"
+                withAsterisk={withAsterisk}
+              >
+                <Pill.Group>
+                  {values}
+
+                  <Combobox.EventsTarget>
+                    <PillsInput.Field
+                      {...others}
+                      ref={ref}
+                      required={required}
+                      readOnly={readOnly}
+                      onFocus={() => {
+                        if (readOnly) return;
+                        combobox.openDropdown();
+                        combobox.updateSelectedOptionIndex();
+                      }}
+                      onBlur={() => {
+                        if (readOnly) return;
+                        combobox.closeDropdown();
+                      }}
+                      value={_searchValue}
+                      placeholder={placeholder}
+                      onChange={(event) => {
+                        if (readOnly) return;
+                        let allowed_v = getAllowedValue(
+                          event.currentTarget.value
+                        );
+                        combobox.updateSelectedOptionIndex();
+                        setSearch(allowed_v);
+                      }}
+                      onKeyDown={(event) => {
+                        if (readOnly) return;
+                        let lnt =
+                          _searchValue && _searchValue.length > 0
+                            ? _searchValue.length
+                            : 0;
+                        if (event.key === "Backspace" && lnt === 0) {
+                          event.preventDefault();
+                          if (_value && _value.length > 0)
+                            handleValueRemove(_value[_value.length - 1]);
+                        }
+                        if (event.key === "Enter" && lnt > 0) {
+                          setEnterClicked(new Date().getTime().toString());
+                          event.preventDefault();
+                        }
+                        if (event.key === "Enter" && lnt == 0) {
+                          if (onEmptyEnter) onEmptyEnter();
+                          event.preventDefault();
+                        }
+
+                        if (event.key === "Escape") {
+                          event.preventDefault();
+                          onEscape(event);
+                        }
+                      }}
+                    />
+                  </Combobox.EventsTarget>
+                </Pill.Group>
+              </PillsInput>
+            </Combobox.DropdownTarget>
+
+            <Combobox.Dropdown>
+              <Combobox.Options>
+                <ScrollArea.Autosize
+                  mah={
+                    maxDropdownHeight &&
+                    (+maxDropdownHeight > 0 || maxDropdownHeight != "")
+                      ? maxDropdownHeight
+                      : ""
+                  }
+                  style={{ overflowY: "auto" }}
+                  type="scroll"
+                >
+                  {options}
+                </ScrollArea.Autosize>
+              </Combobox.Options>
+            </Combobox.Dropdown>
+          </Combobox>
+        )}
+        {showAsPop && (
+          <PopUpMulti
+            values={values}
+            options={optionsPup}
+            readOnly={readOnly}
             error={error}
-            onBlur={(e) => {
-              if (readOnly) return;
-              combobox.closeDropdown();
-              if (onBlur) onBlur(e);
-            }}
             description={description}
             required={required}
             label={label}
             style={style}
-            rightSection={rightSection}
-            w="100%"
             withAsterisk={withAsterisk}
-          >
-            <Pill.Group>
-              {values}
+            placeholder={placeholder}
+            _searchValue={_searchValue}
+            getAllowedValue={getAllowedValue}
+            setSearch={setSearch}
 
-              <Combobox.EventsTarget>
-                <PillsInput.Field
-                  {...others}
-                  ref={ref}
-                  required={required}
-                  readOnly={readOnly}
-                  onFocus={() => {
-                    if (readOnly) return;
-                    combobox.openDropdown();
-                    combobox.updateSelectedOptionIndex();
-                  }}
-                  onBlur={() => {
-                    if (readOnly) return;
-                    combobox.closeDropdown();
-                  }}
-                  value={_searchValue}
-                  placeholder={placeholder}
-                  onChange={(event) => {
-                    if (readOnly) return;
-                    let allowed_v = getAllowedValue(event.currentTarget.value);
-                    combobox.updateSelectedOptionIndex();
-                    setSearch(allowed_v);
-                  }}
-                  onKeyDown={(event) => {
-                    if (readOnly) return;
-                    let lnt =
-                      _searchValue && _searchValue.length > 0
-                        ? _searchValue.length
-                        : 0;
-                    if (event.key === "Backspace" && lnt === 0) {
-                      event.preventDefault();
-                      if (_value && _value.length > 0)
-                        handleValueRemove(_value[_value.length - 1]);
-                    }
-                    if (event.key === "Enter" && lnt > 0) {
-                      setEnterClicked(new Date().getTime().toString());
-                      event.preventDefault();
-                    }
-                    if (event.key === "Enter" && lnt == 0) {
-                      if (onEmptyEnter) onEmptyEnter();
-                      event.preventDefault();
-                    }
-
-                    if (event.key === "Escape") {
-                      event.preventDefault();
-                      onEscape(event);
-                    }
-                  }}
-                />
-              </Combobox.EventsTarget>
-            </Pill.Group>
-          </PillsInput>
-        </Combobox.DropdownTarget>
-
-        <Combobox.Dropdown>
-          <Combobox.Options>
-            <ScrollArea.Autosize
-              mah={
-                maxDropdownHeight &&
-                (+maxDropdownHeight > 0 || maxDropdownHeight != "")
-                  ? maxDropdownHeight
-                  : ""
-              }
-              style={{ overflowY: "auto" }}
-              type="scroll"
-            >
-              {options}
-            </ScrollArea.Autosize>
-          </Combobox.Options>
-        </Combobox.Dropdown>
-      </Combobox>
+            _value={_value}
+            handleValueRemove={handleValueRemove}
+            setEnterClicked={setEnterClicked}
+            onEmptyEnter={onEmptyEnter}
+            onEscape={onEscape}
+          />
+        )}
+      </>
     );
   }
 );
@@ -376,3 +435,136 @@ export function useAppMultiSelectToAddMissedSearchVal<T>(
 
   return addPendingUpdate;
 }
+const PopUpMulti = (props) => {
+  let {
+    values,
+    options,
+    readOnly,
+    error,
+    description,
+    required,
+    label,
+    style,
+    withAsterisk,
+    placeholder,
+    _searchValue,
+    getAllowedValue,
+    setSearch,
+
+    _value,
+    handleValueRemove,
+    setEnterClicked,
+    onEmptyEnter,
+    onEscape
+  } = props;
+  const [opened, { open, close }] = useDisclosure(false);
+  const { classes: classesG } = useGlobalStyl();
+  const inputRef = useRef<any>(null);
+
+  // useEffect(() => {
+  //   if (forceClose != "") close();
+  // }, [forceClose]);
+  const MultiPop = () => {
+    return (
+      <>
+        <List icon={<></>}>{options}</List>
+      </>
+    );
+  };
+  return (
+    <>
+      <PillsInput
+        onClick={() => {
+          if (readOnly) return;
+          open();
+        }}
+        error={error}
+        description={description}
+        required={required}
+        label={label}
+        style={style}
+        w="100%"
+        withAsterisk={withAsterisk}
+      >
+        <Pill.Group>{values}</Pill.Group>
+      </PillsInput>
+      <Modal
+        fullScreen
+        withCloseButton={false}
+        opened={opened}
+        onClose={() => {
+          close();
+        }}
+        scrollAreaComponent={ScrollArea.Autosize}
+        yOffset={0}
+        pt={0}
+        classNames={{ body: classesG.modalBodyComboBox }}
+        zIndex={1000000000000000}
+        closeOnEscape={false}
+      >
+        <FocusTrap.InitialFocus />
+        <Box pos="relative">
+          <Box pos="sticky" top={0} className={classesG.modalBodyComboBoxTitle}>
+            <Group justify="space-between">
+              <PillsInput
+                error={error}
+                description={description}
+                required={required}
+                label={label}
+                style={style}
+                w="100%"
+                withAsterisk={withAsterisk}
+              >
+                <Pill.Group>
+                  {values}
+                  <PillsInput.Field
+                    placeholder={placeholder}
+                    value={_searchValue}
+                    onChange={(event) => {
+                      if (readOnly) return;
+                      let allowed_v = getAllowedValue(
+                        event.currentTarget.value
+                      );
+                      
+                      setSearch(allowed_v);
+                    }}
+                    onKeyDown={(event) => {
+                      if (readOnly) return;
+                      let lnt =
+                        _searchValue && _searchValue.length > 0
+                          ? _searchValue.length
+                          : 0;
+                      if (event.key === "Backspace" && lnt === 0) {
+                        event.preventDefault();
+                        if (_value && _value.length > 0)
+                          handleValueRemove(_value[_value.length - 1]);
+                      }
+                      if (event.key === "Enter" && lnt > 0) {
+                        setEnterClicked(new Date().getTime().toString());
+                        event.preventDefault();
+                      }
+                      if (event.key === "Enter" && lnt == 0) {
+                        if (onEmptyEnter) onEmptyEnter();
+                        event.preventDefault();
+                      }
+
+                      if (event.key === "Escape") {
+                        event.preventDefault();
+                        onEscape(event);
+                      }
+                    }}
+                
+                  />
+                </Pill.Group>
+              </PillsInput>
+              <ActionIcon onClick={close} variant="transparent" c="red">
+                <IconX />
+              </ActionIcon>
+            </Group>
+          </Box>
+          <MultiPop />
+        </Box>
+      </Modal>
+    </>
+  );
+};

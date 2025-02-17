@@ -1983,6 +1983,7 @@ export const DealSearch = (props) => {
           </Grid.Col>
           <Grid.Col>
             <AppSelect
+            forceDrop={true}
               {...form.getInputProps("doc_status")}
               label={t("doc_status", "Document Status")}
               placeholder={t("doc_status", "Document Status")}
