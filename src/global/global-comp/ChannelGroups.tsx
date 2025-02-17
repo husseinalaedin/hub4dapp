@@ -41,9 +41,10 @@ export const ChannelGroups = ({ dataChannelsGroups, ...others }) => {
   let { value } = others;
   return (
     <AppSelect
+    
       // comboboxProps={{ withinPortal: false }}
       style={{ zIndex: 501 }}
-      // withinPortal={false}
+      withinPortal={false}
       // dropdownjustify="bottom"
       // itemComponent={SelectItem}
       leftSection={<IconBrands brand={value} size={20} />}

@@ -53,6 +53,7 @@ export const AppRoutes = () => (
         <Route path="out-response/:purpose" element={<OutResponse />} />
       </Route>
       <Route path="/app" element={<AppMain />}>
+        <Route path="" element={<QuickAccess />} />
         <Route path="quickaccess" element={<QuickAccess />} />
         <Route path="usage" element={<Usage />} />
 

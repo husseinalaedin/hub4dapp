@@ -1,26 +1,34 @@
 import { useEffect, useState } from "react";
 import { BUILD_API } from "../../../global/G";
-import { useAxiosGet } from "../../../hooks/Https"; 
+import { useAxiosGet } from "../../../hooks/Https";
 
 import {
+  ActionIcon,
   Alert,
   Box,
   Button,
   Card,
   Center,
+  Combobox,
   Grid,
   Group,
   List,
   LoadingOverlay,
   MultiSelect,
   Overlay,
+  ScrollArea,
+  ScrollAreaAutosize,
+  Text,
   Textarea,
+  TextInput,
+  useCombobox,
 } from "@mantine/core";
 import { AppHeader } from "../app-admin/AppHeader";
 import {
   IconAlertCircle,
   IconCircleCheck,
   IconRefresh,
+  IconX,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { changeActive } from "../../../store/features/ActiveNav";
@@ -35,6 +43,9 @@ import {
 } from "../../../global/global-comp/AppMultiSelect";
 import { AppSelect } from "../../../global/global-comp/AppSelect";
 import { useForm } from "@mantine/form";
+import { closeModal, modals } from "@mantine/modals";
+import { Modal } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 
 export const Usage = () => {
   const { t } = useTranslation("private", { keyPrefix: "usage" });
@@ -50,15 +61,16 @@ export const Usage = () => {
     isLoading: isLoading,
     executeGet: executeGet,
   } = useAxiosGet(BUILD_API("usage"), {});
+   
   useEffect(() => {
     executeGet();
   }, []);
   useEffect(() => {
     dispatch(changeActive("usage"));
-  }, []); 
+  }, []);
 
   return (
-    <> 
+    <>
       {isLoading && <Overlay opacity={1} color="#000" zIndex={5} />}
       {isLoading && (
         <LoadingOverlay
@@ -77,7 +89,8 @@ export const Usage = () => {
             <IconRefresh />
           </Button>
         </Group>
-      </AppHeader> 
+      </AppHeader>
+       
       <Box className={classesG.max400} pos="relative" w="100%">
         {data && !isLoading && succeeded && (
           <>
@@ -336,3 +349,4 @@ export const Usage = () => {
     </>
   );
 };
+ 

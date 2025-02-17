@@ -1370,6 +1370,19 @@ export const AppGlobalStylProvider = ({ children }: any) => {
       },
       violet:{
         color:theme.colors.violet[5]
+      },
+      modalBodyComboBox:{
+        paddingTop:`0 !important`
+      },
+      modalBodyComboBoxTitle: {
+        backgroundColor:
+          colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[3],
+      },
+      modalBodyComboBoxTitleHover: {
+        '&:hover':{
+          backgroundColor:
+        colorScheme == "dark" ? theme.colors.teal[7] : theme.colors.indigo[7],
+        }
       }
     };
   });

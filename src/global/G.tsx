@@ -155,12 +155,18 @@ export class G {
 }
 
 
-export const API_URL = "http://localhost:1000/"; // process.env.REACT_APP_API_URL
-export const APP_URL = "http://localhost:5173/"; //process.env.REACT_APP_URL
+// export const API_URL = "http://localhost:1000/"; // process.env.VITE_APP_API_URL
+// export const APP_URL = "http://localhost:5173/"; //process.env.VITE_APP_URL
+// export const PORTAL_URL = "http://localhost:3000/"; //process.env.VITE_APP_URL
+// export const CLOUDFARE_IMAGE_URL1 = `https://imagedelivery.net/1yS6CCx9XkJ-Y7IxgnLbww/`;
 
-export const PORTAL_URL = "http://localhost:3000/"; //process.env.REACT_APP_URL
+export const API_URL =  import.meta.env.VITE_APP_API_URL
+export const APP_URL = import.meta.env.VITE_APP_URL
+export const PORTAL_URL = import.meta.env.VITE_APP_URL
+export const CLOUDFARE_IMAGE_URL1 = import.meta.env.VITE_CLOUDFARE_IMAGE_URL1
+;
 
-export const CLOUDFARE_IMAGE_URL1 = `https://imagedelivery.net/1yS6CCx9XkJ-Y7IxgnLbww/`;
+
 export const BUILD_API = (url) => {
   return API_URL + url;
 };

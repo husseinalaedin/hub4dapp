@@ -16,6 +16,7 @@ export const ActiveSelect = ({ ...others }) => {
     }]
     return (
       <AppSelect
+      forceDrop={true}
         label={t("channel_active", "Active?")}
         // searchable
         clearable

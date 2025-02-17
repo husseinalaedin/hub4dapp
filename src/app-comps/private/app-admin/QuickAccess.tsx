@@ -109,7 +109,7 @@ export const QuickAccess = () => {
               );
             }}
           >
-            {t("show_access_links", "Show Quick Access Links")}
+            {t("quick_access_links", "Quick Access Links")}
           </Button>
           <Button
             fw="normal"
@@ -122,7 +122,7 @@ export const QuickAccess = () => {
               );
             }}
           >
-            {t("show_preferences_links", "Show Preferences Links")}
+            {t("preferences_links", "Preferences Links")}
           </Button>
         </Group>
       </AppHeader>
