@@ -236,6 +236,9 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
           style={{ cursor: "pointer" }}
           value={item.value}
           key={item.value}
+          onClick={()=>{
+            handleValueSelect(item.label);
+          }}
         >
           {_renderOption(item)}
         </List.Item>
