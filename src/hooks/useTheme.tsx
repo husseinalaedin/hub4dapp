@@ -1376,14 +1376,19 @@ export const AppGlobalStylProvider = ({ children }: any) => {
       },
       modalBodyComboBoxTitle: {
         backgroundColor:
-          colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[3],
+          colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.white,
       },
       modalBodyComboBoxTitleHover: {
         '&:hover':{
           backgroundColor:
         colorScheme == "dark" ? theme.colors.teal[7] : theme.colors.indigo[7],
         }
-      }
+      },
+      hoverAppPopComMulti: {
+        backgroundColor:
+        colorScheme == "dark" ? theme.colors.teal[7] : theme.colors.indigo[7],
+      },
+      
     };
   });
   const value = {

@@ -107,7 +107,7 @@ declare module "@tanstack/react-table" {
 function useSkipper() {
   const shouldSkipRef = useRef(true);
   const shouldSkip = shouldSkipRef.current;
- 
+
   const skip = useCallback(() => {
     shouldSkipRef.current = false;
   }, []);
@@ -149,7 +149,7 @@ export const AppTable = forwardRef((props: any, ref) => {
   const [history, setHistory] = useState<any>([]);
   const [redoStack, setRedoStack] = useState<any>([]);
   const [deletedIds, setDeletedIds] = useState<any>([]);
-  const [startCell, setStartCell] = useState<any>(null); 
+  const [startCell, setStartCell] = useState<any>(null);
   const [endCell, setEndCell] = useState<any>(null);
   const [onEdit, setOnEdit] = useState(false);
   const [density, setDensity] = useState<boolean>(true);
@@ -164,7 +164,7 @@ export const AppTable = forwardRef((props: any, ref) => {
   useEffect(() => {
     let initD = JSON.parse(JSON.stringify(data));
     setInitData(initD);
-  }, [afterSaved]); 
+  }, [afterSaved]);
   const cancelChanges = () => {
     let initD = JSON.parse(JSON.stringify(initData));
     setData(initD);
@@ -318,10 +318,10 @@ export const AppTable = forwardRef((props: any, ref) => {
     if (col_ == 0)
       switch (event.key) {
         case "ArrowUp":
-          row_ = -1; 
+          row_ = -1;
           break;
         case "ArrowDown":
-          row_ = 1; 
+          row_ = 1;
           break;
         case "ArrowLeft":
           col_ = -1;
@@ -354,7 +354,7 @@ export const AppTable = forwardRef((props: any, ref) => {
     if (editingCell) return;
     const isPrintableKey =
       (event.key.length === 1 &&
-        !event.ctrlKey && 
+        !event.ctrlKey &&
         !event.metaKey &&
         !event.altKey) ||
       event.key == "Enter" ||
@@ -369,7 +369,6 @@ export const AppTable = forwardRef((props: any, ref) => {
     setEditingCell([startCell.row, startCell.col, targetColId, event.key]);
   };
 
-  
   const [columnResizeMode, setColumnResizeMode] =
     useState<ColumnResizeMode>("onChange");
 
@@ -414,7 +413,7 @@ export const AppTable = forwardRef((props: any, ref) => {
     const lastState = history[history.length - 1];
     const newRedoStack = [data, ...redoStack];
     if (newRedoStack.length > MAX_HISTORY_SIZE) {
-      newRedoStack.pop(); 
+      newRedoStack.pop();
     }
 
     setRedoStack(newRedoStack);
@@ -430,7 +429,7 @@ export const AppTable = forwardRef((props: any, ref) => {
       newHistory.shift();
     }
     setHistory(newHistory);
-    setRedoStack((prev) => prev.slice(1))
+    setRedoStack((prev) => prev.slice(1));
     setData(nextState);
   };
   const saveToHistory = () => {
@@ -778,7 +777,7 @@ export const AppTable = forwardRef((props: any, ref) => {
   const adjustHeight = () => {
     try {
       if (contentRef.current) {
-        window.scrollTo(0, 0); 
+        window.scrollTo(0, 0);
         const topOffset = contentRef.current.getBoundingClientRect().top;
         const availableHeight = window.innerHeight - topOffset - 20;
         setMaxHeight(`${availableHeight}px`);
@@ -940,7 +939,15 @@ export const AppTable = forwardRef((props: any, ref) => {
               </ActionIcon>
             </Popover.Target>
             <Popover.Dropdown p="xs">
-              <Alert icon={<IconHelp />} color="violet" maw="500px">
+              <Alert color="red" maw="500px" mb="xs">
+                <Text size="md">
+                  {t(
+                    "help_excel_work_on_desctop",
+                    "The spreadsheet view works well only on a desktop device."
+                  )}
+                </Text>
+              </Alert>
+              <Alert color="violet" maw="500px">
                 <Text size="md">
                   {t(
                     "help_excel_changes",
@@ -954,7 +961,7 @@ export const AppTable = forwardRef((props: any, ref) => {
                   )}
                 </Text>
               </Alert>
-              <Alert icon={<IconHelp />} color="green" maw="500px" mt="xs">
+              <Alert color="green" maw="500px" mt="xs">
                 <Text size="md">
                   {t(
                     "help_excel_recommendation",
@@ -962,7 +969,7 @@ export const AppTable = forwardRef((props: any, ref) => {
                   )}
                 </Text>
               </Alert>
-              <Alert icon={<IconHelp />} color="red" maw="500px" mt="xs">
+              <Alert color="red" maw="500px" mt="xs">
                 <Text size="md">
                   {t(
                     "help_excel_delete",
@@ -970,7 +977,7 @@ export const AppTable = forwardRef((props: any, ref) => {
                   )}
                 </Text>
               </Alert>
-              <Alert icon={<IconHelp />} color="blue" maw="500px" mt="xs">
+              <Alert color="blue" maw="500px" mt="xs">
                 <Text size="md">
                   {t(
                     "help_excel_behaviors",
@@ -997,7 +1004,7 @@ export const AppTable = forwardRef((props: any, ref) => {
         >
           {/* <ScrollArea maw={"100%"} mx="auto" type="auto"> */}
           <table
-          className="table-container"
+            className="table-container"
             ref={tableRef}
             {...{
               style: {
@@ -1232,7 +1239,7 @@ export function getDivContentWithLineBreaks(divElement) {
 }
 function CheckSave({ t, onSave, disabled, editingCell }) {
   const [opened, { close, open }] = useDisclosure(false);
-  
+
   return (
     <>
       <Modal
@@ -1383,7 +1390,7 @@ const handleRemoveText = (elementRef) => {
   }
 };
 
-export const AddByPaste = ({ isIcon,init }) => {
+export const AddByPaste = ({ isIcon, init }) => {
   const { t } = useTranslation("common", { keyPrefix: "table" });
   const [tableData, setTableData] = useState<any>([]);
   const { classes: classesG } = useGlobalStyl();
@@ -1409,7 +1416,7 @@ export const AddByPaste = ({ isIcon,init }) => {
     if (value == "") return;
     const pastedText = value; // Get pasted text
     const rows = pastedText.split("\n").filter((row) => row.trim() !== ""); // Split by lines and filter empty rows
-   
+
     const parsedData = rows.map((row) => {
       const [type, title, quantity, price, hashtags, description] =
         row.split("\t"); // Split by tab
@@ -1428,24 +1435,24 @@ export const AddByPaste = ({ isIcon,init }) => {
     SetSelectAll0(true);
     selectAll(true);
   }, [value]);
-  
-  useEffect(()=>{
-      if (hash == "bypasting" && !opened && init) {
-        open();
-      }
-  },[hash,opened])
+
+  useEffect(() => {
+    if (hash == "bypasting" && !opened && init) {
+      open();
+    }
+  }, [hash, opened]);
   return (
     <>
       <Modal
         opened={opened}
-        onClose={()=>{
+        onClose={() => {
           window.location.hash = "";
-          close() 
+          close();
         }}
         size="auto"
         withCloseButton={true}
         title={t("adding_deals_by_paste", "Adding deals via pasting...")}
-        fullScreen={small||medium}
+        fullScreen={small || medium}
       >
         <Box>
           <Alert
@@ -1634,7 +1641,7 @@ export const AddByPaste = ({ isIcon,init }) => {
           </table>
         </Box>
         <Textarea
-        autosize
+          autosize
           value={value}
           onChange={(event) => setValue(event.currentTarget.value)}
           // h={100}
@@ -1649,12 +1656,12 @@ export const AddByPaste = ({ isIcon,init }) => {
         <MassDealEntry
           dataSet={tableData}
           setData={setTableData}
-          onClose={()=>{
+          onClose={() => {
             window.location.hash = "";
-            close() 
+            close();
           }}
           onSucceed={(dt) => {
-            window.location.hash = ""; 
+            window.location.hash = "";
             close();
             navigate("../app/mydeals?src=navigator&created_on=" + dt);
           }}
@@ -1672,8 +1679,8 @@ export const AddByPaste = ({ isIcon,init }) => {
         {isIcon && (
           <ActionIcon
             variant="filled"
-            onClick={()=>{
-              window.location.hash = "bypasting"; 
+            onClick={() => {
+              window.location.hash = "bypasting";
             }}
             title={t("add_deals_by_pasting", "Add deals by pasting")}
           >
@@ -1688,10 +1695,10 @@ export const AddByPaste = ({ isIcon,init }) => {
               variant="gradient"
               gradient={{ from: "lime", to: "indigo", deg: 60 }}
               type="button"
-              style={{ width: small || medium ? 'auto' : 150 }}
-              // onClick={open} 
-              onClick={()=>{
-                window.location.hash = "bypasting"; 
+              style={{ width: small || medium ? "auto" : 150 }}
+              // onClick={open}
+              onClick={() => {
+                window.location.hash = "bypasting";
               }}
             >
               <Group>

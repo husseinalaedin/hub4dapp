@@ -104,7 +104,11 @@ export const StripePricingTable = () => {
 
   return (
     <>
-      <AppHeader title={t("plans_n_pricing", "Plans And Pricing")}></AppHeader>
+      <AppHeader title={t("plans_n_pricing", "Plans And Pricing")}>
+        <Group justify="right">
+          <Button variant="transparent"></Button>
+        </Group>
+      </AppHeader>
       <Box className={classesG.editMax800}>
         <Tabs defaultValue="current" variant="outline">
           <Tabs.List justify="flex-start">
@@ -489,7 +493,10 @@ const PlanDetails = ({ data, t }) => {
               <Group gap={"4px"}>
                 <Box opacity="0.75">{t("up_to", "Up to")}</Box>{" "}
                 <strong>
-                  <span className={classesG.violet}>~{`${data.parse_count}`}</span> {t("ai_post_attempts", "AI Attempts")}
+                  <span className={classesG.violet}>
+                    ~{`${data.parse_count}`}
+                  </span>{" "}
+                  {t("ai_post_attempts", "AI Attempts")}
                 </strong>{" "}
                 <Box opacity="0.75">
                   {" "}
@@ -497,8 +504,10 @@ const PlanDetails = ({ data, t }) => {
                     "can_be_used_to_create_deals",
                     "can be used to create deals"
                   )}
-                  {data.id === "FREE" && <span> {t('per_day','per day')}</span>}
-                   ***
+                  {data.id === "FREE" && (
+                    <span> {t("per_day", "per day")}</span>
+                  )}
+                  ***
                 </Box>
               </Group>
             </List.Item>
@@ -539,7 +548,8 @@ const PlanDetails = ({ data, t }) => {
                 {t(
                   "hidden_prfl_n_prvt_access",
                   "Hidden-profile and Private-Access"
-                )} ****
+                )}{" "}
+                ****
               </strong>
             </List.Item>
           </List>
@@ -715,7 +725,7 @@ const FreePlan = ({
   stripeInfo,
 }) => {
   const small = useSelector(selectSmall);
-  const medium = useSelector(selectMedium); 
+  const medium = useSelector(selectMedium);
   const { t } = useTranslation("public", { keyPrefix: "stripe" });
   const [extraCS, setExtraCS] = useState<any>("1");
   const [showCurrent, setShowCurrent] = useState(true);

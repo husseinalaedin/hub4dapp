@@ -130,6 +130,7 @@ export const DealToShareComMain = ({ t, opened, openas, closeToShare }) => {
 
   return (
     <Modal
+      closeOnEscape={false}
       padding={"5px"}
       size="auto"
       className={classesG.PopUpShareBackGRound}
@@ -345,6 +346,7 @@ const DealToShareCom = ({ t, openas, closeToShare }) => {
           className={classesG.popUpBackground}
         >
           <Modal
+            closeOnEscape={false}
             zIndex={100000000}
             opened={sharedOpened}
             onClose={() => {

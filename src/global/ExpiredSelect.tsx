@@ -17,6 +17,7 @@ export const ExpiredSelect = ({ ...others }) => {
     return (
         <AppSelect
             // zIndex={501}
+            forceDrop={true}
             clearable
             withinPortal={false}
             {...others}

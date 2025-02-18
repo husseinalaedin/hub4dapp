@@ -12,15 +12,21 @@ import {
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { changeActive } from "../../../store/features/ActiveNav";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IconListDetails } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import { NavItems } from "./Nav";
 import { AppHeader } from "./AppHeader";
 import { NavAccItems } from "./NavAcc";
+import {
+  selectMedium,
+  selectSmall,
+} from "../../../store/features/ScreenStatus";
 
 export const QuickAccess = () => {
+  const small = useSelector(selectSmall);
+  const medium = useSelector(selectMedium);
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation("common", { keyPrefix: "navigator" });
   const navigate = useNavigate();
@@ -28,7 +34,9 @@ export const QuickAccess = () => {
   let src = searchParams.get("src");
   let titleOly = searchParams.get("titleOnly");
   const [showSiteLinks, setShowSiteLinks] = useState(src == "links");
-  const [titleOnly, setTitleOnly] = useState(!!(titleOly && titleOly == "X"));
+  const [titleOnly0, setTitleOnly0] = useState(
+    (titleOly && titleOly == "Y") || small || medium ? "Y" : "N"
+  );
   useEffect(() => {
     dispatch(changeActive("quickaccess"));
   }, [dispatch]);
@@ -36,8 +44,10 @@ export const QuickAccess = () => {
     setShowSiteLinks(src == "links");
   }, [src]);
   useEffect(() => {
-    setTitleOnly(!!(titleOly && titleOly == "X"));
+    if (!titleOly || titleOly == "") return;
+    setTitleOnly0(titleOly && titleOly == "Y" ? "Y" : "N");
   }, [titleOly]);
+  const titleOnly = titleOnly0 == "Y";
   const NavCard = ({ nav }) => {
     return (
       <UnstyledButton
@@ -105,7 +115,7 @@ export const QuickAccess = () => {
             onClick={() => {
               // setShowSiteLinks(true);
               navigate(
-                "../quickaccess?src=links&titleOnly=" + (titleOnly ? "X" : "")
+                "../quickaccess?src=links&titleOnly=" + (titleOnly ? "Y" : "N")
               );
             }}
           >
@@ -118,7 +128,7 @@ export const QuickAccess = () => {
               // setShowSiteLinks(false);
               navigate(
                 "../quickaccess?src=preferences&titleOnly=" +
-                  (titleOnly ? "X" : "")
+                  (titleOnly ? "Y" : "N")
               );
             }}
           >
@@ -135,7 +145,7 @@ export const QuickAccess = () => {
               "../quickaccess?src=" +
                 src +
                 "&titleOnly=" +
-                (!titleOnly ? "X" : "")
+                (!titleOnly ? "Y" : "N")
             );
           }}
         />

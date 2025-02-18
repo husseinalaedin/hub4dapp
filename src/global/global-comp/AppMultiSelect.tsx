@@ -20,7 +20,7 @@ import {
 import { useGlobalStyl } from "../../hooks/useTheme";
 import { useDisclosure, useUncontrolled } from "@mantine/hooks";
 import { G } from "../G";
-import { IconX } from "@tabler/icons-react";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import { selectMedium, selectSmall } from "../../store/features/ScreenStatus";
 import { useSelector } from "react-redux";
 interface AppMultiSelectProps
@@ -56,6 +56,7 @@ interface AppMultiSelectProps
   charsNotAllowed?: string[];
   onEmptyEnter?: any;
   addOnNotFound?: any;
+  forceDrop?:any
 }
 export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
   (
@@ -92,6 +93,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       charsNotAllowed,
       onEmptyEnter,
       addOnNotFound,
+      forceDrop,
       ...others
     }: AppMultiSelectProps,
     ref // Receive the ref as the second argument
@@ -105,6 +107,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
     withAsterisk = !!withAsterisk;
     withinPortal = !!withinPortal;
     required = !!required;
+    forceDrop = !!forceDrop;
     limit = limit && limit > 0 ? limit : 1000000;
     // value = !!value ? value : [];
     const small = useSelector(selectSmall);
@@ -112,6 +115,8 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
     const [charNotAllowed, setCharNotAllowed] = useState("");
     const [enterClicked, setEnterClicked] = useState("");
     const [defaulted, setDefaulted] = useState(false);
+    const [hoverIndex, setHoverIndex] = useState(-1);
+    const [handlePopFocus,setHandlePopFocus]=useState("")
     const combobox = useCombobox({
       onDropdownClose: () => combobox.resetSelectedOption(),
     });
@@ -141,12 +146,8 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       if (defaultValue && defaultValue.length > 0) setValue(defaultValue);
     }, [defaultValue]);
     const handleValueSelect = (val: string) => {
-      //  const newArr = !value
-      //    ? [val]
-      //    : value.includes(val)
-      //    ? value
-      //    : [...value, val];
-      //  setValue(newArr);
+      // setHandlePopFocus('F'+new Date().getTime().toString())
+      setHoverIndex(-1);
       setSearch("");
       setValue((current) => {
         if (!current) return [val];
@@ -210,6 +211,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
       if (!item || !item.label) return val;
       return item.label;
     };
+
     const options = filteredOptions
       ?.filter(
         (item) =>
@@ -226,23 +228,44 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
           {_renderOption(item)}
         </Combobox.Option>
       ));
+    const handleKeyDown = (event) => {
+      if (optionsLength === 0) return;
+
+      if (event.key === "ArrowDown") {
+        setHandlePopFocus('B'+new Date().getTime().toString())
+        setHoverIndex((prev) => (prev + 1) % optionsLength);
+      } else if (event.key === "ArrowUp") {
+        setHandlePopFocus('B'+new Date().getTime().toString())
+        setHoverIndex((prev) => (prev - 1 + optionsLength) % optionsLength);
+      } else if (event.key === "Enter" && hoverIndex >= 0) {
+        handleValueSelect(optionsPup[hoverIndex].props.value);
+      }
+    };
     const optionsPup = filteredOptions
       ?.filter(
         (item) =>
           !_value?.includes(item?.label) && !_value?.includes(item?.value)
       )
-      ?.map((item) => (
+      ?.map((item, index) => (
         <List.Item
           style={{ cursor: "pointer" }}
           value={item.value}
           key={item.value}
-          onClick={()=>{
+          onClick={() => {
             handleValueSelect(item.label);
           }}
+          className={`${
+            hoverIndex === index ? classesG.hoverAppPopComMulti : ""
+          }`}
         >
           {_renderOption(item)}
         </List.Item>
       ));
+    const optionsLength = optionsPup.length;
+    useEffect(() => {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [hoverIndex, optionsPup]);
     const values =
       _value &&
       _value?.map &&
@@ -271,7 +294,7 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
         return;
       handleValueByEnter();
     }, [enterClicked]);
-    const showAsPop = true; // small;
+    const showAsPop = small && !forceDrop;;
     return (
       <>
         {!showAsPop && (
@@ -395,12 +418,15 @@ export const AppMultiSelect = forwardRef<any, AppMultiSelectProps>(
             _searchValue={_searchValue}
             getAllowedValue={getAllowedValue}
             setSearch={setSearch}
-
             _value={_value}
             handleValueRemove={handleValueRemove}
             setEnterClicked={setEnterClicked}
             onEmptyEnter={onEmptyEnter}
             onEscape={onEscape}
+            handlePopFocus={handlePopFocus}
+            onFocus={()=>{
+              setHoverIndex(-1)
+            }}
           />
         )}
       </>
@@ -458,15 +484,21 @@ const PopUpMulti = (props) => {
     handleValueRemove,
     setEnterClicked,
     onEmptyEnter,
-    onEscape
+    onEscape,
+    handlePopFocus,
+    onFocus
   } = props;
   const [opened, { open, close }] = useDisclosure(false);
   const { classes: classesG } = useGlobalStyl();
   const inputRef = useRef<any>(null);
 
-  // useEffect(() => {
-  //   if (forceClose != "") close();
-  // }, [forceClose]);
+  useEffect(() => {
+    if (handlePopFocus == "") return;
+    try {
+      if (handlePopFocus.slice(0, 1) == "F") inputRef.current.focus();
+      else inputRef.current.blur();
+    } catch (error) {}
+  }, [handlePopFocus]);
   const MultiPop = () => {
     return (
       <>
@@ -474,6 +506,17 @@ const PopUpMulti = (props) => {
       </>
     );
   };
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        event.stopPropagation(); 
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
   return (
     <>
       <PillsInput
@@ -489,7 +532,11 @@ const PopUpMulti = (props) => {
         w="100%"
         withAsterisk={withAsterisk}
       >
-        <Pill.Group>{values}</Pill.Group>
+        <Pill.Group>
+          {values}
+
+          <PillsInput.Field placeholder={placeholder} readOnly={true} />
+        </Pill.Group>
       </PillsInput>
       <Modal
         fullScreen
@@ -505,63 +552,70 @@ const PopUpMulti = (props) => {
         zIndex={1000000000000000}
         closeOnEscape={false}
       >
-        <FocusTrap.InitialFocus />
         <Box pos="relative">
           <Box pos="sticky" top={0} className={classesG.modalBodyComboBoxTitle}>
             <Group justify="space-between">
-              <PillsInput
-                error={error}
-                description={description}
-                required={required}
-                label={label}
-                style={style}
-                w="100%"
-                withAsterisk={withAsterisk}
-              >
-                <Pill.Group>
-                  {values}
-                  <PillsInput.Field
-                    placeholder={placeholder}
-                    value={_searchValue}
-                    onChange={(event) => {
-                      if (readOnly) return;
-                      let allowed_v = getAllowedValue(
-                        event.currentTarget.value
-                      );
-                      
-                      setSearch(allowed_v);
-                    }}
-                    onKeyDown={(event) => {
-                      if (readOnly) return;
-                      let lnt =
-                        _searchValue && _searchValue.length > 0
-                          ? _searchValue.length
-                          : 0;
-                      if (event.key === "Backspace" && lnt === 0) {
-                        event.preventDefault();
-                        if (_value && _value.length > 0)
-                          handleValueRemove(_value[_value.length - 1]);
-                      }
-                      if (event.key === "Enter" && lnt > 0) {
-                        setEnterClicked(new Date().getTime().toString());
-                        event.preventDefault();
-                      }
-                      if (event.key === "Enter" && lnt == 0) {
-                        if (onEmptyEnter) onEmptyEnter();
-                        event.preventDefault();
-                      }
+              <Box style={{ flex: 1 }}>
+                <PillsInput
+                  error={error}
+                  description={description}
+                  required={required}
+                  label={label}
+                  style={style}
+                  w="100%"
+                  withAsterisk={withAsterisk}
+                >
+                  <Pill.Group>
+                    {values}
+                    <PillsInput.Field
+                    data-autofocus
+                      ref={inputRef}
+                      placeholder={placeholder}
+                      value={_searchValue}
+                      onChange={(event) => {
+                        if (readOnly) return;
+                        let allowed_v = getAllowedValue(
+                          event.currentTarget.value
+                        );
 
-                      if (event.key === "Escape") {
-                        event.preventDefault();
-                        onEscape(event);
-                      }
-                    }}
-                
-                  />
-                </Pill.Group>
-              </PillsInput>
-              <ActionIcon onClick={close} variant="transparent" c="red">
-                <IconX />
+                        setSearch(allowed_v);
+                      }}
+                      onKeyDown={(event) => {
+                        if (readOnly) return;
+                        let lnt =
+                          _searchValue && _searchValue.length > 0
+                            ? _searchValue.length
+                            : 0;
+                        if (event.key === "Backspace" && lnt === 0) {
+                          event.preventDefault();
+                          if (_value && _value.length > 0)
+                            handleValueRemove(_value[_value.length - 1]);
+                        }
+                        if (event.key === "Enter" && lnt > 0) {
+                          setEnterClicked(new Date().getTime().toString());
+                          event.preventDefault();
+                        }
+                        if (event.key === "Enter" && lnt == 0) {
+                          if (onEmptyEnter) onEmptyEnter();
+                          event.preventDefault();
+                        }
+
+                        if (event.key === "Escape") {
+                          event.preventDefault();
+                          onEscape(event);
+                        }
+                      }}
+                      onFocus={()=>{
+                        if(onFocus)
+                          onFocus()
+                      }}
+                    />
+                  </Pill.Group>
+                </PillsInput>
+              </Box>
+
+              <ActionIcon onClick={close} variant="transparent" c="teal">
+                <IconCheck />
               </ActionIcon>
             </Group>
           </Box>

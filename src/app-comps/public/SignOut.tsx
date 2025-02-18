@@ -4,6 +4,7 @@ import { BUILD_API, BUILD_PORTAL_URL, useMessage } from "../../global/G";
 import { useEffect } from "react";
 import { useAuth } from "../../providers/AuthProvider";
 import { useGlobalStyl } from "../../hooks/useTheme";
+import { AppHeader } from "../private/app-admin/AppHeader";
 
 export const SignOut = () => {
 
@@ -25,6 +26,18 @@ export const SignOut = () => {
     }, [succeeded, errorMessage])
     return (
       <Box>
+        <AppHeader title={''}>
+        {/* <Group justify="right" gap="xs">
+          <Button
+            variant="default"
+            onClick={(val) => {
+              executeGet();
+            }}
+          >
+            <IconRefresh />
+          </Button>
+        </Group> */}
+      </AppHeader>
         {!islogged && (
           <Box>
             <Title>You’ve successfully logged out!</Title>

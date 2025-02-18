@@ -115,20 +115,20 @@ export const NavAccItems=()=>{
       label: <div className="acc-nav-item">line</div>,
     },
 
-    {
-      key: "help",
-      to: "",
-      private: "N",
-      icon: IconHelp,
-      label: <div className="acc-nav-item">{t("help", "Help")}</div>,
-    },
-    {
-      key: "about",
-      to: "",
-      private: "N",
-      icon: IconInfoSquare,
-      label: <div className="acc-nav-item">{t("about", "About")}</div>,
-    },
+    // {
+    //   key: "help",
+    //   to: "",
+    //   private: "N",
+    //   icon: IconHelp,
+    //   label: <div className="acc-nav-item">{t("help", "Help")}</div>,
+    // },
+    // {
+    //   key: "about",
+    //   to: "",
+    //   private: "N",
+    //   icon: IconInfoSquare,
+    //   label: <div className="acc-nav-item">{t("about", "About")}</div>,
+    // },
     {
       key: "singup",
       to: "../pub/sign-up",
@@ -195,6 +195,9 @@ const NavAccItemsComp = (props: any) => {
 
     setActive(index);
     if (!navAccItems[index].keepDrawerOpen && props && props.andCloseDrawer) {
+      if(props.onLinkClicked){
+        props.onLinkClicked()
+      }
       props.andCloseDrawer();
       if (small2 && opened2) {
         dispatch(toggle());
@@ -211,7 +214,7 @@ const NavAccItemsComp = (props: any) => {
         ) {
           switch (item.key) {
             case "line":
-              return <div key={item.key} className="acc-nav-line"></div>;
+              return <Box key={item.key} className="acc-nav-line" mb="md" mt="lg"></Box>;
             case "theme":
               return (
                 <NavLink
@@ -337,6 +340,7 @@ export const NavAcc = (props: any) => {
           </ActionIcon>
         </Group>
         <NavAccItemsComp
+          onLinkClicked={props.onLinkClicked}
           andCloseDrawer={() => {
             if (props && props.state_changed) props.state_changed(false);
             setOpened(false);

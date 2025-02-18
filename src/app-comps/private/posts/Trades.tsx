@@ -861,7 +861,7 @@ export const TradesSearch = ({ action, grid, src }) => {
               label={
                 <Group justify="flex-start" gap={0}>
                   <Box>{t("hashtag_all", "Hashtag(All)#")}</Box>
-                  <HashtagsAlert withinPortal={false} />
+                  <HashtagsAlert withinPortal={false} withPaste={false} />
                 </Group>
               }
               {...form.getInputProps("hashtags_and")}
@@ -879,7 +879,7 @@ export const TradesSearch = ({ action, grid, src }) => {
               label={
                 <Group justify="flex-start" gap={0}>
                   <Box>{t("hashtag_any", "Hashtag(Any)#")}</Box>
-                  <HashtagsAlert withinPortal={false} />
+                  <HashtagsAlert withinPortal={false}  withPaste={false}/>
                 </Group>
               }
               {...form.getInputProps("hashtags_or")}

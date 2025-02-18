@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { AppSelect } from "../global/global-comp/AppSelect";
 export const pageSizes = [
-  { value: "1", label: "1" },
+  // { value: "1", label: "1" },
   { value: "6", label: "6" },
   { value: "10", label: "10" },
   { value: "24", label: "24" },
@@ -79,6 +79,7 @@ export const Pages = ({ data, small }) => {
         }}
       />
       <AppSelect
+        forceDrop={true}
         size="md"
         // mt="lg"
         maw="100"

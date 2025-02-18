@@ -192,33 +192,10 @@ export const Companies = () => {
       <AppHeader
         title={t("channel_title_company_directory", "Company Directory")}
       >
-        {/* <Group mt="xs" justify="right" gap="xs" >
-                    <Button variant="default" onClick={(val) => {
-                        refresh()
-                    }}>
-                        <IconRefresh />
-                    </Button>
-
-                </Group> */}
-        {/* <Group mt="xs" justify="right" gap="xs" >
-                    <Button size="sm" variant="light" type="button" color="red.9" onClick={() => {
-                        setSearchAction(() => {
-                            return 'CLEAR' + (new Date()).getTime().toString()
-                        })
-                    }}>
-                        <Group justify="space-between">
-                            <IconAdjustmentsOff style={{ transform: 'rotate(90deg)' }} />
-                            {!small && <>{t('clear_filters', 'Clear Filters')}</>}
-                        </Group>let hex = G.ifNull(searchParams.get("hex"), "");
-                    </Button>
-                </Group> */}
-        {/* <Group mt="xs" justify="right" gap="xs" >
-                    <ClearButton t={t} small={small} onClear={() => {
-                        setSearchAction(() => {
-                            return 'CLEAR' + (new Date()).getTime().toString()
-                        })
-                    }} />
-                </Group> */}
+        <Group justify="right" gap={small || medium ? "2px" : "xs"}>
+          <Box></Box>
+          <Button variant="transparent"></Button>
+        </Group>
       </AppHeader>
       <Box style={{ width: "100%" }}>
         <Stack justify="flex-start" gap={0}>

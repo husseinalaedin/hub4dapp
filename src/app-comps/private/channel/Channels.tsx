@@ -697,6 +697,7 @@ export const AddEditChannelMain = ({ fromPopup, onSaved }: any) => {
   const [edit, setEdit] = useState<boolean>(false);
 
   useEffect(() => {
+    if(fromPopup) return
     dispatch(changeActive("channels"));
   }, []);
   const navigate = useNavigate();

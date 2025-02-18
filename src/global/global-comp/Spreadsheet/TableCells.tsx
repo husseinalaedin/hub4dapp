@@ -101,7 +101,7 @@ export const HashTagHeader = ({ table }) => {
   return (
     <Group justify="center" gap={0}>
       <Box>Hashtags</Box>
-      <HashtagsAlert withinPortal={true} />
+      <HashtagsAlert withinPortal={true} withPaste={true} />
     </Group>
   );
 };

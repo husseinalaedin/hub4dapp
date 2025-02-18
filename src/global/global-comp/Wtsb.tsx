@@ -58,6 +58,7 @@ export const WtsbMulti = ({ ...others }) => {
   } = useDbData();
   return (
     <AppMultiSelect
+    forceDrop={true}
       label={t("deal_type", "Deal Type")}
       {...others}
       renderOption={renderWtsWtbDropVOption}

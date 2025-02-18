@@ -308,6 +308,7 @@ export function Wtsb4BoardSearch({
 export const HashTagsInput = forwardRef<any, any>(
   ({ readOnly,addOnNotFound, ...others }, ref) => {
     let {initSearchValue}:any = { ...others };
+    let {addOnNotFound:addOnNotFound0}:any = { ...others };
     const { error, succeed, info } = useMessage();
     const [searchValue, onSearchChange] = useState(initSearchValue);
     //   const [value, setValue] = useState<any>(defaultValue);
@@ -321,6 +322,7 @@ export const HashTagsInput = forwardRef<any, any>(
       return [];
     });
     let handlnotfound = useAppMultiSelectToAddMissedSearchVal<any>(setHashData);
+     
     useEffect(() => {
       let errorMsg = errorMessageHashGet;
       if (errorMsg) error(errorMsg);
@@ -397,7 +399,7 @@ export const SplitHashtags = (hashtags) => {
   if (trm === "") return [];
   return [trm];
 };
-export const HashtagsAlert = ({ withinPortal }) => {
+export const HashtagsAlert = ({ withinPortal,withPaste }) => {
   const { t } = useTranslation("common", { keyPrefix: "table" });
   return (
     <Popover
@@ -433,14 +435,15 @@ export const HashtagsAlert = ({ withinPortal }) => {
               `When you press Enter, it marks the end of the hashtag, and it will be treated as a single hashtag phrase.`
             )}
           </Text>
-          <Text size="md" mt="xs">
+         {withPaste && <Text size="md" mt="xs">
             {t(
               "hashtag_allowence",
               `However, if you want to paste the hashtags, they must be separated either by the # symbol or by commas.`
             )}
           </Text>
+}
         </Alert>
-        <Alert variant="light" color="teal" mt="xs">
+        {withPaste && <Alert variant="light" color="teal" mt="xs">
           <Text size="md" mt="xs">
             {t("hashtag_example", `e.g grade A,Grade B,iphone 15 promax,used`)}
           </Text>
@@ -453,7 +456,7 @@ export const HashtagsAlert = ({ withinPortal }) => {
               `Either one will be converted to: [grade A] [Grade B] [iphone 15 promax] [used]`
             )}
           </Text>
-        </Alert>
+        </Alert>}
       </Popover.Dropdown>
     </Popover>
   );

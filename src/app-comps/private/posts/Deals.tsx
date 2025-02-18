@@ -1574,7 +1574,6 @@ export const AddEditDeal0 = () => {
 
             <Grid.Col span={{ base: 12 }}>
               <TextInput
-                c="green"
                 withAsterisk
                 autoComplete="off"
                 label={t("deal_title", "Title")}
@@ -1588,14 +1587,35 @@ export const AddEditDeal0 = () => {
               </Text>
             </Grid.Col>
             <Grid.Col span={{ base: 12 }}>
-              <AppMultiSelect
+            <HashTagsInput
+            {...form.getInputProps("hashtags")}
+              addOnNotFound={true}
+              withAsterisk={false}
+               
+              readOnly={disableSave}
+              data={ArrayToAppSelect(
+                hashData && hashData.length > 0 ? hashData : []
+              )}
+              // label="Hashtag#"
+                // placeholder="#"
+                searchable
+              label={
+                <Group justify="flex-start" gap={0}>
+                  <Box>{"Hashtag#"}</Box>
+                  <Box c="red.9" ml="5px">*</Box>
+                  <HashtagsAlert withinPortal={false} withPaste={false}/>
+                </Group>
+              }
+              {...form.getInputProps("hashtags")}
+              withinPortal={true}
+              placeholder={t("enter_hashtags", "Please Enter#")}
+              w="100%"
+              
+            />
+              {/* <AppMultiSelect
+                addOnNotFound={true}
                 readOnly={disableSave}
                 {...form.getInputProps("hashtags")}
-                // onKeyDown={(event) => {
-                //   if (event.code === "Space") {
-                //     event.preventDefault();
-                //   }
-                // }}
                 required
                 withAsterisk={true}
                 data={ArrayToAppSelect(
@@ -1611,16 +1631,7 @@ export const AddEditDeal0 = () => {
                 }}
                 clearable
                 maxDropdownHeight={250}
-                // valueComponent={HashValue}
-                // itemComponent={HashItem}
                 limit={20}
-                // nothingFoundMessage={(query) => `+ Create ${query}`}
-                // onCreate={(query) => {
-                //   const item = { value: query, label: query };
-                //   setHashData((current) => [...current, item]);
-                //   return item;
-                // }}
-
                 createOnNotFound={async (val) => {
                   return await handlnotfound({ value: val, label: val });
                 }}
@@ -1628,7 +1639,7 @@ export const AddEditDeal0 = () => {
                   "hashtags_infor_message",
                   "Add hashtags that best fit your deal, as they will help improve its visibility in searches."
                 )}
-              />
+              /> */}
             </Grid.Col>
             <Grid.Col span={{ base: 12 }}>
               <Group gap={0} justify="left">
@@ -1983,7 +1994,7 @@ export const DealSearch = (props) => {
           </Grid.Col>
           <Grid.Col>
             <AppSelect
-            forceDrop={true}
+              forceDrop={true}
               {...form.getInputProps("doc_status")}
               label={t("doc_status", "Document Status")}
               placeholder={t("doc_status", "Document Status")}
@@ -2044,13 +2055,12 @@ export const DealSearch = (props) => {
           </Grid.Col>
           <Grid.Col>
             <HashTagsInput
-              // zIndex={30000000}
               addOnNotFound={false}
               withAsterisk={false}
               label={
                 <Group justify="flex-start" gap={0}>
                   <Box>{t("hashtag_all", "Hashtag(All)#")}</Box>
-                  <HashtagsAlert withinPortal={false} />
+                  <HashtagsAlert withinPortal={false}  withPaste={false}/>
                 </Group>
               }
               {...form.getInputProps("hashtags_and")}
@@ -2063,12 +2073,12 @@ export const DealSearch = (props) => {
           <Grid.Col>
             <HashTagsInput
               // zIndex={30000000}
-              addOnNotFound={false}
+              addOnNotFound={true}
               withAsterisk={false}
               label={
                 <Group justify="flex-start" gap={0}>
-                  <Box>{t("hashtag_any", "Hashtag(Any)#")}</Box>
-                  <HashtagsAlert withinPortal={false} />
+                  <Box>{t("hashtag_any", "Hashtag(Any)##")}</Box>
+                  <HashtagsAlert withinPortal={false}  withPaste={false}/>
                 </Group>
               }
               {...form.getInputProps("hashtags_or")}
@@ -2565,7 +2575,7 @@ const ParseDeal = ({ onApply }) => {
   const [value, setValue] = useState("");
   const [dealCount, setDealCount] = useState<string | null>("");
   const [dealDataCount, setDealDataCount] = useState([]);
-  const [aiModel,setAiModel]= useState<string | null>("");
+  const [aiModel, setAiModel] = useState<string | null>("");
   const [activeTab, setActiveTab] = useState<string | null>("input");
 
   const [selectAll0, SetSelectAll0] = useState(false);
@@ -2585,7 +2595,7 @@ const ParseDeal = ({ onApply }) => {
   } = useAxiosPost(BUILD_API("ai-parse-deal"), {
     deal: value,
     count: dealCount,
-    ai_model:aiModel
+    ai_model: aiModel,
   });
   const {
     data: dataPlanInfo,
@@ -2624,11 +2634,10 @@ const ParseDeal = ({ onApply }) => {
   useEffect(() => {
     if (errorMessagePlanInfo) error("Plan Info Error:" + errorMessagePlanInfo);
     if (succeededPlanInfo) {
-      setAiModel(()=>{
-        if(ai_model_info.length==1)
-            return ai_model_info[0]['model_name']
-          return null
-      })
+      setAiModel(() => {
+        if (ai_model_info.length == 1) return ai_model_info[0]["model_name"];
+        return null;
+      });
       let cnt: any = [];
       if (dataDealCount && +dataDealCount > 0) {
         for (let i = 1; i <= +dataDealCount; i++) {
@@ -2646,11 +2655,10 @@ const ParseDeal = ({ onApply }) => {
     if (succeeded) {
       setActiveTab("output");
       setDealCount(null);
-      setAiModel(()=>{
-        if(ai_model_info.length==1)
-            return ai_model_info[0]['model_name']
-          return null
-      })
+      setAiModel(() => {
+        if (ai_model_info.length == 1) return ai_model_info[0]["model_name"];
+        return null;
+      });
       SetSelectAll0(true);
       selectAll(true);
       executeGetPlanInfo();
@@ -2786,15 +2794,12 @@ Pack Boxes
                 maw={350}
                 value={aiModel}
                 onChange={setAiModel}
-                label={t(
-                  "ai_model_used",
-                  "AI model used to extract the deals"
-                )}
-                placeholder={t("select_ai_model", "Select AI Model") }
+                label={t("ai_model_used", "AI model used to extract the deals")}
+                placeholder={t("select_ai_model", "Select AI Model")}
                 data={ai_model_info?.map((itm) => {
                   return {
                     value: itm.model_name,
-                    label: itm.model_name+` - ${itm.parse_count_left} `,
+                    label: itm.model_name + ` - ${itm.parse_count_left} `,
                   };
                 })}
                 description={t(
@@ -2829,7 +2834,12 @@ Pack Boxes
                 </Button>
                 <Button
                   disabled={
-                    !value || value == "" || !dealCount || dealCount == "" || !aiModel||aiModel==''
+                    !value ||
+                    value == "" ||
+                    !dealCount ||
+                    dealCount == "" ||
+                    !aiModel ||
+                    aiModel == ""
                   }
                   onClick={parse}
                   variant="gradient"
@@ -3134,6 +3144,7 @@ const CreatedTree = ({ onDateClick }) => {
             overlayProps={{ radius: "sm", blur: 2 }}
           />
           <AppSelect
+          forceDrop={true}
             value={value}
             onChange={setValue}
             label={t("doc_status", "Document Status")}

@@ -177,7 +177,13 @@ export const AppMain0 = () => {
             </Box>
           </AppShell.Section>
           <AppShell.Section grow mt="md" component={ScrollArea}>
-            {nav_is_main && <Nav />}
+            {nav_is_main && (
+              <Nav
+                onLinkClicked={() => {
+                  // toggle();
+                }}
+              />
+            )}
             {/* <AiSessions /> */}
           </AppShell.Section>
           <AppShell.Section>
@@ -250,22 +256,17 @@ export const AppMain = () => {
   const { HeaderComponent }: any = useAppHeaderNdSide();
   const small = useSelector(selectSmall);
   const medium = useSelector(selectMedium);
-  const padng =  small ? "sm" : medium ? "md" : "lg";
+  const padng = small ? "sm" : medium ? "md" : "lg";
   const { classes: classesG } = useGlobalStyl();
   const { desktopFocus }: any = useAppHeaderNdSide();
   return (
     <AppShell
       header={{
         height:
-          HeaderComponent && !HeaderComponent.CoHeader
-            ? (small
-              ? 60
-              : 66
-            )
-            : 0,
+          HeaderComponent && !HeaderComponent.CoHeader ? (small ? 60 : 66) : 0,
       }}
       navbar={{
-        width:  300,
+        width: 300,
         breakpoint: "sm",
         collapsed: { mobile: !opened, desktop: desktopFocus },
       }}
@@ -288,7 +289,11 @@ export const AppMain = () => {
               />
               {(opened || !small) && (
                 <Box w={small ? "" : "300px"} className={classesG.userBorder}>
-                  <NavAcc />
+                  <NavAcc
+                    onLinkClicked={() => {
+                      if (opened) toggle();
+                    }}
+                  />
                 </Box>
               )}
             </Group>
@@ -314,7 +319,11 @@ export const AppMain = () => {
       )}
 
       <AppShell.Navbar p="md">
-        <Nav />
+        <Nav
+          onLinkClicked={() => {
+            if (opened) toggle();
+          }}
+        />
       </AppShell.Navbar>
 
       <AppShell.Main>
@@ -341,7 +350,6 @@ export const AppMain = () => {
           <Box p={padng}>
             <Outlet />
           </Box>
-          
         </Box>
       </AppShell.Main>
     </AppShell>

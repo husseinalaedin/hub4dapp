@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Card,
   Flex,
   Group,
@@ -263,7 +264,7 @@ const DefaultShareExpire = () => {
   let [defaultExpireShare, setDefaultExpireShare] = useState(() => {
     let val = userData["default_expire_share_in_days"];
     if (!val) val = 2;
-    console.log(val,"FFFF")
+    console.log(val, "FFFF");
     return val;
   });
   let {
@@ -293,6 +294,11 @@ const DefaultShareExpire = () => {
   }, []);
   return (
     <Box pos="relative">
+      <AppHeader title={t("user_settings", "User Settings")}>
+        <Group justify="right">
+          <Button variant="transparent"></Button>
+        </Group>
+      </AppHeader>
       <LoadingOverlay
         visible={isLoading}
         overlayProps={{ radius: "sm", blur: 2 }}

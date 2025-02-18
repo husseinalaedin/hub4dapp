@@ -276,7 +276,7 @@ export const NavItems=(hex_q)=>{
   ]; 
   return nav_items
 }
-export const Nav = () => {
+export const Nav = ({onLinkClicked}) => {
   const { t } = useTranslation("common", { keyPrefix: "navigator" });
   const { userData, islogged, iscoadmin } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -325,7 +325,8 @@ export const Nav = () => {
             </Group>
           }
           onClick={() => {
-            dispatch(closeMenu());
+            if(onLinkClicked)
+              onLinkClicked()
           }}
         >
           {item.links?.map((item2, index2) => {
@@ -341,6 +342,10 @@ export const Nav = () => {
                     <item2.icon size={22} stroke={1.5} />
                   </Group>
                 }
+                onClick={() => {
+                  if(onLinkClicked)
+                    onLinkClicked()
+                }}
               />
             );
           })}

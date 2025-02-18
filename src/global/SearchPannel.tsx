@@ -464,6 +464,7 @@ export const SearchPannel = (props) => {
         </Box>
       </Box>
       <Drawer
+      closeOnEscape={false}
        removeScrollProps={{
         allowPinchZoom: true, // Allow pinch to zoom on mobile devices
       }}

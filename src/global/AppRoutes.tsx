@@ -31,7 +31,7 @@ import { AddEditDeal, CompanyDeals } from "../app-comps/private/posts/Deals";
 import { SignOut } from "../app-comps/public/SignOut";
 import { StripePricingTable } from "../app-comps/private/acc/Stripe";
 import { Usage } from "../app-comps/private/dashboard/Usage";
-import { Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 import { Box } from "@mantine/core";
 import Home2 from "../app-comps/public/Home";
 import { QuickAccess } from "../app-comps/private/app-admin/QuickAccess";
@@ -53,7 +53,7 @@ export const AppRoutes = () => (
         <Route path="out-response/:purpose" element={<OutResponse />} />
       </Route>
       <Route path="/app" element={<AppMain />}>
-        <Route path="" element={<QuickAccess />} />
+        <Route path="" element={<Navigate to="quickaccess?src=links" replace />} />
         <Route path="quickaccess" element={<QuickAccess />} />
         <Route path="usage" element={<Usage />} />
 
