@@ -131,14 +131,14 @@ export const NavAccItems=()=>{
     // },
     {
       key: "singup",
-      to: "../pub/sign-up",
+      to: "../app/pub/sign-up",
       private: "C",
       icon: IconUserPlus,
       label: <div className="acc-nav-item">{t("sign_up", "Sign Up")}</div>,
     },
     {
       key: "singin",
-      to: "../pub/sign-in",
+      to: "../app/pub/sign-in",
       private: "C",
       icon: IconLogin,
       label: <div className="acc-nav-item">{t("sign_in", "Sign In")}</div>,

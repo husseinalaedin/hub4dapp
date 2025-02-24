@@ -3,11 +3,12 @@ import react from '@vitejs/plugin-react'
 import { reactRouter } from "@react-router/dev/vite";
  
 export default defineConfig({
-  
+  base:'/app/',
   plugins: [
     reactRouter(),
     
   ],
+  
   // build: {
   //   sourcemap: true,
   //   outDir:"dist",

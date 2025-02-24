@@ -59,19 +59,25 @@ export const SignIn = () => {
       onLogin(data, postError);
       if (searchParams) {
         let id = searchParams.get("id");
-        if (id && id != "") navigate(`/app/trades/t/${id}`);
-        else {
+        if (id && id != "") {
+          navigate(`/app/trades/t/${id}`);
+          return;
+        } else {
           let co_id = searchParams.get("co_id");
-          if (co_id && co_id != "") navigate(`/app/trades/t?co_id=${co_id}`);
-          else {
+          if (co_id && co_id != "") {
+            navigate(`/app/trades/t?co_id=${co_id}`);
+            return;
+          } else {
             let hashtags_and = searchParams.get("hashtags_and");
             if (hashtags_and && hashtags_and != "") {
               hashtags_and = encodeURIComponent(hashtags_and);
               navigate(`/app/trades/t?hashtags_and=${hashtags_and}`);
+              return
             }
           }
         }
       }
+      navigate(`/app`)
     }
   }, [succeeded]);
 
@@ -84,16 +90,18 @@ export const SignIn = () => {
     <div
       style={{
         width: "100%",
-        margin: "auto",
+        // margin: "auto",
         position: "relative",
-        marginTop: "50px",
+        // marginTop: "50px",
         padding: "5px",
       }}
     >
-      <LoadingOverlay
-        visible={isLoading}
-        overlayProps={{ radius: "sm", blur: 2 }}
-      />
+      {isLoading && (
+        <LoadingOverlay
+          visible={isLoading}
+          overlayProps={{ radius: "sm", blur: 2 }}
+        />
+      )}
       <OutResponse />
       <form onSubmit={post}>
         <TextInput
@@ -118,6 +126,7 @@ export const SignIn = () => {
         </Button>
         {errorMessage && (
           <Notification
+             mt="xs"
             icon={<IconX size={18} />}
             color="red"
             title={t("sign_in_error", `Sign in error!`)}
@@ -134,14 +143,14 @@ export const SignIn = () => {
           size="lg"
           variant="outline"
           component={Link}
-          to="/out-email-request/verif_email"
+          to="/app/pub/out-email-request/verif_email"
         >
           {/* {t("Send a verification email request!.")} */}
           {t(`send_verify_email`, "Send a verification email request!.")}
         </Button>
       )}
       <p>
-        <Link to="/out-email-request/reset_pwd">
+        <Link to="/app/pub/out-email-request/reset_pwd">
           {t(`trouble_sign_in`, "Trouble sign in?")}
         </Link>
       </p>
@@ -161,9 +170,11 @@ export const SendVeriOrResetPwdfEmail = () => {
     },
   });
 
-  let url = "",
-    title = "",
-    title_failed = "";
+  let title="",
+    url = "",
+    notif_title_msg = "",
+    failed_notif_title_msg = "";
+  
   const {
     data,
     postError,
@@ -176,23 +187,25 @@ export const SendVeriOrResetPwdfEmail = () => {
 
   switch (purpose) {
     case "verif_email":
+      title=t('verify_email','Verify Eamil')
       url = BUILD_API("send_verif_email");
-      title = t(
+      notif_title_msg = t(
         "verif_email_sent_succ",
         `Verification email successfully sent!.`
       );
-      title_failed = t(
+      failed_notif_title_msg = t(
         "verif_email_sent_failed",
         `Verification email sent failed!.`
       );
       break;
     case "reset_pwd":
+      title=t('reset_pwd','Reset Password')
       url = BUILD_API("send_reset_pwd_email");
-      title = t(
+      notif_title_msg = t(
         "reset_email_sent_succ",
         `Password reset email successfully sent!.`
       );
-      title_failed = t(
+      failed_notif_title_msg = t(
         "reset_email_sent_failed",
         `Password reset email sent failed!.`
       );
@@ -220,6 +233,7 @@ export const SendVeriOrResetPwdfEmail = () => {
         visible={isLoading}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
+      <h1>{title}</h1>
       <form onSubmit={post}>
         <TextInput
           size="lg"
@@ -238,7 +252,7 @@ export const SendVeriOrResetPwdfEmail = () => {
         <Notification
           icon={<IconCheck size={18} />}
           color="teal"
-          title={title}
+          title={notif_title_msg}
           withCloseButton={false}
         >
           {data["message"]}
@@ -248,7 +262,7 @@ export const SendVeriOrResetPwdfEmail = () => {
         <Notification
           icon={<IconX size={18} />}
           color="red"
-          title={title_failed}
+          title={failed_notif_title_msg}
           withCloseButton={false}
         >
           {errorMessage}

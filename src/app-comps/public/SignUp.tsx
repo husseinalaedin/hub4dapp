@@ -122,10 +122,10 @@ export const SignUp = () => {
   return (
     <div
       style={{
-        width: "500px",
-        margin: "auto",
+        width: "100%",
+        // margin: "auto",
         position: "relative",
-        marginTop: "50px",
+        // marginTop: "50px",
         padding: "5px",
       }}
     >

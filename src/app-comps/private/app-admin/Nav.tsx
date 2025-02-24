@@ -45,7 +45,7 @@ export const NavItems=(hex_q)=>{
   const nav_items = [
     {
       key: "hub4d",
-      to: BUILD_PORTAL_URL("back"),
+      to: BUILD_PORTAL_URL(""),
       private: "N",
       icon: IconLogout2,
       icon_class: "",
@@ -53,16 +53,16 @@ export const NavItems=(hex_q)=>{
       label: <div className="acc-nav-item">{t("hub4d", "Hub4d")}</div>,
       description:''
     },
-    {
-      key: "home",
-      to: "/pub",
-      private: "N",
-      icon: IconHome,
-      icon_class: "",
-      iconcolor: "",
-      label: <div className="acc-nav-item">{t("home", "Home")}</div>,
-      description:''
-    },
+    // {
+    //   key: "home",
+    //   to: "/app/pub",
+    //   private: "N",
+    //   icon: IconHome,
+    //   icon_class: "",
+    //   iconcolor: "",
+    //   label: <div className="acc-nav-item">{t("home", "Home")}</div>,
+    //   description:''
+    // },
     {
       key: "quickaccess",
       to: "quickaccess?src=links",

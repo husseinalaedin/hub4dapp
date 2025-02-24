@@ -162,7 +162,7 @@ export class G {
 
 export const API_URL =  import.meta.env.VITE_APP_API_URL
 export const APP_URL = import.meta.env.VITE_APP_URL
-export const PORTAL_URL = import.meta.env.VITE_APP_URL
+export const PORTAL_URL = import.meta.env.VITE_PORTAL_URL
 export const CLOUDFARE_IMAGE_URL1 = import.meta.env.VITE_CLOUDFARE_IMAGE_URL1
 ;
 

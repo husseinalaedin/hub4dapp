@@ -40,9 +40,8 @@ export const AppRoutes = () => (
   <>
     <Routes>
       <Route path="" element={<Home2 />} />
-
       <Route path="/:shareidhex" element={<Main />} />
-      <Route path="/pub" element={<Home2 />}>
+      <Route path="/app/pub" element={<Home2 />}>
         <Route path="sign-up" element={<SignUp />} />
         <Route path="sign-in" element={<SignIn />} />
         <Route path="sign-out" element={<SignOut />} />
@@ -53,7 +52,10 @@ export const AppRoutes = () => (
         <Route path="out-response/:purpose" element={<OutResponse />} />
       </Route>
       <Route path="/app" element={<AppMain />}>
-        <Route path="" element={<Navigate to="quickaccess?src=links" replace />} />
+        <Route
+          path=""
+          element={<Navigate to="quickaccess?src=links" replace />}
+        />
         <Route path="quickaccess" element={<QuickAccess />} />
         <Route path="usage" element={<Usage />} />
 

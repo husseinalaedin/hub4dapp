@@ -24,7 +24,7 @@ export const OutResponse = () => {
         width: "100%",
         margin: "auto",
         position: "relative",
-        marginTop: "50px",
+        // marginTop: "50px",
         padding: "5px",
       }}
     >
