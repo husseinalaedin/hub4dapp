@@ -72,12 +72,12 @@ export const SignIn = () => {
             if (hashtags_and && hashtags_and != "") {
               hashtags_and = encodeURIComponent(hashtags_and);
               navigate(`/app/trades/t?hashtags_and=${hashtags_and}`);
-              return
+              return;
             }
           }
         }
       }
-      navigate(`/app`)
+      navigate(`/app`);
     }
   }, [succeeded]);
 
@@ -126,7 +126,7 @@ export const SignIn = () => {
         </Button>
         {errorMessage && (
           <Notification
-             mt="xs"
+            mt="xs"
             icon={<IconX size={18} />}
             color="red"
             title={t("sign_in_error", `Sign in error!`)}
@@ -170,11 +170,11 @@ export const SendVeriOrResetPwdfEmail = () => {
     },
   });
 
-  let title="",
+  let title = "",
     url = "",
     notif_title_msg = "",
     failed_notif_title_msg = "";
-  
+
   const {
     data,
     postError,
@@ -187,7 +187,7 @@ export const SendVeriOrResetPwdfEmail = () => {
 
   switch (purpose) {
     case "verif_email":
-      title=t('verify_email','Verify Eamil')
+      title = t("verify_email", "Verify Eamil");
       url = BUILD_API("send_verif_email");
       notif_title_msg = t(
         "verif_email_sent_succ",
@@ -199,7 +199,7 @@ export const SendVeriOrResetPwdfEmail = () => {
       );
       break;
     case "reset_pwd":
-      title=t('reset_pwd','Reset Password')
+      title = t("reset_pwd", "Reset Password");
       url = BUILD_API("send_reset_pwd_email");
       notif_title_msg = t(
         "reset_email_sent_succ",
@@ -215,8 +215,7 @@ export const SendVeriOrResetPwdfEmail = () => {
   }
 
   const post = (e: any) => {
-    e.preventDefault();
-    executePost();
+    executePost({ url_e: url });
     // setPostStamp((new Date()).getTime())
   };
   return (
@@ -234,20 +233,24 @@ export const SendVeriOrResetPwdfEmail = () => {
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       <h1>{title}</h1>
-      <form onSubmit={post}>
-        <TextInput
-          size="lg"
-          mt="md"
-          withAsterisk
-          label={t("email", `Email`)}
-          placeholder={t("email", `Email`)}
-          {...form.getInputProps("email")}
-        />
+      {!succeeded && (
+        <>
+          <TextInput
+            size="lg"
+            mt="md"
+            withAsterisk
+            label={t("email", `Email`)}
+            placeholder={t("email", `Email`)}
+            {...form.getInputProps("email")}
+          />
 
-        <Button type="submit" mt="md" size="lg" variant="outline">
-          {t("request", "Request")}
-        </Button>
-      </form>
+          <Button  mt="md" size="lg" variant="outline" onClick={(e)=>{
+            post(e)
+          }}>
+            {t("request", "Request")}
+          </Button>
+        </>
+      )}
       {succeeded && (
         <Notification
           icon={<IconCheck size={18} />}
