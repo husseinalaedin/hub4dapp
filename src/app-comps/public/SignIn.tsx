@@ -5,6 +5,8 @@ import {
   LoadingOverlay,
   PasswordInput,
   Notification,
+  Popover,
+  Progress,
 } from "@mantine/core";
 
 import { IconCheck, IconX } from "@tabler/icons-react";
@@ -16,6 +18,7 @@ import { useForm } from "@mantine/form";
 import { useAxiosPost } from "../../hooks/Https";
 import { BUILD_API } from "../../global/G";
 import { OutResponse } from "./OutResponse";
+import { getStrength, PasswordRequirement, requirements } from "./PasswordExt";
 
 export const SignIn = () => {
   const { t } = useTranslation("public", { keyPrefix: "sign_in" });
@@ -23,7 +26,7 @@ export const SignIn = () => {
   const [values, setValues] = useState<any>();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-
+  // const [value, setValue] = useState("");
   const form = useForm({
     initialValues: {
       first_name: "",
@@ -41,6 +44,7 @@ export const SignIn = () => {
         value.length < 5 ? t("invalid_password", "'Invalid Password'") : null,
     },
   });
+
   // const onCompleted=()=>{
   //     onLogin(data, null);
   // }
@@ -81,8 +85,7 @@ export const SignIn = () => {
     }
   }, [succeeded]);
 
-  const post = (e: any) => {
-    e.preventDefault();
+  const post = () => {
     executePost();
   };
 
@@ -90,9 +93,7 @@ export const SignIn = () => {
     <div
       style={{
         width: "100%",
-        // margin: "auto",
         position: "relative",
-        // marginTop: "50px",
         padding: "5px",
       }}
     >
@@ -103,7 +104,7 @@ export const SignIn = () => {
         />
       )}
       <OutResponse />
-      <form onSubmit={post}>
+      <>
         <TextInput
           size="lg"
           mt="md"
@@ -121,7 +122,14 @@ export const SignIn = () => {
           placeholder={t("password", `Password`)}
           {...form.getInputProps("password")}
         />
-        <Button type="submit" mt="md" size="lg" style={{ width: "175px" }}>
+        <Button
+          mt="md"
+          size="lg"
+          style={{ width: "175px" }}
+          onClick={() => {
+            post();
+          }}
+        >
           {t("sign_in", "Sign In")}
         </Button>
         {errorMessage && (
@@ -135,7 +143,7 @@ export const SignIn = () => {
             {errorMessage}
           </Notification>
         )}
-      </form>
+      </>
       {errorCode == "ACC_NOT_ACTIVATED_YET" && (
         <Button
           type="button"
@@ -187,7 +195,7 @@ export const SendVeriOrResetPwdfEmail = () => {
 
   switch (purpose) {
     case "verif_email":
-      title = t("verify_email", "Verify Eamil");
+      title = t("verify_email", "Verify Email");
       url = BUILD_API("send_verif_email");
       notif_title_msg = t(
         "verif_email_sent_succ",
@@ -222,9 +230,7 @@ export const SendVeriOrResetPwdfEmail = () => {
     <div
       style={{
         width: "100%",
-        margin: "auto",
         position: "relative",
-        marginTop: "50px",
         padding: "5px",
       }}
     >
@@ -232,7 +238,7 @@ export const SendVeriOrResetPwdfEmail = () => {
         visible={isLoading}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
-      <h1>{title}</h1>
+      <h3>{title}</h3>
       {!succeeded && (
         <>
           <TextInput
@@ -244,9 +250,14 @@ export const SendVeriOrResetPwdfEmail = () => {
             {...form.getInputProps("email")}
           />
 
-          <Button  mt="md" size="lg" variant="outline" onClick={(e)=>{
-            post(e)
-          }}>
+          <Button
+            mt="md"
+            size="lg"
+            variant="outline"
+            onClick={(e) => {
+              post(e);
+            }}
+          >
             {t("request", "Request")}
           </Button>
         </>
@@ -283,14 +294,26 @@ export const ResetPWD = () => {
   const form = useForm({
     initialValues: { password: "", conf_password: "", token: token },
 
-    // functions will be used to validate values at corresponding key
     validate: {
       password: (value) =>
         value.length < 5 ? t("ivalid_password", "Invalid password") : null,
       conf_password: (value) =>
-        value.length < 5 ? t("ivalid_password", "Invalid password") : null,
+        getStrength(t, form.values.password) < 100
+          ? t("ivalid_password", "Invalid password")
+          : null,
     },
   });
+  const strength = getStrength(t, form.values.password);
+  const color = strength === 100 ? "teal" : strength > 40 ? "yellow" : "red";
+  const [popoverOpened, setPopoverOpened] = useState(false);
+  const checks = requirements(t).map((requirement, index) => (
+    <PasswordRequirement
+      key={index}
+      label={requirement.label}
+      meets={requirement.re.test(form.values.password)}
+    />
+  ));
+
   let {
     data,
     postError,
@@ -302,8 +325,7 @@ export const ResetPWD = () => {
   } = useAxiosPost(BUILD_API("reset_pwd"), form.values);
 
   useEffect(() => {}, [data, postError, succeeded, errorMessage]);
-  const post = (e: any) => {
-    e.preventDefault();
+  const post = () => {
     form.validate();
     if (!form.isValid()) return;
     if (form.values.password != form.values.conf_password) {
@@ -312,16 +334,13 @@ export const ResetPWD = () => {
       });
       return;
     }
-
     executePost();
   };
   return (
     <div
       style={{
-        width: "500px",
-        margin: "auto",
+        width: "100%",
         position: "relative",
-        marginTop: "50px",
         padding: "5px",
       }}
     >
@@ -330,19 +349,44 @@ export const ResetPWD = () => {
         overlayProps={{ radius: "sm", blur: 2 }}
       />
       {!succeeded && (
-        <form onSubmit={post}>
-          <PasswordInput
-            size="lg"
-            mt="md"
-            withAsterisk
-            label={t("password", "Password")}
-            placeholder={t("password", "Password")}
-            {...form.getInputProps("password")}
-            description={t(
-              "pass_must_include_xyz",
-              "Password must include at least one letter, number and special character"
-            )}
-          />
+        <>
+          <Popover
+            opened={popoverOpened}
+            position="bottom"
+            width="target"
+            transitionProps={{ transition: "pop" }}
+          >
+            <Popover.Target>
+              <div
+                onFocusCapture={() => setPopoverOpened(true)}
+                onBlurCapture={() => setPopoverOpened(false)}
+              >
+                <PasswordInput
+                  size="lg"
+                  mt="md"
+                  withAsterisk
+                  label={t("password", "Password")}
+                  placeholder={t("password", "Password")}
+                  {...form.getInputProps("password")}
+                  description={t(
+                    "pass_must_include_xyz",
+                    "Password must include at least one letter, number and special character"
+                  )}
+                />
+              </div>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <Progress color={color} value={strength} size={5} mb="xs" />
+              <PasswordRequirement
+                label={t(
+                  "pwd_include_atlst_6chars",
+                  "Includes at least 6 characters"
+                )}
+                meets={form.values.password.length > 5}
+              />
+              {checks}
+            </Popover.Dropdown>
+          </Popover>
 
           <PasswordInput
             size="lg"
@@ -361,10 +405,16 @@ export const ResetPWD = () => {
             />
           </div>
 
-          <Button type="submit" mt="md" size="lg">
+          <Button
+            mt="md"
+            size="lg"
+            onClick={() => {
+              post();
+            }}
+          >
             {t("reset_password", "Reset password")}
           </Button>
-        </form>
+        </>
       )}
       {succeeded && (
         <Notification

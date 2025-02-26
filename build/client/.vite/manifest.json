@@ -1,0 +1,57 @@
+{
+  "_chunk-IR6S3I6Y-tj9AlM_o.js": {
+    "file": "assets/chunk-IR6S3I6Y-tj9AlM_o.js",
+    "name": "chunk-IR6S3I6Y"
+  },
+  "_index-I5J48u6I.js": {
+    "file": "assets/index-I5J48u6I.js",
+    "name": "index",
+    "imports": [
+      "_chunk-IR6S3I6Y-tj9AlM_o.js"
+    ]
+  },
+  "_with-props-BhvFzedm.js": {
+    "file": "assets/with-props-BhvFzedm.js",
+    "name": "with-props",
+    "imports": [
+      "_chunk-IR6S3I6Y-tj9AlM_o.js"
+    ]
+  },
+  "src/catchall.tsx?__react-router-build-client-route": {
+    "file": "assets/catchall-skqiHGTe.js",
+    "name": "catchall",
+    "src": "src/catchall.tsx?__react-router-build-client-route",
+    "isEntry": true,
+    "imports": [
+      "_with-props-BhvFzedm.js",
+      "_chunk-IR6S3I6Y-tj9AlM_o.js",
+      "_index-I5J48u6I.js"
+    ],
+    "css": [
+      "assets/catchall-nyeOxEbN.css"
+    ]
+  },
+  "src/entry.client.tsx": {
+    "file": "assets/entry.client-YEtdTJZP.js",
+    "name": "entry.client",
+    "src": "src/entry.client.tsx",
+    "isEntry": true,
+    "imports": [
+      "_chunk-IR6S3I6Y-tj9AlM_o.js",
+      "_index-I5J48u6I.js"
+    ]
+  },
+  "src/root.tsx?__react-router-build-client-route": {
+    "file": "assets/root-CFY0ohmn.js",
+    "name": "root",
+    "src": "src/root.tsx?__react-router-build-client-route",
+    "isEntry": true,
+    "imports": [
+      "_with-props-BhvFzedm.js",
+      "_chunk-IR6S3I6Y-tj9AlM_o.js"
+    ],
+    "css": [
+      "assets/root-1jzT5-nj.css"
+    ]
+  }
+}

@@ -5,6 +5,8 @@ import {
   LoadingOverlay,
   PasswordInput,
   Notification,
+  Popover,
+  Progress,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 
@@ -15,6 +17,7 @@ import { useParams, useSearchParams } from "react-router";
 import { showNotification } from "@mantine/notifications";
 import { useAxiosGet, useAxiosPost } from "../../hooks/Https";
 import { BUILD_API, G } from "../../global/G";
+import { getStrength, PasswordRequirement, requirements } from "./PasswordExt";
 
 export const SignUp = () => {
   let [signUpValues, setSignUpValues] = useState<any>(null);
@@ -67,9 +70,14 @@ export const SignUp = () => {
       email: (value) =>
         /^\S+@\S+$/.test(value) ? null : t("invalid_eamil", "Invalid email"),
       password: (value) =>
-        value.length < 5 ? t("ivalid_password", "Invalid password") : null,
+        getStrength(t, form.values.password)<100 ? t("ivalid_password", "Invalid password") : null,
     },
   });
+  
+  const strength = getStrength(t, form.values.password);
+  const color = strength === 100 ? "teal" : strength > 40 ? "yellow" : "red";
+  const [popoverOpened, setPopoverOpened] = useState(false);
+
   let {
     data,
     postError,
@@ -93,7 +101,6 @@ export const SignUp = () => {
     if (team_company_errorMessage)
       showNotification({
         id: "notify_failed",
-        // disallowClose: true,
         autoClose: G.delay(team_company_errorMessage),
         title: t("post_failed", "Failed!."),
         message: team_company_errorMessage,
@@ -102,9 +109,18 @@ export const SignUp = () => {
         loading: false,
       });
   }, [team_company_succeeded, team_company_errorMessage]);
-  const post = (e: any) => {
+
+  const checks = requirements(t).map((requirement, index) => (
+    <PasswordRequirement
+      key={index}
+      label={requirement.label}
+      meets={requirement.re.test(form.values.password)}
+    />
+  ));
+
+
+  const post = () => {
     let url = "";
-    e.preventDefault();
     form.validate();
     if (!form.isValid()) return;
     if (!memberToJoinTeam) {
@@ -123,9 +139,7 @@ export const SignUp = () => {
     <div
       style={{
         width: "100%",
-        // margin: "auto",
         position: "relative",
-        // marginTop: "50px",
         padding: "5px",
       }}
     >
@@ -133,8 +147,9 @@ export const SignUp = () => {
         visible={isLoading}
         overlayProps={{ radius: "sm", blur: 2 }}
       />
+      
       {!succeeded && (
-        <form onSubmit={post}>
+        <>
           <TextInput
             disabled={memberToJoinTeam}
             size="lg"
@@ -171,23 +186,58 @@ export const SignUp = () => {
             placeholder={t("email", "Email")}
             {...form.getInputProps("email")}
           />
-          <PasswordInput
-            size="lg"
-            mt="md"
-            withAsterisk
-            label={t("password", "Password")}
-            placeholder={t("password", "Password")}
-            {...form.getInputProps("password")}
-            description={t(
-              "pass_must_include_xyz",
-              "Password must include at least one letter, number and special character"
-            )}
-          />
+          {/*  */}
 
-          <Button type="submit" mt="md" size="lg" style={{ width: "175px" }}>
+          <Popover
+            opened={popoverOpened}
+            position="bottom"
+            width="target"
+            transitionProps={{ transition: "pop" }}
+          >
+            <Popover.Target>
+              <div
+                onFocusCapture={() => setPopoverOpened(true)}
+                onBlurCapture={() => setPopoverOpened(false)}
+              >
+                <PasswordInput
+                  {...form.getInputProps("password")}
+                  inputMode="none"
+                  size="lg"
+                  mt="md"
+                  withAsterisk
+                  label={t("password", "Password")}
+                  placeholder={t("password", "Password")}
+                  description={t(
+                    "pass_must_include_xyz",
+                    "Password must include at least one letter, number and special character"
+                  )}
+                  autoComplete="off"
+                />
+              </div>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <Progress color={color} value={strength} size={5} mb="xs" />
+              <PasswordRequirement
+                label={t(
+                  "pwd_include_atlst_6chars",
+                  "Includes at least 6 characters"
+                )}
+                meets={form.values.password.length > 5}
+              />
+              {checks}
+            </Popover.Dropdown>
+          </Popover>
+          <Button
+            mt="md"
+            size="lg"
+            style={{ width: "175px" }}
+            onClick={() => {
+              post();
+            }}
+          >
             {t("sign_up", "Sign Up")}
           </Button>
-        </form>
+        </>
       )}
       {succeeded && (
         <Notification
